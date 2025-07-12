@@ -7,4 +7,10 @@
  * @flow
  */
 
-export {createRoot, hydrateRoot, version} from './src/client/ReactDOMClient';
+import { createRoot, hydrateRoot, version } from "./src/client/ReactDOMClient";
+
+const ReactDOMClient = { createRoot, hydrateRoot, version };
+
+export { createRoot, hydrateRoot, version };
+
+export default ReactDOMClient;

@@ -8,3 +8,14 @@
 'use strict';
 
 export * from './src/forks/Scheduler';
+
+export {
+  log,
+  unstable_flushAllWithoutAsserting,
+  unstable_flushNumberOfYields,
+  unstable_flushExpired,
+  unstable_flushUntilNextPaint,
+  unstable_flushAll,
+  unstable_advanceTime,
+  unstable_setDisableYieldValue,
+} from "./src/forks/SchedulerMock";
