@@ -258,6 +258,7 @@ export function createContainer(
   onDefaultTransitionIndicator: () => void | (() => void),
   transitionCallbacks: null | TransitionTracingCallbacks,
 ): OpaqueRoot {
+  // 浏览器端渲染，hydrate标记为false
   const hydrate = false;
   const initialChildren = null;
   const root = createFiberRoot(

@@ -227,7 +227,7 @@ function createFiberImplClass(
   tag: WorkTag,
   pendingProps: mixed,
   key: null | string,
-  mode: TypeOfMode,
+  mode: TypeOfMode, // ? mode的含义
 ): Fiber {
   // $FlowFixMe[invalid-constructor]: the shapes are exact here but Flow doesn't like constructors
   return new FiberNode(tag, pendingProps, key, mode);
@@ -526,11 +526,14 @@ export function createHostRootFiber(
 ): Fiber {
   let mode;
   if (disableLegacyMode || tag === ConcurrentRoot) {
+    // 并发模式 1
     mode = ConcurrentMode;
     if (isStrictMode === true) {
+      // 严格模式下的生命周期双调用
       mode |= StrictLegacyMode | StrictEffectsMode;
     }
   } else {
+    // 传统模式（非并发模式）0
     mode = NoMode;
   }
 
@@ -538,6 +541,7 @@ export function createHostRootFiber(
     // Always collect profile timings when DevTools are present.
     // This enables DevTools to start capturing timing at any point–
     // Without some nodes in the tree having empty base times.
+    // 性能分析
     mode |= ProfileMode;
   }
 

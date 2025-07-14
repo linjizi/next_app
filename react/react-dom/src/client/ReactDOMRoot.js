@@ -180,6 +180,7 @@ export function createRoot(
 
   const concurrentUpdatesByDefaultOverride = false;
   let isStrictMode = false;
+  // ? 似乎仅用于dev环境
   let identifierPrefix = '';
   let onUncaughtError = defaultOnUncaughtError;
   let onCaughtError = defaultOnCaughtError;
@@ -236,7 +237,7 @@ export function createRoot(
 
   const root = createContainer(
     container,
-    ConcurrentRoot,
+    ConcurrentRoot, // 1，使用并发模式渲染
     null,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,

@@ -738,6 +738,7 @@ export function getCurrentTime(): number {
   return now();
 }
 
+// 给更新计算优先级
 export function requestUpdateLane(fiber: Fiber): Lane {
   // Special cases
   const mode = fiber.mode;
