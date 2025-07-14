@@ -240,6 +240,7 @@ export const enableComponentPerformanceTrack = __EXPERIMENTAL__;
 
 // Adds user timing marks for e.g. state updates, suspense, and work loop stuff,
 // for an experimental timeline tool.
+/** false */
 export const enableSchedulingProfiler: boolean =
   !enableComponentPerformanceTrack && __PROFILE__;
 

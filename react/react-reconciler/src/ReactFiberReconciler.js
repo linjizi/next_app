@@ -404,6 +404,7 @@ function updateContainerImpl(
     onScheduleRoot(container, element);
   }
 
+  // enableSchedulingProfiler：false
   if (enableSchedulingProfiler) {
     markRenderScheduled(lane);
   }
@@ -454,6 +455,7 @@ function updateContainerImpl(
   const root = enqueueUpdate(rootFiber, update, lane);
   if (root !== null) {
     startUpdateTimerByLane(lane, 'root.render()');
+    // root.pendingLanes = 32 && firstScheduledRoot = lastScheduledRoot = root;
     scheduleUpdateOnFiber(root, rootFiber, lane);
     entangleTransitions(root, rootFiber, lane);
   }
