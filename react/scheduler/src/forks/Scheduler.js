@@ -12,7 +12,6 @@
 import type {PriorityLevel} from '../SchedulerPriorities';
 
 import {
-  enableProfiling,
   frameYieldMs,
   userBlockingPriorityTimeout,
   lowPriorityTimeout,
@@ -31,18 +30,6 @@ import {
   LowPriority,
   IdlePriority,
 } from '../SchedulerPriorities';
-import {
-  markTaskRun,
-  markTaskYield,
-  markTaskCompleted,
-  markTaskCanceled,
-  markTaskErrored,
-  markSchedulerSuspended,
-  markSchedulerUnsuspended,
-  markTaskStart,
-  stopLoggingProfilingEvents,
-  startLoggingProfilingEvents,
-} from '../SchedulerProfiling';
 
 export type Callback = boolean => ?Callback;
 
@@ -76,7 +63,9 @@ if (hasPerformanceNow) {
 var maxSigned31BitInt = 1073741823;
 
 // Tasks are stored on a min heap
+// 立即队列
 var taskQueue: Array<Task> = [];
+// 延迟队列
 var timerQueue: Array<Task> = [];
 
 // Incrementing id counter. Used to maintain insertion order.
@@ -112,10 +101,6 @@ function advanceTimers(currentTime: number) {
       pop(timerQueue);
       timer.sortIndex = timer.expirationTime;
       push(taskQueue, timer);
-      if (enableProfiling) {
-        markTaskStart(timer, currentTime);
-        timer.isQueued = true;
-      }
     } else {
       // Remaining timers are pending.
       return;
@@ -142,14 +127,11 @@ function handleTimeout(currentTime: number) {
 }
 
 function flushWork(initialTime: number) {
-  if (enableProfiling) {
-    markSchedulerUnsuspended(initialTime);
-  }
-
   // We'll need a host callback the next time work is scheduled.
   isHostCallbackScheduled = false;
   if (isHostTimeoutScheduled) {
     // We scheduled a timeout but it's no longer needed. Cancel it.
+    // ? 为什么取消掉delay任务
     isHostTimeoutScheduled = false;
     cancelHostTimeout();
   }
@@ -157,31 +139,12 @@ function flushWork(initialTime: number) {
   isPerformingWork = true;
   const previousPriorityLevel = currentPriorityLevel;
   try {
-    if (enableProfiling) {
-      try {
-        return workLoop(initialTime);
-      } catch (error) {
-        if (currentTask !== null) {
-          const currentTime = getCurrentTime();
-          // $FlowFixMe[incompatible-call] found when upgrading Flow
-          markTaskErrored(currentTask, currentTime);
-          // $FlowFixMe[incompatible-use] found when upgrading Flow
-          currentTask.isQueued = false;
-        }
-        throw error;
-      }
-    } else {
-      // No catch in prod code path.
-      return workLoop(initialTime);
-    }
+    // No catch in prod code path.
+    return workLoop(initialTime);
   } finally {
     currentTask = null;
     currentPriorityLevel = previousPriorityLevel;
     isPerformingWork = false;
-    if (enableProfiling) {
-      const currentTime = getCurrentTime();
-      markSchedulerSuspended(currentTime);
-    }
   }
 }
 
@@ -191,6 +154,7 @@ function workLoop(initialTime: number) {
   currentTask = peek(taskQueue);
   while (currentTask !== null) {
     if (!enableAlwaysYieldScheduler) {
+      // ? expirationTime
       if (currentTask.expirationTime > currentTime && shouldYieldToHost()) {
         // This currentTask hasn't expired, and we've reached the deadline.
         break;
@@ -205,10 +169,7 @@ function workLoop(initialTime: number) {
       currentPriorityLevel = currentTask.priorityLevel;
       // $FlowFixMe[incompatible-use] found when upgrading Flow
       const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
-      if (enableProfiling) {
-        // $FlowFixMe[incompatible-call] found when upgrading Flow
-        markTaskRun(currentTask, currentTime);
-      }
+
       const continuationCallback = callback(didUserCallbackTimeout);
       currentTime = getCurrentTime();
       if (typeof continuationCallback === 'function') {
@@ -216,19 +177,10 @@ function workLoop(initialTime: number) {
         // regardless of how much time is left in the current time slice.
         // $FlowFixMe[incompatible-use] found when upgrading Flow
         currentTask.callback = continuationCallback;
-        if (enableProfiling) {
-          // $FlowFixMe[incompatible-call] found when upgrading Flow
-          markTaskYield(currentTask, currentTime);
-        }
+
         advanceTimers(currentTime);
         return true;
       } else {
-        if (enableProfiling) {
-          // $FlowFixMe[incompatible-call] found when upgrading Flow
-          markTaskCompleted(currentTask, currentTime);
-          // $FlowFixMe[incompatible-use] found when upgrading Flow
-          currentTask.isQueued = false;
-        }
         if (currentTask === peek(taskQueue)) {
           pop(taskQueue);
         }
@@ -324,6 +276,7 @@ function unstable_wrapCallback<T: (...Array<mixed>) => mixed>(callback: T): T {
   };
 }
 
+// scheduler任务调度入口
 function unstable_scheduleCallback(
   priorityLevel: PriorityLevel,
   callback: Callback,
@@ -368,6 +321,7 @@ function unstable_scheduleCallback(
       break;
   }
 
+  // ? 计算任务到期时间，用于后续任务是否超时
   var expirationTime = startTime + timeout;
 
   var newTask: Task = {
@@ -378,9 +332,6 @@ function unstable_scheduleCallback(
     expirationTime,
     sortIndex: -1,
   };
-  if (enableProfiling) {
-    newTask.isQueued = false;
-  }
 
   if (startTime > currentTime) {
     // This is a delayed task.
@@ -400,10 +351,6 @@ function unstable_scheduleCallback(
   } else {
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
-    if (enableProfiling) {
-      markTaskStart(newTask, currentTime);
-      newTask.isQueued = true;
-    }
     // Schedule a host callback, if needed. If we're already performing work,
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork) {
@@ -416,13 +363,6 @@ function unstable_scheduleCallback(
 }
 
 function unstable_cancelCallback(task: Task) {
-  if (enableProfiling) {
-    if (task.isQueued) {
-      const currentTime = getCurrentTime();
-      markTaskCanceled(task, currentTime);
-      task.isQueued = false;
-    }
-  }
 
   // Null out the callback to indicate the task has been canceled. (Can't
   // remove from the queue because you can't remove arbitrary nodes from an
@@ -587,12 +527,4 @@ export {
   forceFrameRate as unstable_forceFrameRate,
 };
 
-export const unstable_Profiling: {
-  startLoggingProfilingEvents(): void,
-  stopLoggingProfilingEvents(): ArrayBuffer | null,
-} | null = enableProfiling
-  ? {
-      startLoggingProfilingEvents,
-      stopLoggingProfilingEvents,
-    }
-  : null;
+export const unstable_Profiling = null;

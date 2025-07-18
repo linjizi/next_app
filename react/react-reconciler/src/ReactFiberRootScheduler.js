@@ -15,9 +15,6 @@ import type {Transition} from 'react/src/ReactStartTransition';
 import {
   disableLegacyMode,
   disableSchedulerTimeoutInWorkLoop,
-  enableProfilerTimer,
-  enableProfilerNestedUpdatePhase,
-  enableComponentPerformanceTrack,
   enableYieldingBeforePassive,
   enableGestureTransition,
   enableDefaultTransitionIndicator,
@@ -138,16 +135,6 @@ export function ensureRootIsScheduled(root: FiberRoot): void {
   mightHavePendingSyncWork = true;
 
   ensureScheduleIsScheduled();
-
-  if (
-    __DEV__ &&
-    !disableLegacyMode &&
-    ReactSharedInternals.isBatchingLegacy &&
-    root.tag === LegacyRoot
-  ) {
-    // Special `act` case: Record whenever a legacy update is scheduled.
-    ReactSharedInternals.didScheduleLegacyUpdate = true;
-  }
 }
 
 export function ensureScheduleIsScheduled(): void {
@@ -174,11 +161,6 @@ export function flushSyncWorkOnAllRoots() {
 }
 
 export function flushSyncWorkOnLegacyRootsOnly() {
-  // This is allowed to be called synchronously, but the caller should check
-  // the execution context first.
-  if (!disableLegacyMode) {
-    flushSyncWorkAcrossRoots_impl(NoLanes, true);
-  }
 }
 
 function flushSyncWorkAcrossRoots_impl(
@@ -246,12 +228,6 @@ function flushSyncWorkAcrossRoots_impl(
 }
 
 function processRootScheduleInImmediateTask() {
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    // Track the currently executing event if there is one so we can ignore this
-    // event when logging events.
-    trackSchedulerEvent();
-  }
-
   processRootScheduleInMicrotask();
 }
 
@@ -516,16 +492,6 @@ function performWorkOnRootViaSchedulerTask(
   // This is the entry point for concurrent tasks scheduled via Scheduler (and
   // postTask, in the future).
 
-  if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-    resetNestedUpdateFlag();
-  }
-
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    // Track the currently executing event if there is one so we can ignore this
-    // event when logging events.
-    trackSchedulerEvent();
-  }
-
   if (hasPendingCommitEffects()) {
     // We are currently in the middle of an async committing (such as a View Transition).
     // We could force these to flush eagerly but it's better to defer any work until
@@ -612,9 +578,6 @@ function performSyncWorkOnRoot(root: FiberRoot, lanes: Lanes) {
     // If passive effects were flushed, exit to the outer work loop in the root
     // scheduler, so we can recompute the priority.
     return null;
-  }
-  if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-    syncNestedUpdateFlag();
   }
   const forceSync = true;
   performWorkOnRoot(root, lanes, forceSync);
