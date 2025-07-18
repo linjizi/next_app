@@ -27,7 +27,6 @@ import type {
   ViewTransitionInstance,
   RunningViewTransition,
 } from './ReactFiberConfig';
-import type {RootState} from './ReactFiberRoot';
 import {
   getViewTransitionName,
   type ViewTransitionState,
@@ -36,9 +35,6 @@ import type {TransitionTypes} from 'react/src/ReactTransitionType';
 
 import {
   enableCreateEventHandleAPI,
-  enableProfilerTimer,
-  enableProfilerCommitHooks,
-  enableProfilerNestedUpdatePhase,
   enableSchedulingProfiler,
   enableUpdaterTracking,
   enableTransitionTracing,
@@ -46,7 +42,6 @@ import {
   alwaysThrottleRetries,
   enableInfiniteRenderLoopDetection,
   disableLegacyMode,
-  enableComponentPerformanceTrack,
   enableYieldingBeforePassive,
   enableThrottledScheduling,
   enableViewTransition,
@@ -68,27 +63,6 @@ import {
   NormalPriority as NormalSchedulerPriority,
   IdlePriority as IdleSchedulerPriority,
 } from './Scheduler';
-import {
-  logBlockingStart,
-  logTransitionStart,
-  logRenderPhase,
-  logInterruptedRenderPhase,
-  logSuspendedRenderPhase,
-  logRecoveredRenderPhase,
-  logErroredRenderPhase,
-  logInconsistentRender,
-  logSuspendedWithDelayPhase,
-  logSuspenseThrottlePhase,
-  logSuspendedCommitPhase,
-  logCommitPhase,
-  logPaintYieldPhase,
-  logPassiveCommitPhase,
-  logYieldTime,
-  logActionYieldTime,
-  logSuspendedYieldTime,
-  setCurrentTrackFromLanes,
-  markAllLanesInOrder,
-} from './ReactFiberPerformanceTrack';
 
 import {
   resetAfterCommit,
@@ -105,7 +79,6 @@ import {
   setCurrentUpdatePriority,
   getCurrentUpdatePriority,
   resolveUpdatePriority,
-  trackSchedulerEvent,
   startViewTransition,
   startGestureTransition,
   stopViewTransition,
@@ -118,7 +91,6 @@ import {isRootDehydrated} from './ReactFiberShellHydration';
 import {getIsHydrating} from './ReactFiberHydrationContext';
 import {
   NoMode,
-  ProfileMode,
   ConcurrentMode,
   StrictLegacyMode,
   StrictEffectsMode,
@@ -174,7 +146,6 @@ import {
   includesOnlyRetries,
   includesOnlyTransitions,
   includesBlockingLane,
-  includesTransitionLane,
   includesExpiredLane,
   getNextLanes,
   getEntangledLanes,
@@ -263,44 +234,8 @@ import {
 } from './ReactFiberConcurrentUpdates';
 
 import {
-  blockingClampTime,
-  blockingUpdateTime,
-  blockingUpdateTask,
-  blockingEventTime,
-  blockingEventType,
-  blockingEventIsRepeat,
-  blockingSpawnedUpdate,
-  blockingSuspendedTime,
-  transitionClampTime,
-  transitionStartTime,
-  transitionUpdateTime,
-  transitionUpdateTask,
-  transitionEventTime,
-  transitionEventType,
-  transitionEventIsRepeat,
-  transitionSuspendedTime,
-  clearBlockingTimers,
-  clearTransitionTimers,
-  clampBlockingTimers,
-  clampTransitionTimers,
-  markNestedUpdateScheduled,
   renderStartTime,
-  commitStartTime,
-  commitEndTime,
-  commitErrors,
-  recordRenderTime,
-  recordCommitTime,
-  recordCommitEndTime,
   startProfilerTimer,
-  stopProfilerTimerIfRunningAndRecordDuration,
-  stopProfilerTimerIfRunningAndRecordIncompleteDuration,
-  trackSuspendedTime,
-  startYieldTimer,
-  yieldStartTime,
-  yieldReason,
-  startPingTimerByLanes,
-  recordEffectError,
-  resetCommitErrors,
 } from './ReactProfilerTimer';
 
 // DEV stuff
@@ -1022,25 +957,6 @@ export function performWorkOnRoot(
     throw new Error('Should not already be working.');
   }
 
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    if (workInProgressRootRenderLanes !== NoLanes && workInProgress !== null) {
-      const yieldedFiber = workInProgress;
-      // We've returned from yielding to the event loop. Let's log the time it took.
-      const yieldEndTime = now();
-      switch (yieldReason) {
-        case SuspendedOnImmediate:
-        case SuspendedOnData:
-          logSuspendedYieldTime(yieldStartTime, yieldEndTime, yieldedFiber);
-          break;
-        case SuspendedOnAction:
-          logActionYieldTime(yieldStartTime, yieldEndTime, yieldedFiber);
-          break;
-        default:
-          logYieldTime(yieldStartTime, yieldEndTime);
-      }
-    }
-  }
-
   // We disable time-slicing in some cases: if the work has been CPU-bound
   // for too long ("expired" work, to prevent starvation), or we're in
   // sync-updates-by-default mode.
@@ -1078,18 +994,9 @@ export function performWorkOnRoot(
         const didAttemptEntireTree = false;
         markRootSuspended(root, lanes, NoLane, didAttemptEntireTree);
       }
-      if (enableProfilerTimer && enableComponentPerformanceTrack) {
-        // We're about to yield. Let's keep track of how long we yield to the event loop.
-        // We also stash the suspended reason at the time we yielded since it might have
-        // changed when we resume such as when it gets pinged.
-        startYieldTimer(workInProgressSuspendedReason);
-      }
       break;
     } else {
       let renderEndTime = 0;
-      if (enableProfilerTimer && enableComponentPerformanceTrack) {
-        renderEndTime = now();
-      }
 
       // The render completed.
 
@@ -1103,11 +1010,6 @@ export function performWorkOnRoot(
         renderWasConcurrent &&
         !isRenderConsistentWithExternalStores(finishedWork)
       ) {
-        if (enableProfilerTimer && enableComponentPerformanceTrack) {
-          setCurrentTrackFromLanes(lanes);
-          logInconsistentRender(renderStartTime, renderEndTime);
-          finalizeRender(lanes, renderEndTime);
-        }
         // A store was mutated in an interleaved event. Render again,
         // synchronously, to block further mutations.
         exitStatus = renderRootSync(root, lanes, false);
@@ -1129,11 +1031,6 @@ export function performWorkOnRoot(
           lanesThatJustErrored,
         );
         if (errorRetryLanes !== NoLanes) {
-          if (enableProfilerTimer && enableComponentPerformanceTrack) {
-            setCurrentTrackFromLanes(lanes);
-            logErroredRenderPhase(renderStartTime, renderEndTime, lanes);
-            finalizeRender(lanes, renderEndTime);
-          }
           lanes = errorRetryLanes;
           exitStatus = recoverFromConcurrentError(
             root,
@@ -1153,18 +1050,10 @@ export function performWorkOnRoot(
             continue;
           } else {
             // The root errored yet again. Proceed to commit the tree.
-            if (enableProfilerTimer && enableComponentPerformanceTrack) {
-              renderEndTime = now();
-            }
           }
         }
       }
       if (exitStatus === RootFatalErrored) {
-        if (enableProfilerTimer && enableComponentPerformanceTrack) {
-          setCurrentTrackFromLanes(lanes);
-          logErroredRenderPhase(renderStartTime, renderEndTime, lanes);
-          finalizeRender(lanes, renderEndTime);
-        }
         prepareFreshStack(root, NoLanes);
         // Since this is a fatal error, we're going to pretend we attempted
         // the entire tree, to avoid scheduling a prerender.
@@ -1301,12 +1190,6 @@ function finishConcurrentRender(
       // This is a transition, so we should exit without committing a
       // placeholder and without scheduling a timeout. Delay indefinitely
       // until we receive more data.
-      if (enableProfilerTimer && enableComponentPerformanceTrack) {
-        setCurrentTrackFromLanes(lanes);
-        logSuspendedRenderPhase(renderStartTime, renderEndTime, lanes);
-        finalizeRender(lanes, renderEndTime);
-        trackSuspendedTime(lanes, renderEndTime);
-      }
       const didAttemptEntireTree = !workInProgressRootDidSkipSuspendedSiblings;
       markRootSuspended(
         root,
@@ -1823,134 +1706,9 @@ function resetWorkInProgressStack() {
 }
 
 function finalizeRender(lanes: Lanes, finalizationTime: number): void {
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    if (includesSyncLane(lanes) || includesBlockingLane(lanes)) {
-      clampBlockingTimers(finalizationTime);
-    }
-    if (includesTransitionLane(lanes)) {
-      clampTransitionTimers(finalizationTime);
-    }
-  }
 }
 
 function prepareFreshStack(root: FiberRoot, lanes: Lanes): Fiber {
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    // The order of tracks within a group are determined by the earliest start time.
-    // Are tracks should show up in priority order and we should ideally always show
-    // every track. This is a hack to ensure that we're displaying all tracks in the
-    // right order. Ideally we could do this only once but because calls that aren't
-    // recorded aren't considered for ordering purposes, we need to keep adding these
-    // over and over again in case recording has just started. We can't tell when
-    // recording starts.
-    markAllLanesInOrder();
-
-    const previousRenderStartTime = renderStartTime;
-    // Starting a new render. Log the end of any previous renders and the
-    // blocked time before the render started.
-    recordRenderTime();
-    // If this was a restart, e.g. due to an interrupting update, then there's no space
-    // in the track to log the cause since we'll have rendered all the way up until the
-    // restart so we need to clamp that.
-    if (
-      workInProgressRootRenderLanes !== NoLanes &&
-      previousRenderStartTime > 0
-    ) {
-      setCurrentTrackFromLanes(workInProgressRootRenderLanes);
-      if (
-        workInProgressRootExitStatus === RootSuspended ||
-        workInProgressRootExitStatus === RootSuspendedWithDelay
-      ) {
-        // If the root was already suspended when it got interrupted and restarted,
-        // then this is considered a prewarm and not an interrupted render because
-        // we couldn't have shown anything anyway so it's not a bad thing that we
-        // got interrupted.
-        logSuspendedRenderPhase(
-          previousRenderStartTime,
-          renderStartTime,
-          lanes,
-        );
-      } else {
-        logInterruptedRenderPhase(
-          previousRenderStartTime,
-          renderStartTime,
-          lanes,
-        );
-      }
-      finalizeRender(workInProgressRootRenderLanes, renderStartTime);
-    }
-
-    if (includesSyncLane(lanes) || includesBlockingLane(lanes)) {
-      const clampedUpdateTime =
-        blockingUpdateTime >= 0 && blockingUpdateTime < blockingClampTime
-          ? blockingClampTime
-          : blockingUpdateTime;
-      const clampedEventTime =
-        blockingEventTime >= 0 && blockingEventTime < blockingClampTime
-          ? blockingClampTime
-          : blockingEventTime;
-      if (blockingSuspendedTime >= 0) {
-        setCurrentTrackFromLanes(lanes);
-        logSuspendedWithDelayPhase(
-          blockingSuspendedTime,
-          // Clamp the suspended time to the first event/update.
-          clampedEventTime >= 0
-            ? clampedEventTime
-            : clampedUpdateTime >= 0
-              ? clampedUpdateTime
-              : renderStartTime,
-          lanes,
-        );
-      }
-      logBlockingStart(
-        clampedUpdateTime,
-        clampedEventTime,
-        blockingEventType,
-        blockingEventIsRepeat,
-        blockingSpawnedUpdate,
-        renderStartTime,
-        lanes,
-        blockingUpdateTask,
-      );
-      clearBlockingTimers();
-    }
-    if (includesTransitionLane(lanes)) {
-      const clampedStartTime =
-        transitionStartTime >= 0 && transitionStartTime < transitionClampTime
-          ? transitionClampTime
-          : transitionStartTime;
-      const clampedUpdateTime =
-        transitionUpdateTime >= 0 && transitionUpdateTime < transitionClampTime
-          ? transitionClampTime
-          : transitionUpdateTime;
-      const clampedEventTime =
-        transitionEventTime >= 0 && transitionEventTime < transitionClampTime
-          ? transitionClampTime
-          : transitionEventTime;
-      if (transitionSuspendedTime >= 0) {
-        setCurrentTrackFromLanes(lanes);
-        logSuspendedWithDelayPhase(
-          transitionSuspendedTime,
-          // Clamp the suspended time to the first event/update.
-          clampedEventTime >= 0
-            ? clampedEventTime
-            : clampedUpdateTime >= 0
-              ? clampedUpdateTime
-              : renderStartTime,
-          lanes,
-        );
-      }
-      logTransitionStart(
-        clampedStartTime,
-        clampedUpdateTime,
-        clampedEventTime,
-        transitionEventType,
-        transitionEventIsRepeat,
-        renderStartTime,
-        transitionUpdateTask,
-      );
-      clearTransitionTimers();
-    }
-  }
 
   const timeoutHandle = root.timeoutHandle;
   if (timeoutHandle !== noTimeout) {
@@ -2093,13 +1851,6 @@ function handleThrow(root: FiberRoot, thrownValue: any): void {
       createCapturedValueAtFiber(thrownValue, root.current),
     );
     return;
-  }
-
-  if (enableProfilerTimer && erroredWork.mode & ProfileMode) {
-    // Record the time spent rendering before an error was thrown. This
-    // avoids inaccurate Profiler durations in the case of a
-    // suspended render.
-    stopProfilerTimerIfRunningAndRecordDuration(erroredWork);
   }
 
   if (enableSchedulingProfiler) {
@@ -2781,32 +2532,16 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   const current = unitOfWork.alternate;
 
   let next;
-  if (enableProfilerTimer && (unitOfWork.mode & ProfileMode) !== NoMode) {
-    startProfilerTimer(unitOfWork);
-    if (__DEV__) {
-      next = runWithFiberInDEV(
-        unitOfWork,
-        beginWork,
-        current,
-        unitOfWork,
-        entangledRenderLanes,
-      );
-    } else {
-      next = beginWork(current, unitOfWork, entangledRenderLanes);
-    }
-    stopProfilerTimerIfRunningAndRecordDuration(unitOfWork);
+  if (__DEV__) {
+    next = runWithFiberInDEV(
+      unitOfWork,
+      beginWork,
+      current,
+      unitOfWork,
+      entangledRenderLanes,
+    );
   } else {
-    if (__DEV__) {
-      next = runWithFiberInDEV(
-        unitOfWork,
-        beginWork,
-        current,
-        unitOfWork,
-        entangledRenderLanes,
-      );
-    } else {
-      next = beginWork(current, unitOfWork, entangledRenderLanes);
-    }
+    next = beginWork(current, unitOfWork, entangledRenderLanes);
   }
 
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
@@ -2844,11 +2579,6 @@ function replayBeginWork(unitOfWork: Fiber): null | Fiber {
   const current = unitOfWork.alternate;
 
   let next;
-  const isProfilingMode =
-    enableProfilerTimer && (unitOfWork.mode & ProfileMode) !== NoMode;
-  if (isProfilingMode) {
-    startProfilerTimer(unitOfWork);
-  }
   switch (unitOfWork.tag) {
     case SimpleMemoComponent:
     case FunctionComponent: {
@@ -2915,9 +2645,6 @@ function replayBeginWork(unitOfWork: Fiber): null | Fiber {
       next = beginWork(current, unitOfWork, entangledRenderLanes);
       break;
     }
-  }
-  if (isProfilingMode) {
-    stopProfilerTimerIfRunningAndRecordDuration(unitOfWork);
   }
 
   return next;
@@ -3093,10 +2820,6 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
     } else {
       next = completeWork(current, completedWork, entangledRenderLanes);
     }
-    if (enableProfilerTimer && (completedWork.mode & ProfileMode) !== NoMode) {
-      // Update render duration assuming we didn't error.
-      stopProfilerTimerIfRunningAndRecordIncompleteDuration(completedWork);
-    }
     if (next !== null) {
       // Completing this fiber spawned new work. Work on that next.
       workInProgress = next;
@@ -3149,21 +2872,6 @@ function unwindUnitOfWork(unitOfWork: Fiber, skipSiblings: boolean): void {
     }
 
     // Keep unwinding until we reach either a boundary or the root.
-
-    if (enableProfilerTimer && (incompleteWork.mode & ProfileMode) !== NoMode) {
-      // Record the render duration for the fiber that errored.
-      stopProfilerTimerIfRunningAndRecordIncompleteDuration(incompleteWork);
-
-      // Include the time spent working on failed children before continuing.
-      let actualDuration = incompleteWork.actualDuration;
-      let child = incompleteWork.child;
-      while (child !== null) {
-        // $FlowFixMe[unsafe-addition] addition with possible null/undefined value
-        actualDuration += child.actualDuration;
-        child = child.sibling;
-      }
-      incompleteWork.actualDuration = actualDuration;
-    }
 
     // TODO: Once we stop prerendering siblings, instead of resetting the parent
     // of the node being unwound, we should be able to reset node itself as we
@@ -3230,33 +2938,6 @@ function commitRoot(
 
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
     throw new Error('Should not already be working.');
-  }
-
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    // Log the previous render phase once we commit. I.e. we weren't interrupted.
-    setCurrentTrackFromLanes(lanes);
-    if (exitStatus === RootErrored) {
-      logErroredRenderPhase(
-        completedRenderStartTime,
-        completedRenderEndTime,
-        lanes,
-      );
-    } else if (recoverableErrors !== null) {
-      const hydrationFailed =
-        finishedWork !== null &&
-        finishedWork.alternate !== null &&
-        (finishedWork.alternate.memoizedState: RootState).isDehydrated &&
-        (finishedWork.flags & ForceClientRender) !== NoFlags;
-      logRecoveredRenderPhase(
-        completedRenderStartTime,
-        completedRenderEndTime,
-        lanes,
-        recoverableErrors,
-        hydrationFailed,
-      );
-    } else {
-      logRenderPhase(completedRenderStartTime, completedRenderEndTime, lanes);
-    }
   }
 
   if (enableSchedulingProfiler) {
@@ -3344,10 +3025,6 @@ function commitRoot(
   pendingPassiveTransitions = transitions;
   pendingRecoverableErrors = recoverableErrors;
   pendingDidIncludeRenderPhaseUpdate = didIncludeRenderPhaseUpdate;
-  if (enableProfilerTimer) {
-    pendingEffectsRenderEndTime = completedRenderEndTime;
-    pendingSuspendedCommitReason = suspendedCommitReason;
-  }
 
   if (enableGestureTransition && isGestureRender(lanes)) {
     // This is a special kind of render that doesn't commit regular effects.
@@ -3355,11 +3032,7 @@ function commitRoot(
       root,
       finishedWork,
       recoverableErrors,
-      enableProfilerTimer
-        ? suspendedCommitReason === IMMEDIATE_COMMIT
-          ? completedRenderEndTime
-          : commitStartTime
-        : 0,
+      0,
     );
     return;
   }
@@ -3385,9 +3058,6 @@ function commitRoot(
   }
   if (
     // If this subtree rendered with profiling this commit, we need to visit it to log it.
-    (enableProfilerTimer &&
-      enableComponentPerformanceTrack &&
-      finishedWork.actualDuration !== 0) ||
     (finishedWork.subtreeFlags & passiveSubtreeMask) !== NoFlags ||
     (finishedWork.flags & passiveSubtreeMask) !== NoFlags
   ) {
@@ -3400,11 +3070,6 @@ function commitRoot(
       root.callbackNode = null;
       root.callbackPriority = NoLane;
       scheduleCallback(NormalSchedulerPriority, () => {
-        if (enableProfilerTimer && enableComponentPerformanceTrack) {
-          // Track the currently executing event if there is one so we can ignore this
-          // event when logging events.
-          trackSchedulerEvent();
-        }
         flushPassiveEffects(true);
         // This render triggered passive effects: release the root cache pool
         // *after* passive effects fire to avoid freeing a cache pool that may
@@ -3417,20 +3082,6 @@ function commitRoot(
     // so we can clear the callback now.
     root.callbackNode = null;
     root.callbackPriority = NoLane;
-  }
-
-  if (enableProfilerTimer) {
-    // Mark the current commit time to be shared by all Profilers in this
-    // batch. This enables them to be grouped later.
-    resetCommitErrors();
-    recordCommitTime();
-    if (enableComponentPerformanceTrack) {
-      if (suspendedCommitReason === SUSPENDED_COMMIT) {
-        logSuspendedCommitPhase(completedRenderEndTime, commitStartTime);
-      } else if (suspendedCommitReason === THROTTLED_COMMIT) {
-        logSuspenseThrottlePhase(completedRenderEndTime, commitStartTime);
-      }
-    }
   }
 
   resetShouldStartViewTransition();
@@ -3665,25 +3316,11 @@ function flushSpawnedWork(): void {
   const didIncludeRenderPhaseUpdate = pendingDidIncludeRenderPhaseUpdate;
   const suspendedCommitReason = pendingSuspendedCommitReason;
 
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    recordCommitEndTime();
-    logCommitPhase(
-      suspendedCommitReason === IMMEDIATE_COMMIT
-        ? completedRenderEndTime
-        : commitStartTime,
-      commitEndTime,
-      commitErrors,
-    );
-  }
-
   const passiveSubtreeMask =
     enableViewTransition && includesOnlyViewTransitionEligibleLanes(lanes)
       ? PassiveTransitionMask
       : PassiveMask;
   const rootDidHavePassiveEffects = // If this subtree rendered with profiling this commit, we need to visit it to log it.
-    (enableProfilerTimer &&
-      enableComponentPerformanceTrack &&
-      finishedWork.actualDuration !== 0) ||
     (finishedWork.subtreeFlags & passiveSubtreeMask) !== NoFlags ||
     (finishedWork.flags & passiveSubtreeMask) !== NoFlags;
 
@@ -3827,9 +3464,6 @@ function flushSpawnedWork(): void {
       // Did it schedule a sync update?
       includesSomeLane(remainingLanes, SyncUpdateLanes))
   ) {
-    if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-      markNestedUpdateScheduled();
-    }
 
     // Count the number of times the root synchronously re-renders without
     // finishing. If there are too many, it indicates an infinite update loop.
@@ -3841,12 +3475,6 @@ function flushSpawnedWork(): void {
     }
   } else {
     nestedUpdateCount = 0;
-  }
-
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    if (!rootDidHavePassiveEffects) {
-      finalizeRender(lanes, commitEndTime);
-    }
   }
 
   // Eagerly flush any event replaying that we unblocked within this commit.
@@ -4129,27 +3757,12 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
     throw new Error('Cannot flush passive effects while already rendering.');
   }
 
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    // We're about to log a lot of profiling for this commit.
-    // We set this once so we don't have to recompute it for every log.
-    setCurrentTrackFromLanes(lanes);
-  }
-
   if (__DEV__) {
     isFlushingPassiveEffects = true;
     didScheduleUpdateDuringPassiveEffects = false;
   }
 
   let passiveEffectStartTime = 0;
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    resetCommitErrors();
-    passiveEffectStartTime = now();
-    logPaintYieldPhase(
-      commitEndTime,
-      passiveEffectStartTime,
-      !!wasDelayedCommit,
-    );
-  }
 
   if (enableSchedulingProfiler) {
     markPassiveEffectsStarted(lanes);
@@ -4176,16 +3789,6 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
   }
 
   executionContext = prevExecutionContext;
-
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    const passiveEffectsEndTime = now();
-    logPassiveCommitPhase(
-      passiveEffectStartTime,
-      passiveEffectsEndTime,
-      commitErrors,
-    );
-    finalizeRender(lanes, passiveEffectsEndTime);
-  }
 
   flushSyncWorkOnAllRoots();
 
@@ -4237,11 +3840,6 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
 
   // TODO: Move to commitPassiveMountEffects
   onPostCommitRootDevTools(root);
-  if (enableProfilerTimer && enableProfilerCommitHooks) {
-    const stateNode = root.current.stateNode;
-    stateNode.effectDuration = 0;
-    stateNode.passiveEffectDuration = 0;
-  }
 
   return true;
 }
@@ -4267,9 +3865,7 @@ function captureCommitPhaseErrorOnRoot(
   error: mixed,
 ) {
   const errorInfo = createCapturedValueAtFiber(error, sourceFiber);
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    recordEffectError(errorInfo);
-  }
+
   const update = createRootErrorUpdate(
     rootFiber.stateNode,
     errorInfo,
@@ -4311,9 +3907,7 @@ export function captureCommitPhaseError(
           !isAlreadyFailedLegacyErrorBoundary(instance))
       ) {
         const errorInfo = createCapturedValueAtFiber(error, sourceFiber);
-        if (enableProfilerTimer && enableComponentPerformanceTrack) {
-          recordEffectError(errorInfo);
-        }
+
         const update = createClassErrorUpdate((SyncLane: Lane));
         const root = enqueueUpdate(fiber, update, (SyncLane: Lane));
         if (root !== null) {
@@ -4398,10 +3992,6 @@ function pingSuspendedRoot(
   }
 
   markRootPinged(root, pingedLanes);
-
-  if (enableProfilerTimer && enableComponentPerformanceTrack) {
-    startPingTimerByLanes(pingedLanes);
-  }
 
   warnIfSuspenseResolutionNotWrappedWithActDEV(root);
 
