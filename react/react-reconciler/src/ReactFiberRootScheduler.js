@@ -14,7 +14,6 @@ import type {Transition} from 'react/src/ReactStartTransition';
 
 import {
   disableLegacyMode,
-  disableSchedulerTimeoutInWorkLoop,
   enableYieldingBeforePassive,
   enableGestureTransition,
   enableDefaultTransitionIndicator,
@@ -551,7 +550,7 @@ function performWorkOnRootViaSchedulerTask(
   // TODO: We only check `didTimeout` defensively, to account for a Scheduler
   // bug we're still investigating. Once the bug in Scheduler is fixed,
   // we can remove this, since we track expiration ourselves.
-  const forceSync = !disableSchedulerTimeoutInWorkLoop && didTimeout;
+  const forceSync = didTimeout;
   performWorkOnRoot(root, lanes, forceSync);
 
   // The work loop yielded, but there may or may not be work left at the current
