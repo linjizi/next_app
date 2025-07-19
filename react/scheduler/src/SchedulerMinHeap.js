@@ -7,6 +7,10 @@
  * @flow strict
  */
 
+/**
+ * 使用最小堆结构维护任务队列，使得堆头永远是优先级最高的任务
+ */
+
 type Heap<T: Node> = Array<T>;
 type Node = {
   id: number,
@@ -20,6 +24,7 @@ export function push<T: Node>(heap: Heap<T>, node: T): void {
   siftUp(heap, node, index);
 }
 
+/** 返回队头（当前队列中根据sortIndex计算出优先级最高的task） */
 export function peek<T: Node>(heap: Heap<T>): T | null {
   return heap.length === 0 ? null : heap[0];
 }
@@ -31,6 +36,7 @@ export function pop<T: Node>(heap: Heap<T>): T | null {
   const first = heap[0];
   const last = heap.pop();
   if (last !== first) {
+    // 队列的长度大于1
     // $FlowFixMe[incompatible-type]
     heap[0] = last;
     // $FlowFixMe[incompatible-call]
@@ -68,16 +74,20 @@ function siftDown<T: Node>(heap: Heap<T>, node: T, i: number): void {
 
     // If the left or right node is smaller, swap with the smaller of those.
     if (compare(left, node) < 0) {
+      // left优先级高于node
       if (rightIndex < length && compare(right, left) < 0) {
+        // 交换right和node
         heap[index] = right;
         heap[rightIndex] = node;
         index = rightIndex;
       } else {
+        // 交换left和node
         heap[index] = left;
         heap[leftIndex] = node;
         index = leftIndex;
       }
     } else if (rightIndex < length && compare(right, node) < 0) {
+      // right优先级高于node
       heap[index] = right;
       heap[rightIndex] = node;
       index = rightIndex;
@@ -90,6 +100,10 @@ function siftDown<T: Node>(heap: Heap<T>, node: T, i: number): void {
 
 function compare(a: Node, b: Node) {
   // Compare sort index first, then task id.
+  /*
+    sortIndex越小，优先级越高
+    sortIndex值相等，则判断taskId，id越小（代表任务越先被创建，则优先级越高）
+  */
   const diff = a.sortIndex - b.sortIndex;
   return diff !== 0 ? diff : a.id - b.id;
 }

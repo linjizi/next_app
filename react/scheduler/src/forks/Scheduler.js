@@ -89,15 +89,18 @@ const localClearTimeout =
 const localSetImmediate =
   typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
 
+// ? 一次性只会开启一个定时任务，但是可能存在多个定时任务同一时间结束，所以需要检查所有的tasks
 function advanceTimers(currentTime: number) {
   // Check for tasks that are no longer delayed and add them to the queue.
   let timer = peek(timerQueue);
   while (timer !== null) {
     if (timer.callback === null) {
       // Timer was cancelled.
+      // ? timer.callback为什么会为null
       pop(timerQueue);
     } else if (timer.startTime <= currentTime) {
       // Timer fired. Transfer to the task queue.
+      // 延迟任务延时结束，将task推入taskQueue
       pop(timerQueue);
       timer.sortIndex = timer.expirationTime;
       push(taskQueue, timer);
@@ -277,6 +280,19 @@ function unstable_wrapCallback<T: (...Array<mixed>) => mixed>(callback: T): T {
 }
 
 // scheduler任务调度入口
+/*
+  构造task，并将task推入队列
+  根据priorityLevel计算出到期时间
+  1. 延时任务：
+    startTime = currentTime + delay
+    sortIndex设置为startTime
+    将task推入timerQueue队列
+  2. 非延时任务
+    startTime = currentTime
+    expirationTime = startTime + timeout
+    sortIndex设置为expirationTime
+    将task推入taskQueue队列
+*/
 function unstable_scheduleCallback(
   priorityLevel: PriorityLevel,
   callback: Callback,
@@ -296,6 +312,7 @@ function unstable_scheduleCallback(
     startTime = currentTime;
   }
 
+  // ? 预计执行任务最多可推迟时间
   var timeout;
   switch (priorityLevel) {
     case ImmediatePriority:
