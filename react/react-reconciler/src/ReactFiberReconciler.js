@@ -132,11 +132,6 @@ type OpaqueRoot = FiberRoot;
 let didWarnAboutNestedUpdates;
 let didWarnAboutFindNodeInStrictMode;
 
-if (__DEV__) {
-  didWarnAboutNestedUpdates = false;
-  didWarnAboutFindNodeInStrictMode = ({}: {[string]: boolean});
-}
-
 function getContextForSubtree(
   parentComponent: ?React$Component<any, any>,
 ): Object {
@@ -180,55 +175,6 @@ function findHostInstanceWithWarning(
   component: Object,
   methodName: string,
 ): PublicInstance | null {
-  if (__DEV__) {
-    const fiber = getInstance(component);
-    if (fiber === undefined) {
-      if (typeof component.render === 'function') {
-        throw new Error('Unable to find node on an unmounted component.');
-      } else {
-        const keys = Object.keys(component).join(',');
-        throw new Error(
-          `Argument appears to not be a ReactComponent. Keys: ${keys}`,
-        );
-      }
-    }
-    const hostFiber = findCurrentHostFiber(fiber);
-    if (hostFiber === null) {
-      return null;
-    }
-    if (hostFiber.mode & StrictLegacyMode) {
-      const componentName = getComponentNameFromFiber(fiber) || 'Component';
-      if (!didWarnAboutFindNodeInStrictMode[componentName]) {
-        didWarnAboutFindNodeInStrictMode[componentName] = true;
-        runWithFiberInDEV(hostFiber, () => {
-          if (fiber.mode & StrictLegacyMode) {
-            console.error(
-              '%s is deprecated in StrictMode. ' +
-                '%s was passed an instance of %s which is inside StrictMode. ' +
-                'Instead, add a ref directly to the element you want to reference. ' +
-                'Learn more about using refs safely here: ' +
-                'https://react.dev/link/strict-mode-find-node',
-              methodName,
-              methodName,
-              componentName,
-            );
-          } else {
-            console.error(
-              '%s is deprecated in StrictMode. ' +
-                '%s was passed an instance of %s which renders StrictMode children. ' +
-                'Instead, add a ref directly to the element you want to reference. ' +
-                'Learn more about using refs safely here: ' +
-                'https://react.dev/link/strict-mode-find-node',
-              methodName,
-              methodName,
-              componentName,
-            );
-          }
-        });
-      }
-    }
-    return getPublicInstance(hostFiber.stateNode);
-  }
   return findHostInstance(component);
 }
 
@@ -400,9 +346,6 @@ function updateContainerImpl(
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
 ): void {
-  if (__DEV__) {
-    onScheduleRoot(container, element);
-  }
 
   // enableSchedulingProfiler：false
   if (enableSchedulingProfiler) {
@@ -416,23 +359,6 @@ function updateContainerImpl(
     container.pendingContext = context;
   }
 
-  if (__DEV__) {
-    if (
-      ReactCurrentFiberIsRendering &&
-      ReactCurrentFiberCurrent !== null &&
-      !didWarnAboutNestedUpdates
-    ) {
-      didWarnAboutNestedUpdates = true;
-      console.error(
-        'Render methods should be a pure function of props and state; ' +
-          'triggering nested component updates from render is not allowed. ' +
-          'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
-          'Check the render method of %s.',
-        getComponentNameFromFiber(ReactCurrentFiberCurrent) || 'Unknown',
-      );
-    }
-  }
-
   const update = createUpdate(lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
@@ -440,15 +366,6 @@ function updateContainerImpl(
 
   callback = callback === undefined ? null : callback;
   if (callback !== null) {
-    if (__DEV__) {
-      if (typeof callback !== 'function') {
-        console.error(
-          'Expected the last optional `callback` argument to be a ' +
-            'function. Instead received: %s.',
-          callback,
-        );
-      }
-    }
     update.callback = callback;
   }
 
@@ -604,248 +521,6 @@ let scheduleUpdate = null;
 let setErrorHandler = null;
 let setSuspenseHandler = null;
 
-if (__DEV__) {
-  const copyWithDeleteImpl = (
-    obj: Object | Array<any>,
-    path: Array<string | number>,
-    index: number,
-  ): $FlowFixMe => {
-    const key = path[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
-    if (index + 1 === path.length) {
-      if (isArray(updated)) {
-        updated.splice(((key: any): number), 1);
-      } else {
-        delete updated[key];
-      }
-      return updated;
-    }
-    // $FlowFixMe[incompatible-use] number or string is fine here
-    updated[key] = copyWithDeleteImpl(obj[key], path, index + 1);
-    return updated;
-  };
-
-  const copyWithDelete = (
-    obj: Object | Array<any>,
-    path: Array<string | number>,
-  ): Object | Array<any> => {
-    return copyWithDeleteImpl(obj, path, 0);
-  };
-
-  const copyWithRenameImpl = (
-    obj: Object | Array<any>,
-    oldPath: Array<string | number>,
-    newPath: Array<string | number>,
-    index: number,
-  ): $FlowFixMe => {
-    const oldKey = oldPath[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
-    if (index + 1 === oldPath.length) {
-      const newKey = newPath[index];
-      // $FlowFixMe[incompatible-use] number or string is fine here
-      updated[newKey] = updated[oldKey];
-      if (isArray(updated)) {
-        updated.splice(((oldKey: any): number), 1);
-      } else {
-        delete updated[oldKey];
-      }
-    } else {
-      // $FlowFixMe[incompatible-use] number or string is fine here
-      updated[oldKey] = copyWithRenameImpl(
-        // $FlowFixMe[incompatible-use] number or string is fine here
-        obj[oldKey],
-        oldPath,
-        newPath,
-        index + 1,
-      );
-    }
-    return updated;
-  };
-
-  const copyWithRename = (
-    obj: Object | Array<any>,
-    oldPath: Array<string | number>,
-    newPath: Array<string | number>,
-  ): Object | Array<any> => {
-    if (oldPath.length !== newPath.length) {
-      console.warn('copyWithRename() expects paths of the same length');
-      return;
-    } else {
-      for (let i = 0; i < newPath.length - 1; i++) {
-        if (oldPath[i] !== newPath[i]) {
-          console.warn(
-            'copyWithRename() expects paths to be the same except for the deepest key',
-          );
-          return;
-        }
-      }
-    }
-    return copyWithRenameImpl(obj, oldPath, newPath, 0);
-  };
-
-  const copyWithSetImpl = (
-    obj: Object | Array<any>,
-    path: Array<string | number>,
-    index: number,
-    value: any,
-  ): $FlowFixMe => {
-    if (index >= path.length) {
-      return value;
-    }
-    const key = path[index];
-    const updated = isArray(obj) ? obj.slice() : {...obj};
-    // $FlowFixMe[incompatible-use] number or string is fine here
-    updated[key] = copyWithSetImpl(obj[key], path, index + 1, value);
-    return updated;
-  };
-
-  const copyWithSet = (
-    obj: Object | Array<any>,
-    path: Array<string | number>,
-    value: any,
-  ): Object | Array<any> => {
-    return copyWithSetImpl(obj, path, 0, value);
-  };
-
-  const findHook = (fiber: Fiber, id: number) => {
-    // For now, the "id" of stateful hooks is just the stateful hook index.
-    // This may change in the future with e.g. nested hooks.
-    let currentHook = fiber.memoizedState;
-    while (currentHook !== null && id > 0) {
-      currentHook = currentHook.next;
-      id--;
-    }
-    return currentHook;
-  };
-
-  // Support DevTools editable values for useState and useReducer.
-  overrideHookState = (
-    fiber: Fiber,
-    id: number,
-    path: Array<string | number>,
-    value: any,
-  ) => {
-    const hook = findHook(fiber, id);
-    if (hook !== null) {
-      const newState = copyWithSet(hook.memoizedState, path, value);
-      hook.memoizedState = newState;
-      hook.baseState = newState;
-
-      // We aren't actually adding an update to the queue,
-      // because there is no update we can add for useReducer hooks that won't trigger an error.
-      // (There's no appropriate action type for DevTools overrides.)
-      // As a result though, React will see the scheduled update as a noop and bailout.
-      // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
-
-      const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-      if (root !== null) {
-        scheduleUpdateOnFiber(root, fiber, SyncLane);
-      }
-    }
-  };
-  overrideHookStateDeletePath = (
-    fiber: Fiber,
-    id: number,
-    path: Array<string | number>,
-  ) => {
-    const hook = findHook(fiber, id);
-    if (hook !== null) {
-      const newState = copyWithDelete(hook.memoizedState, path);
-      hook.memoizedState = newState;
-      hook.baseState = newState;
-
-      // We aren't actually adding an update to the queue,
-      // because there is no update we can add for useReducer hooks that won't trigger an error.
-      // (There's no appropriate action type for DevTools overrides.)
-      // As a result though, React will see the scheduled update as a noop and bailout.
-      // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
-
-      const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-      if (root !== null) {
-        scheduleUpdateOnFiber(root, fiber, SyncLane);
-      }
-    }
-  };
-  overrideHookStateRenamePath = (
-    fiber: Fiber,
-    id: number,
-    oldPath: Array<string | number>,
-    newPath: Array<string | number>,
-  ) => {
-    const hook = findHook(fiber, id);
-    if (hook !== null) {
-      const newState = copyWithRename(hook.memoizedState, oldPath, newPath);
-      hook.memoizedState = newState;
-      hook.baseState = newState;
-
-      // We aren't actually adding an update to the queue,
-      // because there is no update we can add for useReducer hooks that won't trigger an error.
-      // (There's no appropriate action type for DevTools overrides.)
-      // As a result though, React will see the scheduled update as a noop and bailout.
-      // Shallow cloning props works as a workaround for now to bypass the bailout check.
-      fiber.memoizedProps = {...fiber.memoizedProps};
-
-      const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-      if (root !== null) {
-        scheduleUpdateOnFiber(root, fiber, SyncLane);
-      }
-    }
-  };
-
-  // Support DevTools props for function components, forwardRef, memo, host components, etc.
-  overrideProps = (fiber: Fiber, path: Array<string | number>, value: any) => {
-    fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
-    if (fiber.alternate) {
-      fiber.alternate.pendingProps = fiber.pendingProps;
-    }
-    const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-    if (root !== null) {
-      scheduleUpdateOnFiber(root, fiber, SyncLane);
-    }
-  };
-  overridePropsDeletePath = (fiber: Fiber, path: Array<string | number>) => {
-    fiber.pendingProps = copyWithDelete(fiber.memoizedProps, path);
-    if (fiber.alternate) {
-      fiber.alternate.pendingProps = fiber.pendingProps;
-    }
-    const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-    if (root !== null) {
-      scheduleUpdateOnFiber(root, fiber, SyncLane);
-    }
-  };
-  overridePropsRenamePath = (
-    fiber: Fiber,
-    oldPath: Array<string | number>,
-    newPath: Array<string | number>,
-  ) => {
-    fiber.pendingProps = copyWithRename(fiber.memoizedProps, oldPath, newPath);
-    if (fiber.alternate) {
-      fiber.alternate.pendingProps = fiber.pendingProps;
-    }
-    const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-    if (root !== null) {
-      scheduleUpdateOnFiber(root, fiber, SyncLane);
-    }
-  };
-
-  scheduleUpdate = (fiber: Fiber) => {
-    const root = enqueueConcurrentRenderForLane(fiber, SyncLane);
-    if (root !== null) {
-      scheduleUpdateOnFiber(root, fiber, SyncLane);
-    }
-  };
-
-  setErrorHandler = (newShouldErrorImpl: Fiber => ?boolean) => {
-    shouldErrorImpl = newShouldErrorImpl;
-  };
-
-  setSuspenseHandler = (newShouldSuspendImpl: Fiber => boolean) => {
-    shouldSuspendImpl = newShouldSuspendImpl;
-  };
-}
-
 function getCurrentFiberForDevTools() {
   return ReactCurrentFiberCurrent;
 }
@@ -869,7 +544,7 @@ function getLaneLabelMap(): Map<Lane, string> | null {
 
 export function injectIntoDevTools(): boolean {
   const internals: Object = {
-    bundleType: __DEV__ ? 1 : 0, // Might add PROFILE later.
+    bundleType: 0, // Might add PROFILE later.
     version: rendererVersion,
     rendererPackageName: rendererPackageName,
     currentDispatcherRef: ReactSharedInternals,
@@ -879,23 +554,6 @@ export function injectIntoDevTools(): boolean {
   };
   if (extraDevToolsConfig !== null) {
     internals.rendererConfig = (extraDevToolsConfig: RendererInspectionConfig);
-  }
-  if (__DEV__) {
-    internals.overrideHookState = overrideHookState;
-    internals.overrideHookStateDeletePath = overrideHookStateDeletePath;
-    internals.overrideHookStateRenamePath = overrideHookStateRenamePath;
-    internals.overrideProps = overrideProps;
-    internals.overridePropsDeletePath = overridePropsDeletePath;
-    internals.overridePropsRenamePath = overridePropsRenamePath;
-    internals.scheduleUpdate = scheduleUpdate;
-    internals.setErrorHandler = setErrorHandler;
-    internals.setSuspenseHandler = setSuspenseHandler;
-    // React Refresh
-    internals.scheduleRefresh = scheduleRefresh;
-    internals.scheduleRoot = scheduleRoot;
-    internals.setRefreshHandler = setRefreshHandler;
-    // Enables DevTools to append owner stacks to error messages in DEV mode.
-    internals.getCurrentFiber = getCurrentFiberForDevTools;
   }
   if (enableSchedulingProfiler) {
     // Conditionally inject these hooks only if Timeline profiler is supported by this build.

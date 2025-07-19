@@ -212,11 +212,6 @@ function getHighestPriorityLanes(lanes: Lanes | Lane): Lanes {
       // with something else.
       return NoLanes;
     default:
-      if (__DEV__) {
-        console.error(
-          'Should have found matching lanes. This is a bug in React.',
-        );
-      }
       // This shouldn't be reachable, but as a fallback, return the entire bitmask.
       return lanes;
   }
@@ -505,11 +500,6 @@ function computeExpirationTime(lane: Lane, currentTime: number) {
       // Anything idle priority or lower should never expire.
       return NoTimestamp;
     default:
-      if (__DEV__) {
-        console.error(
-          'Should have found matching lanes. This is a bug in React.',
-        );
-      }
       return NoTimestamp;
   }
 }

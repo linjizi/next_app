@@ -139,17 +139,9 @@ export function ensureRootIsScheduled(root: FiberRoot): void {
 export function ensureScheduleIsScheduled(): void {
   // At the end of the current event, go through each of the roots and ensure
   // there's a task scheduled for each one at the correct priority.
-  if (__DEV__ && ReactSharedInternals.actQueue !== null) {
-    // We're inside an `act` scope.
-    if (!didScheduleMicrotask_act) {
-      didScheduleMicrotask_act = true;
-      scheduleImmediateRootScheduleTask();
-    }
-  } else {
-    if (!didScheduleMicrotask) {
-      didScheduleMicrotask = true;
-      scheduleImmediateRootScheduleTask();
-    }
+  if (!didScheduleMicrotask) {
+    didScheduleMicrotask = true;
+    scheduleImmediateRootScheduleTask();
   }
 }
 
@@ -234,9 +226,6 @@ function processRootScheduleInMicrotask() {
   // This function is always called inside a microtask. It should never be
   // called synchronously.
   didScheduleMicrotask = false;
-  if (__DEV__) {
-    didScheduleMicrotask_act = false;
-  }
 
   // We'll recompute this as we iterate through all the roots and schedule them.
   mightHavePendingSyncWork = false;
@@ -433,17 +422,7 @@ function scheduleTaskForRootDuringMicrotask(
     const existingCallbackPriority = root.callbackPriority;
     const newCallbackPriority = getHighestPriorityLane(nextLanes);
 
-    if (
-      newCallbackPriority === existingCallbackPriority &&
-      // Special case related to `act`. If the currently scheduled task is a
-      // Scheduler task, rather than an `act` task, cancel it and re-schedule
-      // on the `act` queue.
-      !(
-        __DEV__ &&
-        ReactSharedInternals.actQueue !== null &&
-        existingCallbackNode !== fakeActCallbackNode
-      )
-    ) {
+    if (newCallbackPriority === existingCallbackPriority) {
       // The priority hasn't changed. We can reuse the existing task.
       return newCallbackPriority;
     } else {
@@ -588,38 +567,16 @@ function scheduleCallback(
   priorityLevel: PriorityLevel,
   callback: RenderTaskFn,
 ) {
-  if (__DEV__ && ReactSharedInternals.actQueue !== null) {
-    // Special case: We're inside an `act` scope (a testing utility).
-    // Instead of scheduling work in the host environment, add it to a
-    // fake internal queue that's managed by the `act` implementation.
-    ReactSharedInternals.actQueue.push(callback);
-    return fakeActCallbackNode;
-  } else {
-    return Scheduler_scheduleCallback(priorityLevel, callback);
-  }
+  return Scheduler_scheduleCallback(priorityLevel, callback);
 }
 
 function cancelCallback(callbackNode: mixed) {
-  if (__DEV__ && callbackNode === fakeActCallbackNode) {
-    // Special `act` case: check if this is the fake callback node used by
-    // the `act` implementation.
-  } else if (callbackNode !== null) {
+  if (callbackNode !== null) {
     Scheduler_cancelCallback(callbackNode);
   }
 }
 
 function scheduleImmediateRootScheduleTask() {
-  if (__DEV__ && ReactSharedInternals.actQueue !== null) {
-    // Special case: Inside an `act` scope, we push microtasks to the fake `act`
-    // callback queue. This is because we currently support calling `act`
-    // without awaiting the result. The plan is to deprecate that, and require
-    // that you always await the result so that the microtasks have a chance to
-    // run. But it hasn't happened yet.
-    ReactSharedInternals.actQueue.push(() => {
-      processRootScheduleInMicrotask();
-      return null;
-    });
-  }
 
   // TODO: Can we land supportsMicrotasks? Which environments don't support it?
   // Alternatively, can we move this check to the host config?
