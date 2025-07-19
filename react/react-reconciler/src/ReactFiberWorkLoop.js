@@ -36,7 +36,6 @@ import type {TransitionTypes} from 'react/src/ReactTransitionType';
 import {
   enableCreateEventHandleAPI,
   enableSchedulingProfiler,
-  enableUpdaterTracking,
   enableTransitionTracing,
   disableLegacyContext,
   alwaysThrottleRetries,
@@ -859,11 +858,6 @@ export function scheduleUpdateOnFiber(
   } else {
     // This is a normal update, scheduled from outside the render phase. For
     // example, during an input event.
-    if (enableUpdaterTracking) {
-      if (isDevToolsPresent) {
-        addFiberToLanesMap(root, fiber, lane);
-      }
-    }
 
     warnIfUpdatesNotWrappedWithActDEV(fiber);
 
@@ -2080,21 +2074,6 @@ function renderRootSync(
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) {
-    if (enableUpdaterTracking) {
-      if (isDevToolsPresent) {
-        const memoizedUpdaters = root.memoizedUpdaters;
-        if (memoizedUpdaters.size > 0) {
-          restorePendingUpdaters(root, workInProgressRootRenderLanes);
-          memoizedUpdaters.clear();
-        }
-
-        // At this point, move Fibers that scheduled the upcoming work from the Map to the Set.
-        // If we bailout on this work, we'll move them back (like above).
-        // It's important to move them now in case the work spawns more work at the same priority with different updaters.
-        // That way we can keep the current update and future updates separate.
-        movePendingFibersToMemoized(root, lanes);
-      }
-    }
 
     workInProgressTransitions = getTransitionsForLanes(root, lanes);
     prepareFreshStack(root, lanes);
@@ -2232,21 +2211,6 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) {
-    if (enableUpdaterTracking) {
-      if (isDevToolsPresent) {
-        const memoizedUpdaters = root.memoizedUpdaters;
-        if (memoizedUpdaters.size > 0) {
-          restorePendingUpdaters(root, workInProgressRootRenderLanes);
-          memoizedUpdaters.clear();
-        }
-
-        // At this point, move Fibers that scheduled the upcoming work from the Map to the Set.
-        // If we bailout on this work, we'll move them back (like above).
-        // It's important to move them now in case the work spawns more work at the same priority with different updaters.
-        // That way we can keep the current update and future updates separate.
-        movePendingFibersToMemoized(root, lanes);
-      }
-    }
 
     workInProgressTransitions = getTransitionsForLanes(root, lanes);
 
@@ -3367,12 +3331,6 @@ function flushSpawnedWork(): void {
   const renderPriority = lanesToEventPriority(lanes);
   onCommitRootDevTools(finishedWork.stateNode, renderPriority);
 
-  if (enableUpdaterTracking) {
-    if (isDevToolsPresent) {
-      root.memoizedUpdaters.clear();
-    }
-  }
-
   if (__DEV__) {
     onCommitRootTestSelector();
   }
@@ -3969,12 +3927,6 @@ export function attachPingListener(
     // Memoize using the thread ID to prevent redundant listeners.
     threadIDs.add(lanes);
     const ping = pingSuspendedRoot.bind(null, root, wakeable, lanes);
-    if (enableUpdaterTracking) {
-      if (isDevToolsPresent) {
-        // If we have pending work still, restore the original updaters
-        restorePendingUpdaters(root, lanes);
-      }
-    }
     wakeable.then(ping, ping);
   }
 }
@@ -4420,18 +4372,6 @@ function warnAboutRenderPhaseUpdatesInDEV(fiber: Fiber) {
 }
 
 export function restorePendingUpdaters(root: FiberRoot, lanes: Lanes): void {
-  if (enableUpdaterTracking) {
-    if (isDevToolsPresent) {
-      const memoizedUpdaters = root.memoizedUpdaters;
-      memoizedUpdaters.forEach(schedulingFiber => {
-        addFiberToLanesMap(root, schedulingFiber, lanes);
-      });
-
-      // This function intentionally does not clear memoized updaters.
-      // Those may still be relevant to the current commit
-      // and a future one (e.g. Suspense).
-    }
-  }
 }
 
 const fakeActCallbackNode = {};
