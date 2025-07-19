@@ -17,7 +17,6 @@ import {
   lowPriorityTimeout,
   normalPriorityTimeout,
   enableRequestPaint,
-  enableAlwaysYieldScheduler,
 } from '../SchedulerFeatureFlags';
 
 import {push, pop, peek} from '../SchedulerMinHeap';
@@ -156,13 +155,6 @@ function workLoop(initialTime: number) {
   advanceTimers(currentTime);
   currentTask = peek(taskQueue);
   while (currentTask !== null) {
-    if (!enableAlwaysYieldScheduler) {
-      // ? expirationTime
-      if (currentTask.expirationTime > currentTime && shouldYieldToHost()) {
-        // This currentTask hasn't expired, and we've reached the deadline.
-        break;
-      }
-    }
     // $FlowFixMe[incompatible-use] found when upgrading Flow
     const callback = currentTask.callback;
     if (typeof callback === 'function') {
@@ -193,11 +185,9 @@ function workLoop(initialTime: number) {
       pop(taskQueue);
     }
     currentTask = peek(taskQueue);
-    if (enableAlwaysYieldScheduler) {
-      if (currentTask === null || currentTask.expirationTime > currentTime) {
-        // This currentTask hasn't expired we yield to the browser task.
-        break;
-      }
+    if (currentTask === null || currentTask.expirationTime > currentTime) {
+      // This currentTask hasn't expired we yield to the browser task.
+      break;
     }
   }
   // Return whether there's additional work
@@ -402,10 +392,6 @@ let frameInterval = frameYieldMs;
 let startTime = -1;
 
 function shouldYieldToHost(): boolean {
-  if (!enableAlwaysYieldScheduler && enableRequestPaint && needsPaint) {
-    // Yield now.
-    return true;
-  }
   const timeElapsed = getCurrentTime() - startTime;
   if (timeElapsed < frameInterval) {
     // The main thread has only been blocked for a really short amount of time;
