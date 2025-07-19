@@ -21,7 +21,6 @@ export type LaneMap<T> = Array<T>;
 import {
   enableRetryLaneExpiration,
   enableSchedulingProfiler,
-  enableTransitionTracing,
   enableUpdaterTracking,
   syncLaneExpirationMs,
   transitionLaneExpirationMs,
@@ -1150,64 +1149,17 @@ export function addTransitionToLanesMap(
   transition: Transition,
   lane: Lane,
 ) {
-  if (enableTransitionTracing) {
-    const transitionLanesMap = root.transitionLanes;
-    const index = laneToIndex(lane);
-    let transitions = transitionLanesMap[index];
-    if (transitions === null) {
-      transitions = new Set();
-    }
-    transitions.add(transition);
-
-    transitionLanesMap[index] = transitions;
-  }
 }
 
 export function getTransitionsForLanes(
   root: FiberRoot,
   lanes: Lane | Lanes,
 ): Array<Transition> | null {
-  if (!enableTransitionTracing) {
-    return null;
-  }
-
-  const transitionsForLanes = [];
-  while (lanes > 0) {
-    const index = laneToIndex(lanes);
-    const lane = 1 << index;
-    const transitions = root.transitionLanes[index];
-    if (transitions !== null) {
-      transitions.forEach(transition => {
-        transitionsForLanes.push(transition);
-      });
-    }
-
-    lanes &= ~lane;
-  }
-
-  if (transitionsForLanes.length === 0) {
-    return null;
-  }
-
-  return transitionsForLanes;
+  return null;
 }
 
 export function clearTransitionsForLanes(root: FiberRoot, lanes: Lane | Lanes) {
-  if (!enableTransitionTracing) {
-    return;
-  }
-
-  while (lanes > 0) {
-    const index = laneToIndex(lanes);
-    const lane = 1 << index;
-
-    const transitions = root.transitionLanes[index];
-    if (transitions !== null) {
-      root.transitionLanes[index] = null;
-    }
-
-    lanes &= ~lane;
-  }
+  return;
 }
 
 // Used to name the Performance Track

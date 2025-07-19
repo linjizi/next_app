@@ -36,7 +36,6 @@ import type {TransitionTypes} from 'react/src/ReactTransitionType';
 import {
   enableCreateEventHandleAPI,
   enableSchedulingProfiler,
-  enableTransitionTracing,
   disableLegacyContext,
   alwaysThrottleRetries,
   enableInfiniteRenderLoopDetection,
@@ -422,25 +421,6 @@ let currentEndTime: number | null = null;
 export function addTransitionStartCallbackToPendingTransition(
   transition: Transition,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = {
-        transitionStart: [],
-        transitionProgress: null,
-        transitionComplete: null,
-        markerProgress: null,
-        markerIncomplete: null,
-        markerComplete: null,
-      };
-    }
-
-    if (currentPendingTransitionCallbacks.transitionStart === null) {
-      currentPendingTransitionCallbacks.transitionStart =
-        ([]: Array<Transition>);
-    }
-
-    currentPendingTransitionCallbacks.transitionStart.push(transition);
-  }
 }
 
 export function addMarkerProgressCallbackToPendingTransition(
@@ -448,27 +428,6 @@ export function addMarkerProgressCallbackToPendingTransition(
   transitions: Set<Transition>,
   pendingBoundaries: PendingBoundaries,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = ({
-        transitionStart: null,
-        transitionProgress: null,
-        transitionComplete: null,
-        markerProgress: new Map(),
-        markerIncomplete: null,
-        markerComplete: null,
-      }: PendingTransitionCallbacks);
-    }
-
-    if (currentPendingTransitionCallbacks.markerProgress === null) {
-      currentPendingTransitionCallbacks.markerProgress = new Map();
-    }
-
-    currentPendingTransitionCallbacks.markerProgress.set(markerName, {
-      pendingBoundaries,
-      transitions,
-    });
-  }
 }
 
 export function addMarkerIncompleteCallbackToPendingTransition(
@@ -476,105 +435,23 @@ export function addMarkerIncompleteCallbackToPendingTransition(
   transitions: Set<Transition>,
   aborts: Array<TransitionAbort>,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = {
-        transitionStart: null,
-        transitionProgress: null,
-        transitionComplete: null,
-        markerProgress: null,
-        markerIncomplete: new Map(),
-        markerComplete: null,
-      };
-    }
-
-    if (currentPendingTransitionCallbacks.markerIncomplete === null) {
-      currentPendingTransitionCallbacks.markerIncomplete = new Map();
-    }
-
-    currentPendingTransitionCallbacks.markerIncomplete.set(markerName, {
-      transitions,
-      aborts,
-    });
-  }
 }
 
 export function addMarkerCompleteCallbackToPendingTransition(
   markerName: string,
   transitions: Set<Transition>,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = {
-        transitionStart: null,
-        transitionProgress: null,
-        transitionComplete: null,
-        markerProgress: null,
-        markerIncomplete: null,
-        markerComplete: new Map(),
-      };
-    }
-
-    if (currentPendingTransitionCallbacks.markerComplete === null) {
-      currentPendingTransitionCallbacks.markerComplete = new Map();
-    }
-
-    currentPendingTransitionCallbacks.markerComplete.set(
-      markerName,
-      transitions,
-    );
-  }
 }
 
 export function addTransitionProgressCallbackToPendingTransition(
   transition: Transition,
   boundaries: PendingBoundaries,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = {
-        transitionStart: null,
-        transitionProgress: new Map(),
-        transitionComplete: null,
-        markerProgress: null,
-        markerIncomplete: null,
-        markerComplete: null,
-      };
-    }
-
-    if (currentPendingTransitionCallbacks.transitionProgress === null) {
-      currentPendingTransitionCallbacks.transitionProgress = new Map();
-    }
-
-    currentPendingTransitionCallbacks.transitionProgress.set(
-      transition,
-      boundaries,
-    );
-  }
 }
 
 export function addTransitionCompleteCallbackToPendingTransition(
   transition: Transition,
 ) {
-  if (enableTransitionTracing) {
-    if (currentPendingTransitionCallbacks === null) {
-      currentPendingTransitionCallbacks = {
-        transitionStart: null,
-        transitionProgress: null,
-        transitionComplete: [],
-        markerProgress: null,
-        markerIncomplete: null,
-        markerComplete: null,
-      };
-    }
-
-    if (currentPendingTransitionCallbacks.transitionComplete === null) {
-      currentPendingTransitionCallbacks.transitionComplete =
-        ([]: Array<Transition>);
-    }
-
-    currentPendingTransitionCallbacks.transitionComplete.push(transition);
-  }
 }
 
 function resetRenderTimer() {
@@ -860,17 +737,6 @@ export function scheduleUpdateOnFiber(
     // example, during an input event.
 
     warnIfUpdatesNotWrappedWithActDEV(fiber);
-
-    if (enableTransitionTracing) {
-      const transition = ReactSharedInternals.T;
-      if (transition !== null && transition.name != null) {
-        if (transition.startTime === -1) {
-          transition.startTime = now();
-        }
-
-        addTransitionToLanesMap(root, transition, lane);
-      }
-    }
 
     if (root === workInProgressRoot) {
       // Received an update to a tree that's in the middle of rendering. Mark
@@ -3447,37 +3313,6 @@ function flushSpawnedWork(): void {
   if (enableSchedulingProfiler) {
     markCommitStopped();
   }
-
-  if (enableTransitionTracing) {
-    // We process transitions during passive effects. However, passive effects can be
-    // processed synchronously during the commit phase as well as asynchronously after
-    // paint. At the end of the commit phase, we schedule a callback that will be called
-    // after the next paint. If the transitions have already been processed (passive
-    // effect phase happened synchronously), we will schedule a callback to process
-    // the transitions. However, if we don't have any pending transition callbacks, this
-    // means that the transitions have yet to be processed (passive effects processed after paint)
-    // so we will store the end time of paint so that we can process the transitions
-    // and then call the callback via the correct end time.
-    const prevRootTransitionCallbacks = root.transitionCallbacks;
-    if (prevRootTransitionCallbacks !== null) {
-      schedulePostPaintCallback(endTime => {
-        const prevPendingTransitionCallbacks =
-          currentPendingTransitionCallbacks;
-        if (prevPendingTransitionCallbacks !== null) {
-          currentPendingTransitionCallbacks = null;
-          scheduleCallback(IdleSchedulerPriority, () => {
-            processTransitionCallbacks(
-              prevPendingTransitionCallbacks,
-              endTime,
-              prevRootTransitionCallbacks,
-            );
-          });
-        } else {
-          currentEndTime = endTime;
-        }
-      });
-    }
-  }
 }
 
 function commitGestureOnRoot(
@@ -3749,27 +3584,6 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
   executionContext = prevExecutionContext;
 
   flushSyncWorkOnAllRoots();
-
-  if (enableTransitionTracing) {
-    const prevPendingTransitionCallbacks = currentPendingTransitionCallbacks;
-    const prevRootTransitionCallbacks = root.transitionCallbacks;
-    const prevEndTime = currentEndTime;
-    if (
-      prevPendingTransitionCallbacks !== null &&
-      prevRootTransitionCallbacks !== null &&
-      prevEndTime !== null
-    ) {
-      currentPendingTransitionCallbacks = null;
-      currentEndTime = null;
-      scheduleCallback(IdleSchedulerPriority, () => {
-        processTransitionCallbacks(
-          prevPendingTransitionCallbacks,
-          prevEndTime,
-          prevRootTransitionCallbacks,
-        );
-      });
-    }
-  }
 
   if (__DEV__) {
     // If additional passive effects were scheduled, increment a counter. If this
