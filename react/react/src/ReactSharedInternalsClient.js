@@ -7,18 +7,18 @@
  * @flow
  */
 
-import type {Dispatcher} from 'react-reconciler/src/ReactInternalTypes';
-import type {AsyncDispatcher} from 'react-reconciler/src/ReactInternalTypes';
-import type {Transition} from './ReactStartTransition';
-import type {GestureProvider, GestureOptions} from 'shared/ReactTypes';
+import type { Dispatcher } from "react-reconciler/src/ReactInternalTypes";
+import type { AsyncDispatcher } from "react-reconciler/src/ReactInternalTypes";
+import type { Transition } from "./ReactStartTransition";
+import type { GestureProvider, GestureOptions } from "shared/ReactTypes";
 
-import {enableGestureTransition} from 'shared/ReactFeatureFlags';
+import { enableGestureTransition } from "shared/ReactFeatureFlags";
 
 type onStartTransitionFinish = (Transition, mixed) => void;
 type onStartGestureTransitionFinish = (
   Transition,
   GestureProvider,
-  ?GestureOptions,
+  ?GestureOptions
 ) => () => void;
 
 export type SharedStateClient = {
@@ -55,7 +55,7 @@ export type SharedStateClient = {
   recentlyCreatedOwnerStacks: 0,
 };
 
-export type RendererTask = boolean => RendererTask | null;
+export type RendererTask = (boolean) => RendererTask | null;
 
 const ReactSharedInternals: SharedStateClient = ({
   H: null,
@@ -67,7 +67,7 @@ if (enableGestureTransition) {
   ReactSharedInternals.G = null;
 }
 
-if (__DEV__) {
+if (false) {
   ReactSharedInternals.actQueue = null;
   ReactSharedInternals.asyncTransitions = 0;
   ReactSharedInternals.isBatchingLegacy = false;

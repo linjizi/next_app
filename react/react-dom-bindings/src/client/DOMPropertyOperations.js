@@ -7,11 +7,11 @@
  * @flow
  */
 
-import isAttributeNameSafe from '../shared/isAttributeNameSafe';
-import {enableTrustedTypesIntegration} from 'shared/ReactFeatureFlags';
-import {checkAttributeStringCoercion} from 'shared/CheckStringCoercion';
-import {getFiberCurrentPropsFromNode} from './ReactDOMComponentTree';
-import {trackHostMutation} from 'react-reconciler/src/ReactFiberMutationTracking';
+import isAttributeNameSafe from "../shared/isAttributeNameSafe";
+import { enableTrustedTypesIntegration } from "shared/ReactFeatureFlags";
+import { checkAttributeStringCoercion } from "shared/CheckStringCoercion";
+import { getFiberCurrentPropsFromNode } from "./ReactDOMComponentTree";
+import { trackHostMutation } from "react-reconciler/src/ReactFiberMutationTracking";
 
 /**
  * Get the value for a attribute on a node. Only used in DEV for SSR validation.
@@ -21,21 +21,21 @@ import {trackHostMutation} from 'react-reconciler/src/ReactFiberMutationTracking
 export function getValueForAttribute(
   node: Element,
   name: string,
-  expected: mixed,
+  expected: mixed
 ): mixed {
-  if (__DEV__) {
+  if (false) {
     if (!isAttributeNameSafe(name)) {
       return;
     }
     if (!node.hasAttribute(name)) {
       // shouldRemoveAttribute
       switch (typeof expected) {
-        case 'function':
-        case 'symbol':
+        case "function":
+        case "symbol":
           return expected;
-        case 'boolean': {
+        case "boolean": {
           const prefix = name.toLowerCase().slice(0, 5);
-          if (prefix !== 'data-' && prefix !== 'aria-') {
+          if (prefix !== "data-" && prefix !== "aria-") {
             return expected;
           }
         }
@@ -43,10 +43,10 @@ export function getValueForAttribute(
       return expected === undefined ? undefined : null;
     }
     const value = node.getAttribute(name);
-    if (__DEV__) {
+    if (false) {
       checkAttributeStringCoercion(expected, name);
     }
-    if (value === '' + (expected: any)) {
+    if (value === "" + (expected: any)) {
       return expected;
     }
     return value;
@@ -56,23 +56,23 @@ export function getValueForAttribute(
 export function getValueForAttributeOnCustomComponent(
   node: Element,
   name: string,
-  expected: mixed,
+  expected: mixed
 ): mixed {
-  if (__DEV__) {
+  if (false) {
     if (!isAttributeNameSafe(name)) {
       return;
     }
     if (!node.hasAttribute(name)) {
       // shouldRemoveAttribute
       switch (typeof expected) {
-        case 'symbol':
-        case 'object':
+        case "symbol":
+        case "object":
           // Symbols and objects are ignored when they're emitted so
           // it would be expected that they end up not having an attribute.
           return expected;
-        case 'function':
+        case "function":
           return expected;
-        case 'boolean':
+        case "boolean":
           if (expected === false) {
             return expected;
           }
@@ -81,14 +81,14 @@ export function getValueForAttributeOnCustomComponent(
     }
     const value = node.getAttribute(name);
 
-    if (value === '' && expected === true) {
+    if (value === "" && expected === true) {
       return true;
     }
 
-    if (__DEV__) {
+    if (false) {
       checkAttributeStringCoercion(expected, name);
     }
-    if (value === '' + (expected: any)) {
+    if (value === "" + (expected: any)) {
       return expected;
     }
     return value;
@@ -98,7 +98,7 @@ export function getValueForAttributeOnCustomComponent(
 export function setValueForAttribute(
   node: Element,
   name: string,
-  value: mixed,
+  value: mixed
 ) {
   if (isAttributeNameSafe(name)) {
     // If the prop isn't in the special list, treat it as a simple attribute.
@@ -108,25 +108,25 @@ export function setValueForAttribute(
       return;
     }
     switch (typeof value) {
-      case 'undefined':
-      case 'function':
-      case 'symbol':
+      case "undefined":
+      case "function":
+      case "symbol":
         node.removeAttribute(name);
         return;
-      case 'boolean': {
+      case "boolean": {
         const prefix = name.toLowerCase().slice(0, 5);
-        if (prefix !== 'data-' && prefix !== 'aria-') {
+        if (prefix !== "data-" && prefix !== "aria-") {
           node.removeAttribute(name);
           return;
         }
       }
     }
-    if (__DEV__) {
+    if (false) {
       checkAttributeStringCoercion(value, name);
     }
     node.setAttribute(
       name,
-      enableTrustedTypesIntegration ? (value: any) : '' + (value: any),
+      enableTrustedTypesIntegration ? (value: any) : "" + (value: any)
     );
   }
 }
@@ -134,27 +134,27 @@ export function setValueForAttribute(
 export function setValueForKnownAttribute(
   node: Element,
   name: string,
-  value: mixed,
+  value: mixed
 ) {
   if (value === null) {
     node.removeAttribute(name);
     return;
   }
   switch (typeof value) {
-    case 'undefined':
-    case 'function':
-    case 'symbol':
-    case 'boolean': {
+    case "undefined":
+    case "function":
+    case "symbol":
+    case "boolean": {
       node.removeAttribute(name);
       return;
     }
   }
-  if (__DEV__) {
+  if (false) {
     checkAttributeStringCoercion(value, name);
   }
   node.setAttribute(
     name,
-    enableTrustedTypesIntegration ? (value: any) : '' + (value: any),
+    enableTrustedTypesIntegration ? (value: any) : "" + (value: any)
   );
 }
 
@@ -162,48 +162,48 @@ export function setValueForNamespacedAttribute(
   node: Element,
   namespace: string,
   name: string,
-  value: mixed,
+  value: mixed
 ) {
   if (value === null) {
     node.removeAttribute(name);
     return;
   }
   switch (typeof value) {
-    case 'undefined':
-    case 'function':
-    case 'symbol':
-    case 'boolean': {
+    case "undefined":
+    case "function":
+    case "symbol":
+    case "boolean": {
       node.removeAttribute(name);
       return;
     }
   }
-  if (__DEV__) {
+  if (false) {
     checkAttributeStringCoercion(value, name);
   }
   node.setAttributeNS(
     namespace,
     name,
-    enableTrustedTypesIntegration ? (value: any) : '' + (value: any),
+    enableTrustedTypesIntegration ? (value: any) : "" + (value: any)
   );
 }
 
 export function setValueForPropertyOnCustomComponent(
   node: Element,
   name: string,
-  value: mixed,
+  value: mixed
 ) {
-  if (name[0] === 'o' && name[1] === 'n') {
-    const useCapture = name.endsWith('Capture');
+  if (name[0] === "o" && name[1] === "n") {
+    const useCapture = name.endsWith("Capture");
     const eventName = name.slice(2, useCapture ? name.length - 7 : undefined);
 
     const prevProps = getFiberCurrentPropsFromNode(node);
     // $FlowFixMe[invalid-computed-prop]
     const prevValue = prevProps != null ? prevProps[name] : null;
-    if (typeof prevValue === 'function') {
+    if (typeof prevValue === "function") {
       node.removeEventListener(eventName, prevValue, useCapture);
     }
-    if (typeof value === 'function') {
-      if (typeof prevValue !== 'function' && prevValue !== null) {
+    if (typeof value === "function") {
+      if (typeof prevValue !== "function" && prevValue !== null) {
         // If we previously assigned a non-function type into this node, then
         // remove it when switching to event listener mode.
         if (name in (node: any)) {
@@ -226,7 +226,7 @@ export function setValueForPropertyOnCustomComponent(
   }
 
   if (value === true) {
-    node.setAttribute(name, '');
+    node.setAttribute(name, "");
     return;
   }
 

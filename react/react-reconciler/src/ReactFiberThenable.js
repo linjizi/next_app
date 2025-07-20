@@ -12,13 +12,13 @@ import type {
   PendingThenable,
   FulfilledThenable,
   RejectedThenable,
-} from 'shared/ReactTypes';
+} from "shared/ReactTypes";
 
-import {getWorkInProgressRoot} from './ReactFiberWorkLoop';
+import { getWorkInProgressRoot } from "./ReactFiberWorkLoop";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
-import noop from 'shared/noop';
+import noop from "shared/noop";
 
 opaque type ThenableStateDev = {
   didWarnAboutUncachedPromise: boolean,
@@ -30,7 +30,7 @@ opaque type ThenableStateProd = Array<Thenable<any>>;
 export opaque type ThenableState = ThenableStateDev | ThenableStateProd;
 
 function getThenablesFromState(state: ThenableState): Array<Thenable<any>> {
-  if (__DEV__) {
+  if (false) {
     const devState: ThenableStateDev = (state: any);
     return devState.thenables;
   } else {
@@ -43,26 +43,26 @@ function getThenablesFromState(state: ThenableState): Array<Thenable<any>> {
 // detect this is caught by userspace, we'll log a warning in development.
 export const SuspenseException: mixed = new Error(
   "Suspense Exception: This is not a real error! It's an implementation " +
-    'detail of `use` to interrupt the current render. You must either ' +
-    'rethrow it immediately, or move the `use` call outside of the ' +
-    '`try/catch` block. Capturing without rethrowing will lead to ' +
-    'unexpected behavior.\n\n' +
-    'To handle async errors, wrap your component in an error boundary, or ' +
-    "call the promise's `.catch` method and pass the result to `use`.",
+    "detail of `use` to interrupt the current render. You must either " +
+    "rethrow it immediately, or move the `use` call outside of the " +
+    "`try/catch` block. Capturing without rethrowing will lead to " +
+    "unexpected behavior.\n\n" +
+    "To handle async errors, wrap your component in an error boundary, or " +
+    "call the promise's `.catch` method and pass the result to `use`."
 );
 
 export const SuspenseyCommitException: mixed = new Error(
-  'Suspense Exception: This is not a real error, and should not leak into ' +
-    "userspace. If you're seeing this, it's likely a bug in React.",
+  "Suspense Exception: This is not a real error, and should not leak into " +
+    "userspace. If you're seeing this, it's likely a bug in React."
 );
 
 export const SuspenseActionException: mixed = new Error(
   "Suspense Exception: This is not a real error! It's an implementation " +
-    'detail of `useActionState` to interrupt the current render. You must either ' +
-    'rethrow it immediately, or move the `useActionState` call outside of the ' +
-    '`try/catch` block. Capturing without rethrowing will lead to ' +
-    'unexpected behavior.\n\n' +
-    'To handle async errors, wrap your component in an error boundary.',
+    "detail of `useActionState` to interrupt the current render. You must either " +
+    "rethrow it immediately, or move the `useActionState` call outside of the " +
+    "`try/catch` block. Capturing without rethrowing will lead to " +
+    "unexpected behavior.\n\n" +
+    "To handle async errors, wrap your component in an error boundary."
 );
 // This is a noop thenable that we use to trigger a fallback in throwException.
 // TODO: It would be better to refactor throwException into multiple functions
@@ -70,10 +70,10 @@ export const SuspenseActionException: mixed = new Error(
 // for now this will do.
 export const noopSuspenseyCommitThenable = {
   then() {
-    if (__DEV__) {
+    if (false) {
       console.error(
-        'Internal React error: A listener was unexpectedly attached to a ' +
-          '"noop" thenable. This is a bug in React. Please file an issue.',
+        "Internal React error: A listener was unexpectedly attached to a " +
+          '"noop" thenable. This is a bug in React. Please file an issue.'
       );
     }
   },
@@ -82,7 +82,7 @@ export const noopSuspenseyCommitThenable = {
 export function createThenableState(): ThenableState {
   // The ThenableState is created the first time a component suspends. If it
   // suspends again, we'll reuse the same state.
-  if (__DEV__) {
+  if (false) {
     return {
       didWarnAboutUncachedPromise: false,
       thenables: [],
@@ -94,15 +94,15 @@ export function createThenableState(): ThenableState {
 
 export function isThenableResolved(thenable: Thenable<mixed>): boolean {
   const status = thenable.status;
-  return status === 'fulfilled' || status === 'rejected';
+  return status === "fulfilled" || status === "rejected";
 }
 
 export function trackUsedThenable<T>(
   thenableState: ThenableState,
   thenable: Thenable<T>,
-  index: number,
+  index: number
 ): T {
-  if (__DEV__ && ReactSharedInternals.actQueue !== null) {
+  if (false && ReactSharedInternals.actQueue !== null) {
     ReactSharedInternals.didUsePromise = true;
   }
   const trackedThenables = getThenablesFromState(thenableState);
@@ -114,7 +114,7 @@ export function trackUsedThenable<T>(
       // Reuse the previous thenable, and drop the new one. We can assume
       // they represent the same value, because components are idempotent.
 
-      if (__DEV__) {
+      if (false) {
         const thenableStateDev: ThenableStateDev = (thenableState: any);
         if (!thenableStateDev.didWarnAboutUncachedPromise) {
           // We should only warn the first time an uncached thenable is
@@ -136,9 +136,9 @@ export function trackUsedThenable<T>(
 
           // TODO: This warning should link to a corresponding docs page.
           console.error(
-            'A component was suspended by an uncached promise. Creating ' +
-              'promises inside a Client Component or hook is not yet ' +
-              'supported, except via a Suspense-compatible library or framework.',
+            "A component was suspended by an uncached promise. Creating " +
+              "promises inside a Client Component or hook is not yet " +
+              "supported, except via a Suspense-compatible library or framework."
           );
         }
       }
@@ -157,17 +157,17 @@ export function trackUsedThenable<T>(
   // If the thenable doesn't have a status, set it to "pending" and attach
   // a listener that will update its status and result when it resolves.
   switch (thenable.status) {
-    case 'fulfilled': {
+    case "fulfilled": {
       const fulfilledValue: T = thenable.value;
       return fulfilledValue;
     }
-    case 'rejected': {
+    case "rejected": {
       const rejectedError = thenable.reason;
       checkIfUseWrappedInAsyncCatch(rejectedError);
       throw rejectedError;
     }
     default: {
-      if (typeof thenable.status === 'string') {
+      if (typeof thenable.status === "string") {
         // Only instrument the thenable if the status if not defined. If
         // it's defined, but an unknown value, assume it's been instrumented by
         // some custom userspace implementation. We treat it as "pending".
@@ -194,41 +194,41 @@ export function trackUsedThenable<T>(
           // this case include forcing a concurrent render, or putting the whole
           // root into offscreen mode.
           throw new Error(
-            'An unknown Component is an async Client Component. ' +
-              'Only Server Components can be async at the moment. ' +
-              'This error is often caused by accidentally ' +
+            "An unknown Component is an async Client Component. " +
+              "Only Server Components can be async at the moment. " +
+              "This error is often caused by accidentally " +
               "adding `'use client'` to a module that was originally written " +
-              'for the server.',
+              "for the server."
           );
         }
 
         const pendingThenable: PendingThenable<T> = (thenable: any);
-        pendingThenable.status = 'pending';
+        pendingThenable.status = "pending";
         pendingThenable.then(
-          fulfilledValue => {
-            if (thenable.status === 'pending') {
+          (fulfilledValue) => {
+            if (thenable.status === "pending") {
               const fulfilledThenable: FulfilledThenable<T> = (thenable: any);
-              fulfilledThenable.status = 'fulfilled';
+              fulfilledThenable.status = "fulfilled";
               fulfilledThenable.value = fulfilledValue;
             }
           },
           (error: mixed) => {
-            if (thenable.status === 'pending') {
+            if (thenable.status === "pending") {
               const rejectedThenable: RejectedThenable<T> = (thenable: any);
-              rejectedThenable.status = 'rejected';
+              rejectedThenable.status = "rejected";
               rejectedThenable.reason = error;
             }
-          },
+          }
         );
       }
 
       // Check one more time in case the thenable resolved synchronously.
       switch ((thenable: Thenable<T>).status) {
-        case 'fulfilled': {
+        case "fulfilled": {
           const fulfilledThenable: FulfilledThenable<T> = (thenable: any);
           return fulfilledThenable.value;
         }
-        case 'rejected': {
+        case "rejected": {
           const rejectedThenable: RejectedThenable<T> = (thenable: any);
           const rejectedError = rejectedThenable.reason;
           checkIfUseWrappedInAsyncCatch(rejectedError);
@@ -244,7 +244,7 @@ export function trackUsedThenable<T>(
       // get captured by the work loop, log a warning, because that means
       // something in userspace must have caught it.
       suspendedThenable = thenable;
-      if (__DEV__) {
+      if (false) {
         needsToResetSuspendedThenableDEV = true;
       }
       throw SuspenseException;
@@ -272,20 +272,20 @@ export function getSuspendedThenable(): Thenable<mixed> {
   // this function.
   if (suspendedThenable === null) {
     throw new Error(
-      'Expected a suspended thenable. This is a bug in React. Please file ' +
-        'an issue.',
+      "Expected a suspended thenable. This is a bug in React. Please file " +
+        "an issue."
     );
   }
   const thenable = suspendedThenable;
   suspendedThenable = null;
-  if (__DEV__) {
+  if (false) {
     needsToResetSuspendedThenableDEV = false;
   }
   return thenable;
 }
 
 export function checkIfUseWrappedInTryCatch(): boolean {
-  if (__DEV__) {
+  if (false) {
     // This was set right before SuspenseException was thrown, and it should
     // have been cleared when the exception was handled. If it wasn't,
     // it must have been caught by userspace.
@@ -310,9 +310,9 @@ export function checkIfUseWrappedInAsyncCatch(rejectedReason: any) {
     rejectedReason === SuspenseActionException
   ) {
     throw new Error(
-      'Hooks are not supported inside an async component. This ' +
+      "Hooks are not supported inside an async component. This " +
         "error is often caused by accidentally adding `'use client'` " +
-        'to a module that was originally written for the server.',
+        "to a module that was originally written for the server."
     );
   }
 }

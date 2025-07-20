@@ -19,9 +19,9 @@ const hasReadOnlyValue = {
 
 export function checkControlledValueProps(
   tagName: string,
-  props: Object,
+  props: Object
 ): void {
-  if (__DEV__) {
+  if (false) {
     if (
       !(
         hasReadOnlyValue[props.type] ||
@@ -32,17 +32,17 @@ export function checkControlledValueProps(
         props.value == null
       )
     ) {
-      if (tagName === 'select') {
+      if (tagName === "select") {
         console.error(
-          'You provided a `value` prop to a form field without an ' +
-            '`onChange` handler. This will render a read-only field. If ' +
-            'the field should be mutable use `defaultValue`. Otherwise, set `onChange`.',
+          "You provided a `value` prop to a form field without an " +
+            "`onChange` handler. This will render a read-only field. If " +
+            "the field should be mutable use `defaultValue`. Otherwise, set `onChange`."
         );
       } else {
         console.error(
-          'You provided a `value` prop to a form field without an ' +
-            '`onChange` handler. This will render a read-only field. If ' +
-            'the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`.',
+          "You provided a `value` prop to a form field without an " +
+            "`onChange` handler. This will render a read-only field. If " +
+            "the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`."
         );
       }
     }
@@ -56,10 +56,10 @@ export function checkControlledValueProps(
       )
     ) {
       console.error(
-        'You provided a `checked` prop to a form field without an ' +
-          '`onChange` handler. This will render a read-only field. If ' +
-          'the field should be mutable use `defaultChecked`. Otherwise, ' +
-          'set either `onChange` or `readOnly`.',
+        "You provided a `checked` prop to a form field without an " +
+          "`onChange` handler. This will render a read-only field. If " +
+          "the field should be mutable use `defaultChecked`. Otherwise, " +
+          "set either `onChange` or `readOnly`."
       );
     }
   }

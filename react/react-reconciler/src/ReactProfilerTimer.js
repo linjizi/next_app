@@ -7,13 +7,13 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
+import type { Fiber } from "./ReactInternalTypes";
 
-import type {SuspendedReason} from './ReactFiberWorkLoop';
+import type { SuspendedReason } from "./ReactFiberWorkLoop";
 
-import type {Lane, Lanes} from './ReactFiberLane';
+import type { Lane, Lanes } from "./ReactFiberLane";
 
-import type {CapturedValue} from './ReactCapturedValue';
+import type { CapturedValue } from "./ReactCapturedValue";
 
 import {
   isTransitionLane,
@@ -22,28 +22,28 @@ import {
   includesTransitionLane,
   includesBlockingLane,
   includesSyncLane,
-} from './ReactFiberLane';
+} from "./ReactFiberLane";
 
-import {resolveEventType, resolveEventTimeStamp} from './ReactFiberConfig';
+import { resolveEventType, resolveEventTimeStamp } from "./ReactFiberConfig";
 
 import {
   enableProfilerCommitHooks,
   enableProfilerNestedUpdatePhase,
   enableProfilerTimer,
   enableComponentPerformanceTrack,
-} from 'shared/ReactFeatureFlags';
+} from "shared/ReactFeatureFlags";
 
-import {isAlreadyRendering} from './ReactFiberWorkLoop';
+import { isAlreadyRendering } from "./ReactFiberWorkLoop";
 
 // Intentionally not named imports because Rollup would use dynamic dispatch for
 // CommonJS interop named imports.
-import * as Scheduler from 'scheduler';
+import * as Scheduler from "scheduler";
 
-const {unstable_now: now} = Scheduler;
+const { unstable_now: now } = Scheduler;
 
 const createTask =
   // eslint-disable-next-line react-internal/no-production-logging
-  __DEV__ && console.createTask
+  false && console.createTask
     ? // eslint-disable-next-line react-internal/no-production-logging
       console.createTask
     : (name: string) => null;
@@ -89,50 +89,7 @@ export function startYieldTimer(reason: SuspendedReason) {
 }
 
 export function startUpdateTimerByLane(lane: Lane, method: string): void {
-  if (!enableProfilerTimer || !enableComponentPerformanceTrack) {
-    return;
-  }
-  if (isSyncLane(lane) || isBlockingLane(lane)) {
-    if (blockingUpdateTime < 0) {
-      blockingUpdateTime = now();
-      blockingUpdateTask = createTask(method);
-      if (isAlreadyRendering()) {
-        blockingSpawnedUpdate = true;
-      }
-      const newEventTime = resolveEventTimeStamp();
-      const newEventType = resolveEventType();
-      if (
-        newEventTime !== blockingEventTime ||
-        newEventType !== blockingEventType
-      ) {
-        blockingEventIsRepeat = false;
-      } else if (newEventType !== null) {
-        // If this is a second update in the same event, we treat it as a spawned update.
-        // This might be a microtask spawned from useEffect, multiple flushSync or
-        // a setState in a microtask spawned after the first setState. Regardless it's bad.
-        blockingSpawnedUpdate = true;
-      }
-      blockingEventTime = newEventTime;
-      blockingEventType = newEventType;
-    }
-  } else if (isTransitionLane(lane)) {
-    if (transitionUpdateTime < 0) {
-      transitionUpdateTime = now();
-      transitionUpdateTask = createTask(method);
-      if (transitionStartTime < 0) {
-        const newEventTime = resolveEventTimeStamp();
-        const newEventType = resolveEventType();
-        if (
-          newEventTime !== transitionEventTime ||
-          newEventType !== transitionEventType
-        ) {
-          transitionEventIsRepeat = false;
-        }
-        transitionEventTime = newEventTime;
-        transitionEventType = newEventType;
-      }
-    }
-  }
+  return;
 }
 
 export function startPingTimerByLanes(lanes: Lanes): void {
@@ -262,7 +219,7 @@ export function popNestedEffectDurations(prevEffectDuration: number): number {
 
 // Like pop but it also adds the current elapsed time to the parent scope.
 export function bubbleNestedEffectDurations(
-  prevEffectDuration: number,
+  prevEffectDuration: number
 ): number {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return 0;
@@ -321,7 +278,7 @@ export function popComponentEffectDuration(prevEffectDuration: number): void {
 }
 
 export function pushComponentEffectErrors(): null | Array<
-  CapturedValue<mixed>,
+  CapturedValue<mixed>
 > {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return null;
@@ -332,7 +289,7 @@ export function pushComponentEffectErrors(): null | Array<
 }
 
 export function popComponentEffectErrors(
-  prevErrors: null | Array<CapturedValue<mixed>>,
+  prevErrors: null | Array<CapturedValue<mixed>>
 ): void {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return;
@@ -424,7 +381,7 @@ export function stopProfilerTimerIfRunning(fiber: Fiber): void {
 }
 
 export function stopProfilerTimerIfRunningAndRecordDuration(
-  fiber: Fiber,
+  fiber: Fiber
 ): void {
   if (!enableProfilerTimer) {
     return;
@@ -439,7 +396,7 @@ export function stopProfilerTimerIfRunningAndRecordDuration(
 }
 
 export function stopProfilerTimerIfRunningAndRecordIncompleteDuration(
-  fiber: Fiber,
+  fiber: Fiber
 ): void {
   if (!enableProfilerTimer) {
     return;

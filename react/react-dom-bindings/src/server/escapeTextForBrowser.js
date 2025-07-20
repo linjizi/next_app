@@ -38,7 +38,7 @@
  * @private
  */
 
-import {checkHtmlStringCoercion} from 'shared/CheckStringCoercion';
+import { checkHtmlStringCoercion } from "shared/CheckStringCoercion";
 
 const matchHtmlRegExp = /["'&<>]/;
 
@@ -51,10 +51,10 @@ const matchHtmlRegExp = /["'&<>]/;
  */
 
 function escapeHtml(string: string) {
-  if (__DEV__) {
+  if (false) {
     checkHtmlStringCoercion(string);
   }
-  const str = '' + string;
+  const str = "" + string;
   const match = matchHtmlRegExp.exec(str);
 
   if (!match) {
@@ -62,26 +62,26 @@ function escapeHtml(string: string) {
   }
 
   let escape;
-  let html = '';
+  let html = "";
   let index;
   let lastIndex = 0;
 
   for (index = match.index; index < str.length; index++) {
     switch (str.charCodeAt(index)) {
       case 34: // "
-        escape = '&quot;';
+        escape = "&quot;";
         break;
       case 38: // &
-        escape = '&amp;';
+        escape = "&amp;";
         break;
       case 39: // '
-        escape = '&#x27;'; // modified from escape-html; used to be '&#39'
+        escape = "&#x27;"; // modified from escape-html; used to be '&#39'
         break;
       case 60: // <
-        escape = '&lt;';
+        escape = "&lt;";
         break;
       case 62: // >
-        escape = '&gt;';
+        escape = "&gt;";
         break;
       default:
         continue;
@@ -107,14 +107,14 @@ function escapeHtml(string: string) {
  */
 function escapeTextForBrowser(text: string | number | boolean): string {
   if (
-    typeof text === 'boolean' ||
-    typeof text === 'number' ||
-    typeof text === 'bigint'
+    typeof text === "boolean" ||
+    typeof text === "number" ||
+    typeof text === "bigint"
   ) {
     // this shortcircuit helps perf for types that we know will never have
     // special characters, especially given that this function is used often
     // for numeric dom ids.
-    return '' + (text: any);
+    return "" + (text: any);
   }
   return escapeHtml(text);
 }

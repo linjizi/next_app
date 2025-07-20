@@ -27,18 +27,11 @@ import {
   createLaneMap,
 } from './ReactFiberLane';
 import {
-  enableSuspenseCallback,
-  enableProfilerCommitHooks,
-  enableProfilerTimer,
-  enableUpdaterTracking,
-  enableTransitionTracing,
-  disableLegacyMode,
   enableViewTransition,
   enableGestureTransition,
-  enableDefaultTransitionIndicator,
 } from 'shared/ReactFeatureFlags';
 import {initializeUpdateQueue} from './ReactFiberClassUpdateQueue';
-import {LegacyRoot, ConcurrentRoot} from './ReactRootTags';
+import {ConcurrentRoot} from './ReactRootTags';
 import {createCache, retainCache} from './ReactFiberCacheComponent';
 
 export type RootState = {
@@ -60,7 +53,7 @@ function FiberRootNode(
   onDefaultTransitionIndicator: any,
   formState: ReactFormState<any, any> | null,
 ) {
-  this.tag = disableLegacyMode ? ConcurrentRoot : tag;
+  this.tag = ConcurrentRoot;
   this.containerInfo = containerInfo;
   this.pendingChildren = null;
   this.current = null;
@@ -79,9 +72,7 @@ function FiberRootNode(
   this.pingedLanes = NoLanes;
   this.warmLanes = NoLanes;
   this.expiredLanes = NoLanes;
-  if (enableDefaultTransitionIndicator) {
-    this.indicatorLanes = NoLanes;
-  }
+  this.indicatorLanes = NoLanes;
   this.errorRecoveryDisabledLanes = NoLanes;
   this.shellSuspendCounter = 0;
 
@@ -94,18 +85,10 @@ function FiberRootNode(
   this.onUncaughtError = onUncaughtError;
   this.onCaughtError = onCaughtError;
   this.onRecoverableError = onRecoverableError;
-
-  if (enableDefaultTransitionIndicator) {
-    this.onDefaultTransitionIndicator = onDefaultTransitionIndicator;
-    this.pendingIndicator = null;
-  }
-
+  this.onDefaultTransitionIndicator = onDefaultTransitionIndicator;
+  this.pendingIndicator = null;
   this.pooledCache = null;
   this.pooledCacheLanes = NoLanes;
-
-  if (enableSuspenseCallback) {
-    this.hydrationCallbacks = null;
-  }
 
   this.formState = formState;
 
@@ -120,39 +103,6 @@ function FiberRootNode(
   }
 
   this.incompleteTransitions = new Map();
-  if (enableTransitionTracing) {
-    this.transitionCallbacks = null;
-    this.transitionLanes = createLaneMap(null);
-  }
-
-  if (enableProfilerTimer && enableProfilerCommitHooks) {
-    this.effectDuration = -0;
-    this.passiveEffectDuration = -0;
-  }
-
-  if (enableUpdaterTracking) {
-    this.memoizedUpdaters = new Set();
-    const pendingUpdatersLaneMap = (this.pendingUpdatersLaneMap = []);
-    for (let i = 0; i < TotalLanes; i++) {
-      pendingUpdatersLaneMap.push(new Set());
-    }
-  }
-
-  if (__DEV__) {
-    if (disableLegacyMode) {
-      // TODO: This varies by each renderer.
-      this._debugRootType = hydrate ? 'hydrateRoot()' : 'createRoot()';
-    } else {
-      switch (tag) {
-        case ConcurrentRoot:
-          this._debugRootType = hydrate ? 'hydrateRoot()' : 'createRoot()';
-          break;
-        case LegacyRoot:
-          this._debugRootType = hydrate ? 'hydrate()' : 'render()';
-          break;
-      }
-    }
-  }
 }
 
 export function createFiberRoot(
@@ -198,13 +148,6 @@ export function createFiberRoot(
     onDefaultTransitionIndicator,
     formState,
   ): any);
-  if (enableSuspenseCallback) {
-    root.hydrationCallbacks = hydrationCallbacks;
-  }
-
-  if (enableTransitionTracing) {
-    root.transitionCallbacks = transitionCallbacks;
-  }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.

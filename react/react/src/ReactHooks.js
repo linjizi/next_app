@@ -7,31 +7,31 @@
  * @flow
  */
 
-import type {Dispatcher} from 'react-reconciler/src/ReactInternalTypes';
+import type { Dispatcher } from "react-reconciler/src/ReactInternalTypes";
 import type {
   ReactContext,
   StartTransitionOptions,
   Usable,
   Awaited,
-} from 'shared/ReactTypes';
-import {REACT_CONSUMER_TYPE} from 'shared/ReactSymbols';
+} from "shared/ReactTypes";
+import { REACT_CONSUMER_TYPE } from "shared/ReactSymbols";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
-type BasicStateAction<S> = (S => S) | S;
-type Dispatch<A> = A => void;
+type BasicStateAction<S> = ((S) => S) | S;
+type Dispatch<A> = (A) => void;
 
 function resolveDispatcher() {
   const dispatcher = ReactSharedInternals.H;
-  if (__DEV__) {
+  if (false) {
     if (dispatcher === null) {
       console.error(
-        'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
-          ' one of the following reasons:\n' +
-          '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
-          '2. You might be breaking the Rules of Hooks\n' +
-          '3. You might have more than one copy of React in the same app\n' +
-          'See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.',
+        "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for" +
+          " one of the following reasons:\n" +
+          "1. You might have mismatching versions of React and the renderer (such as React DOM)\n" +
+          "2. You might be breaking the Rules of Hooks\n" +
+          "3. You might have more than one copy of React in the same app\n" +
+          "See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
       );
     }
   }
@@ -52,11 +52,11 @@ export function getCacheForType<T>(resourceType: () => T): T {
 
 export function useContext<T>(Context: ReactContext<T>): T {
   const dispatcher = resolveDispatcher();
-  if (__DEV__) {
+  if (false) {
     if (Context.$$typeof === REACT_CONSUMER_TYPE) {
       console.error(
-        'Calling useContext(Context.Consumer) is not supported and will cause bugs. ' +
-          'Did you mean to call useContext(Context) instead?',
+        "Calling useContext(Context.Consumer) is not supported and will cause bugs. " +
+          "Did you mean to call useContext(Context) instead?"
       );
     }
   }
@@ -64,7 +64,7 @@ export function useContext<T>(Context: ReactContext<T>): T {
 }
 
 export function useState<S>(
-  initialState: (() => S) | S,
+  initialState: (() => S) | S
 ): [S, Dispatch<BasicStateAction<S>>] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useState(initialState);
@@ -73,25 +73,25 @@ export function useState<S>(
 export function useReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
-  init?: I => S,
+  init?: (I) => S
 ): [S, Dispatch<A>] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useReducer(reducer, initialArg, init);
 }
 
-export function useRef<T>(initialValue: T): {current: T} {
+export function useRef<T>(initialValue: T): { current: T } {
   const dispatcher = resolveDispatcher();
   return dispatcher.useRef(initialValue);
 }
 
 export function useEffect(
   create: () => (() => void) | void,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): void {
-  if (__DEV__) {
+  if (false) {
     if (create == null) {
       console.warn(
-        'React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?',
+        "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
       );
     }
   }
@@ -102,12 +102,12 @@ export function useEffect(
 
 export function useInsertionEffect(
   create: () => (() => void) | void,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): void {
-  if (__DEV__) {
+  if (false) {
     if (create == null) {
       console.warn(
-        'React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?',
+        "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
       );
     }
   }
@@ -118,12 +118,12 @@ export function useInsertionEffect(
 
 export function useLayoutEffect(
   create: () => (() => void) | void,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): void {
-  if (__DEV__) {
+  if (false) {
     if (create == null) {
       console.warn(
-        'React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?',
+        "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
       );
     }
   }
@@ -134,7 +134,7 @@ export function useLayoutEffect(
 
 export function useCallback<T>(
   callback: T,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): T {
   const dispatcher = resolveDispatcher();
   return dispatcher.useCallback(callback, deps);
@@ -142,16 +142,16 @@ export function useCallback<T>(
 
 export function useMemo<T>(
   create: () => T,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): T {
   const dispatcher = resolveDispatcher();
   return dispatcher.useMemo(create, deps);
 }
 
 export function useImperativeHandle<T>(
-  ref: {current: T | null} | ((inst: T | null) => mixed) | null | void,
+  ref: { current: T | null } | ((inst: T | null) => mixed) | null | void,
   create: () => T,
-  deps: Array<mixed> | void | null,
+  deps: Array<mixed> | void | null
 ): void {
   const dispatcher = resolveDispatcher();
   return dispatcher.useImperativeHandle(ref, create, deps);
@@ -159,9 +159,9 @@ export function useImperativeHandle<T>(
 
 export function useDebugValue<T>(
   value: T,
-  formatterFn: ?(value: T) => mixed,
+  formatterFn: ?(value: T) => mixed
 ): void {
-  if (__DEV__) {
+  if (false) {
     const dispatcher = resolveDispatcher();
     return dispatcher.useDebugValue(value, formatterFn);
   }
@@ -169,7 +169,7 @@ export function useDebugValue<T>(
 
 export function useTransition(): [
   boolean,
-  (callback: () => void, options?: StartTransitionOptions) => void,
+  (callback: () => void, options?: StartTransitionOptions) => void
 ] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useTransition();
@@ -188,13 +188,13 @@ export function useId(): string {
 export function useSyncExternalStore<T>(
   subscribe: (() => void) => () => void,
   getSnapshot: () => T,
-  getServerSnapshot?: () => T,
+  getServerSnapshot?: () => T
 ): T {
   const dispatcher = resolveDispatcher();
   return dispatcher.useSyncExternalStore(
     subscribe,
     getSnapshot,
-    getServerSnapshot,
+    getServerSnapshot
   );
 }
 
@@ -216,7 +216,7 @@ export function useMemoCache(size: number): Array<mixed> {
 }
 
 export function useEffectEvent<Args, F: (...Array<Args>) => mixed>(
-  callback: F,
+  callback: F
 ): F {
   const dispatcher = resolveDispatcher();
   // $FlowFixMe[not-a-function] This is unstable, thus optional
@@ -225,7 +225,7 @@ export function useEffectEvent<Args, F: (...Array<Args>) => mixed>(
 
 export function useOptimistic<S, A>(
   passthrough: S,
-  reducer: ?(S, A) => S,
+  reducer: ?(S, A) => S
 ): [S, (A) => void] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useOptimistic(passthrough, reducer);
@@ -234,7 +234,7 @@ export function useOptimistic<S, A>(
 export function useActionState<S, P>(
   action: (Awaited<S>, P) => S,
   initialState: Awaited<S>,
-  permalink?: string,
+  permalink?: string
 ): [Awaited<S>, (P) => void, boolean] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useActionState(action, initialState, permalink);

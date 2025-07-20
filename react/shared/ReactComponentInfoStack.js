@@ -7,27 +7,27 @@
  * @flow
  */
 
-import type {ReactComponentInfo} from 'shared/ReactTypes';
+import type { ReactComponentInfo } from "shared/ReactTypes";
 
-import {describeBuiltInComponentFrame} from 'shared/ReactComponentStackFrame';
+import { describeBuiltInComponentFrame } from "shared/ReactComponentStackFrame";
 
-import {formatOwnerStack} from 'shared/ReactOwnerStackFrames';
+import { formatOwnerStack } from "shared/ReactOwnerStackFrames";
 
 export function getOwnerStackByComponentInfoInDev(
-  componentInfo: ReactComponentInfo,
+  componentInfo: ReactComponentInfo
 ): string {
-  if (!__DEV__) {
-    return '';
+  if (!false) {
+    return "";
   }
   try {
-    let info = '';
+    let info = "";
 
     // The owner stack of the current component will be where it was created, i.e. inside its owner.
     // There's no actual name of the currently executing component. Instead, that is available
     // on the regular stack that's currently executing. However, if there is no owner at all, then
     // there's no stack frame so we add the name of the root component to the stack to know which
     // component is currently executing.
-    if (!componentInfo.owner && typeof componentInfo.name === 'string') {
+    if (!componentInfo.owner && typeof componentInfo.name === "string") {
       return describeBuiltInComponentFrame(componentInfo.name);
     }
 
@@ -40,7 +40,7 @@ export function getOwnerStackByComponentInfoInDev(
         owner = owner.owner;
         if (owner) {
           // TODO: Should we stash this somewhere for caching purposes?
-          info += '\n' + formatOwnerStack(ownerStack);
+          info += "\n" + formatOwnerStack(ownerStack);
         }
       } else {
         break;
@@ -48,6 +48,6 @@ export function getOwnerStackByComponentInfoInDev(
     }
     return info;
   } catch (x) {
-    return '\nError generating stack: ' + x.message + '\n' + x.stack;
+    return "\nError generating stack: " + x.message + "\n" + x.stack;
   }
 }

@@ -4,18 +4,18 @@ let ReactNoop;
 let act;
 let log;
 
-describe('Activity StrictMode', () => {
+describe("Activity StrictMode", () => {
   beforeEach(() => {
     jest.resetModules();
     log = [];
 
-    React = require('react');
+    React = require("react");
     Activity = React.unstable_Activity;
-    ReactNoop = require('react-noop-renderer');
-    act = require('internal-test-utils').act;
+    ReactNoop = require("react-noop-renderer");
+    act = require("internal-test-utils").act;
   });
 
-  function Component({label}) {
+  function Component({ label }) {
     React.useEffect(() => {
       log.push(`${label}: useEffect mount`);
       return () => log.push(`${label}: useEffect unmount`);
@@ -32,42 +32,42 @@ describe('Activity StrictMode', () => {
   }
 
   // @gate __DEV__ && enableActivity
-  it('should trigger strict effects when offscreen is visible', async () => {
+  it("should trigger strict effects when offscreen is visible", async () => {
     await act(() => {
       ReactNoop.render(
         <React.StrictMode>
           <Activity mode="visible">
             <Component label="A" />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
     expect(log).toEqual([
-      'A: render',
-      'A: render',
-      'A: useLayoutEffect mount',
-      'A: useEffect mount',
-      'A: useLayoutEffect unmount',
-      'A: useEffect unmount',
-      'A: useLayoutEffect mount',
-      'A: useEffect mount',
+      "A: render",
+      "A: render",
+      "A: useLayoutEffect mount",
+      "A: useEffect mount",
+      "A: useLayoutEffect unmount",
+      "A: useEffect unmount",
+      "A: useLayoutEffect mount",
+      "A: useEffect mount",
     ]);
   });
 
   // @gate __DEV__ && enableActivity
-  it('should not trigger strict effects when offscreen is hidden', async () => {
+  it("should not trigger strict effects when offscreen is hidden", async () => {
     await act(() => {
       ReactNoop.render(
         <React.StrictMode>
           <Activity mode="hidden">
             <Component label="A" />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
-    expect(log).toEqual(['A: render', 'A: render']);
+    expect(log).toEqual(["A: render", "A: render"]);
 
     log = [];
 
@@ -78,11 +78,11 @@ describe('Activity StrictMode', () => {
             <Component label="A" />
             <Component label="B" />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
-    expect(log).toEqual(['A: render', 'A: render', 'B: render', 'B: render']);
+    expect(log).toEqual(["A: render", "A: render", "B: render", "B: render"]);
 
     log = [];
 
@@ -92,19 +92,19 @@ describe('Activity StrictMode', () => {
           <Activity mode="visible">
             <Component label="A" />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
     expect(log).toEqual([
-      'A: render',
-      'A: render',
-      'A: useLayoutEffect mount',
-      'A: useEffect mount',
-      'A: useLayoutEffect unmount',
-      'A: useEffect unmount',
-      'A: useLayoutEffect mount',
-      'A: useEffect mount',
+      "A: render",
+      "A: render",
+      "A: useLayoutEffect mount",
+      "A: useEffect mount",
+      "A: useLayoutEffect unmount",
+      "A: useEffect unmount",
+      "A: useLayoutEffect mount",
+      "A: useEffect mount",
     ]);
 
     log = [];
@@ -115,19 +115,19 @@ describe('Activity StrictMode', () => {
           <Activity mode="hidden">
             <Component label="A" />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
     expect(log).toEqual([
-      'A: useLayoutEffect unmount',
-      'A: useEffect unmount',
-      'A: render',
-      'A: render',
+      "A: useLayoutEffect unmount",
+      "A: useEffect unmount",
+      "A: render",
+      "A: render",
     ]);
   });
 
-  it('should not cause infinite render loop when StrictMode is used with Suspense and synchronous set states', async () => {
+  it("should not cause infinite render loop when StrictMode is used with Suspense and synchronous set states", async () => {
     // This is a regression test, see https://github.com/facebook/react/pull/25179 for more details.
     function App() {
       const [state, setState] = React.useState(false);
@@ -149,25 +149,25 @@ describe('Activity StrictMode', () => {
           <React.Suspense>
             <App />
           </React.Suspense>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
   });
 
   // @gate __DEV__ && enableActivity
-  it('should double invoke effects on unsuspended child', async () => {
+  it("should double invoke effects on unsuspended child", async () => {
     let shouldSuspend = true;
     let resolve;
-    const suspensePromise = new Promise(_resolve => {
+    const suspensePromise = new Promise((_resolve) => {
       resolve = _resolve;
     });
 
     function Parent() {
-      log.push('Parent rendered');
+      log.push("Parent rendered");
       React.useEffect(() => {
-        log.push('Parent mount');
+        log.push("Parent mount");
         return () => {
-          log.push('Parent unmount');
+          log.push("Parent unmount");
         };
       });
 
@@ -179,15 +179,15 @@ describe('Activity StrictMode', () => {
     }
 
     function Child() {
-      log.push('Child rendered');
+      log.push("Child rendered");
       React.useEffect(() => {
-        log.push('Child mount');
+        log.push("Child mount");
         return () => {
-          log.push('Child unmount');
+          log.push("Child unmount");
         };
       });
       if (shouldSuspend) {
-        log.push('Child suspended');
+        log.push("Child suspended");
         throw suspensePromise;
       }
       return null;
@@ -199,11 +199,11 @@ describe('Activity StrictMode', () => {
           <Activity mode="visible">
             <Parent />
           </Activity>
-        </React.StrictMode>,
+        </React.StrictMode>
       );
     });
 
-    log.push('------------------------------');
+    log.push("------------------------------");
 
     await act(() => {
       resolve();
@@ -211,23 +211,23 @@ describe('Activity StrictMode', () => {
     });
 
     expect(log).toEqual([
-      'Parent rendered',
-      'Parent rendered',
-      'Child rendered',
-      'Child suspended',
-      'Parent mount',
-      'Parent unmount',
-      'Parent mount',
+      "Parent rendered",
+      "Parent rendered",
+      "Child rendered",
+      "Child suspended",
+      "Parent mount",
+      "Parent unmount",
+      "Parent mount",
       // pre-warming
-      'Child rendered',
-      'Child suspended',
+      "Child rendered",
+      "Child suspended",
       // end pre-warming
-      '------------------------------',
-      'Child rendered',
-      'Child rendered',
-      'Child mount',
-      'Child unmount',
-      'Child mount',
+      "------------------------------",
+      "Child rendered",
+      "Child rendered",
+      "Child mount",
+      "Child unmount",
+      "Child mount",
     ]);
   });
 });

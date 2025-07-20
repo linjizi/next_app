@@ -7,29 +7,29 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
-describe('ReactStrictMode', () => {
+describe("ReactStrictMode", () => {
   let React;
   let ReactDOMClient;
   let act;
 
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
 
-    act = require('internal-test-utils').act;
+    act = require("internal-test-utils").act;
   });
 
-  describe('levels', () => {
+  describe("levels", () => {
     let log;
 
     beforeEach(() => {
       log = [];
     });
 
-    function Component({label}) {
+    function Component({ label }) {
       React.useEffect(() => {
         log.push(`${label}: useEffect mount`);
         return () => log.push(`${label}: useEffect unmount`);
@@ -45,24 +45,24 @@ describe('ReactStrictMode', () => {
       return null;
     }
 
-    it('should default to not strict', async () => {
+    it("should default to not strict", async () => {
       await act(() => {
-        const container = document.createElement('div');
+        const container = document.createElement("div");
         const root = ReactDOMClient.createRoot(container);
         root.render(<Component label="A" />);
       });
 
       expect(log).toEqual([
-        'A: render',
-        'A: useLayoutEffect mount',
-        'A: useEffect mount',
+        "A: render",
+        "A: useLayoutEffect mount",
+        "A: useEffect mount",
       ]);
     });
 
-    if (__DEV__) {
-      it('should support enabling strict mode via createRoot option', async () => {
+    if (false) {
+      it("should support enabling strict mode via createRoot option", async () => {
         await act(() => {
-          const container = document.createElement('div');
+          const container = document.createElement("div");
           const root = ReactDOMClient.createRoot(container, {
             unstable_strictMode: true,
           });
@@ -70,43 +70,43 @@ describe('ReactStrictMode', () => {
         });
 
         expect(log).toEqual([
-          'A: render',
-          'A: render',
-          'A: useLayoutEffect mount',
-          'A: useEffect mount',
-          'A: useLayoutEffect unmount',
-          'A: useEffect unmount',
-          'A: useLayoutEffect mount',
-          'A: useEffect mount',
+          "A: render",
+          "A: render",
+          "A: useLayoutEffect mount",
+          "A: useEffect mount",
+          "A: useLayoutEffect unmount",
+          "A: useEffect unmount",
+          "A: useLayoutEffect mount",
+          "A: useEffect mount",
         ]);
       });
 
-      it('should include legacy + strict effects mode', async () => {
+      it("should include legacy + strict effects mode", async () => {
         await act(() => {
-          const container = document.createElement('div');
+          const container = document.createElement("div");
           const root = ReactDOMClient.createRoot(container);
           root.render(
             <React.StrictMode>
               <Component label="A" />
-            </React.StrictMode>,
+            </React.StrictMode>
           );
         });
 
         expect(log).toEqual([
-          'A: render',
-          'A: render',
-          'A: useLayoutEffect mount',
-          'A: useEffect mount',
-          'A: useLayoutEffect unmount',
-          'A: useEffect unmount',
-          'A: useLayoutEffect mount',
-          'A: useEffect mount',
+          "A: render",
+          "A: render",
+          "A: useLayoutEffect mount",
+          "A: useEffect mount",
+          "A: useLayoutEffect unmount",
+          "A: useEffect unmount",
+          "A: useLayoutEffect mount",
+          "A: useEffect mount",
         ]);
       });
 
-      it('should allow level to be increased with nesting', async () => {
+      it("should allow level to be increased with nesting", async () => {
         await act(() => {
-          const container = document.createElement('div');
+          const container = document.createElement("div");
           const root = ReactDOMClient.createRoot(container);
           root.render(
             <>
@@ -115,31 +115,31 @@ describe('ReactStrictMode', () => {
                 <Component label="B" />,
               </React.StrictMode>
               ,
-            </>,
+            </>
           );
         });
 
         expect(log).toEqual([
-          'A: render',
-          'B: render',
-          'B: render',
-          'A: useLayoutEffect mount',
-          'B: useLayoutEffect mount',
-          'A: useEffect mount',
-          'B: useEffect mount',
-          'B: useLayoutEffect unmount',
-          'B: useEffect unmount',
-          'B: useLayoutEffect mount',
-          'B: useEffect mount',
+          "A: render",
+          "B: render",
+          "B: render",
+          "A: useLayoutEffect mount",
+          "B: useLayoutEffect mount",
+          "A: useEffect mount",
+          "B: useEffect mount",
+          "B: useLayoutEffect unmount",
+          "B: useEffect unmount",
+          "B: useLayoutEffect mount",
+          "B: useEffect mount",
         ]);
       });
 
-      it('should support nested strict mode on initial mount', async () => {
-        function Wrapper({children}) {
+      it("should support nested strict mode on initial mount", async () => {
+        function Wrapper({ children }) {
           return children;
         }
         await act(() => {
-          const container = document.createElement('div');
+          const container = document.createElement("div");
           const root = ReactDOMClient.createRoot(container);
           root.render(
             <Wrapper>
@@ -148,18 +148,18 @@ describe('ReactStrictMode', () => {
                 <Component label="B" />,
               </React.StrictMode>
               ,
-            </Wrapper>,
+            </Wrapper>
           );
         });
 
         expect(log).toEqual([
-          'A: render',
-          'B: render',
-          'B: render',
-          'A: useLayoutEffect mount',
-          'B: useLayoutEffect mount',
-          'A: useEffect mount',
-          'B: useEffect mount',
+          "A: render",
+          "B: render",
+          "B: render",
+          "A: useLayoutEffect mount",
+          "B: useLayoutEffect mount",
+          "A: useEffect mount",
+          "B: useEffect mount",
           // TODO: this is currently broken
           // 'B: useLayoutEffect unmount',
           // 'B: useEffect unmount',

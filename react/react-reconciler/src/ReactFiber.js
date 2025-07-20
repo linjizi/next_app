@@ -36,10 +36,8 @@ import {
   isHostSingletonType,
 } from './ReactFiberConfig';
 import {
-  enableProfilerTimer,
   enableScopeAPI,
   enableLegacyHidden,
-  enableTransitionTracing,
   disableLegacyMode,
   enableObjectFiber,
   enableViewTransition,
@@ -121,20 +119,6 @@ export type {Fiber};
 
 let hasBadMapPolyfill;
 
-if (__DEV__) {
-  hasBadMapPolyfill = false;
-  try {
-    const nonExtensibleObject = Object.preventExtensions({});
-    // eslint-disable-next-line no-new
-    new Map([[nonExtensibleObject, null]]);
-    // eslint-disable-next-line no-new
-    new Set([nonExtensibleObject]);
-  } catch (e) {
-    // TODO: Consider warning about bad polyfills
-    hasBadMapPolyfill = true;
-  }
-}
-
 function FiberNode(
   this: $FlowFixMe,
   tag: WorkTag,
@@ -175,39 +159,6 @@ function FiberNode(
   this.childLanes = NoLanes;
 
   this.alternate = null;
-
-  if (enableProfilerTimer) {
-    // Note: The following is done to avoid a v8 performance cliff.
-    //
-    // Initializing the fields below to smis and later updating them with
-    // double values will cause Fibers to end up having separate shapes.
-    // This behavior/bug has something to do with Object.preventExtension().
-    // Fortunately this only impacts DEV builds.
-    // Unfortunately it makes React unusably slow for some applications.
-    // To work around this, initialize the fields below with doubles.
-    //
-    // Learn more about this here:
-    // https://github.com/facebook/react/issues/14365
-    // https://bugs.chromium.org/p/v8/issues/detail?id=8538
-
-    this.actualDuration = -0;
-    this.actualStartTime = -1.1;
-    this.selfBaseDuration = -0;
-    this.treeBaseDuration = -0;
-  }
-
-  if (__DEV__) {
-    // This isn't directly used but is handy for debugging internals:
-    this._debugInfo = null;
-    this._debugOwner = null;
-    this._debugStack = null;
-    this._debugTask = null;
-    this._debugNeedsRemount = false;
-    this._debugHookTypes = null;
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(this);
-    }
-  }
 }
 
 // This is a constructor function, rather than a POJO constructor, still
@@ -277,26 +228,6 @@ function createFiberImplObject(
     pendingProps,
     mode,
   };
-
-  if (enableProfilerTimer) {
-    fiber.actualDuration = -0;
-    fiber.actualStartTime = -1.1;
-    fiber.selfBaseDuration = -0;
-    fiber.treeBaseDuration = -0;
-  }
-
-  if (__DEV__) {
-    // This isn't directly used but is handy for debugging internals:
-    fiber._debugInfo = null;
-    fiber._debugOwner = null;
-    fiber._debugStack = null;
-    fiber._debugTask = null;
-    fiber._debugNeedsRemount = false;
-    fiber._debugHookTypes = null;
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(fiber);
-    }
-  }
   return fiber;
 }
 
@@ -342,15 +273,6 @@ export function createWorkInProgress(current: Fiber, pendingProps: any): Fiber {
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
 
-    if (__DEV__) {
-      // DEV-only fields
-
-      workInProgress._debugOwner = current._debugOwner;
-      workInProgress._debugStack = current._debugStack;
-      workInProgress._debugTask = current._debugTask;
-      workInProgress._debugHookTypes = current._debugHookTypes;
-    }
-
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   } else {
@@ -365,15 +287,6 @@ export function createWorkInProgress(current: Fiber, pendingProps: any): Fiber {
     // The effects are no longer valid.
     workInProgress.subtreeFlags = NoFlags;
     workInProgress.deletions = null;
-
-    if (enableProfilerTimer) {
-      // We intentionally reset, rather than copy, actualDuration & actualStartTime.
-      // This prevents time from endlessly accumulating in new commits.
-      // This has the downside of resetting values for different priority renders,
-      // But works for yielding (the common case) and should support resuming.
-      workInProgress.actualDuration = -0;
-      workInProgress.actualStartTime = -1.1;
-    }
   }
 
   // Reset all effects except static ones.
@@ -393,46 +306,16 @@ export function createWorkInProgress(current: Fiber, pendingProps: any): Fiber {
   workInProgress.dependencies =
     currentDependencies === null
       ? null
-      : __DEV__
-        ? {
-            lanes: currentDependencies.lanes,
-            firstContext: currentDependencies.firstContext,
-            _debugThenableState: currentDependencies._debugThenableState,
-          }
-        : {
-            lanes: currentDependencies.lanes,
-            firstContext: currentDependencies.firstContext,
-          };
+      : {
+          lanes: currentDependencies.lanes,
+          firstContext: currentDependencies.firstContext,
+        };
 
   // These will be overridden during the parent's reconciliation
   workInProgress.sibling = current.sibling;
   workInProgress.index = current.index;
   workInProgress.ref = current.ref;
   workInProgress.refCleanup = current.refCleanup;
-
-  if (enableProfilerTimer) {
-    workInProgress.selfBaseDuration = current.selfBaseDuration;
-    workInProgress.treeBaseDuration = current.treeBaseDuration;
-  }
-
-  if (__DEV__) {
-    workInProgress._debugInfo = current._debugInfo;
-    workInProgress._debugNeedsRemount = current._debugNeedsRemount;
-    switch (workInProgress.tag) {
-      case FunctionComponent:
-      case SimpleMemoComponent:
-        workInProgress.type = resolveFunctionForHotReloading(current.type);
-        break;
-      case ClassComponent:
-        workInProgress.type = resolveClassForHotReloading(current.type);
-        break;
-      case ForwardRef:
-        workInProgress.type = resolveForwardRefForHotReloading(current.type);
-        break;
-      default:
-        break;
-    }
-  }
 
   return workInProgress;
 }
@@ -471,13 +354,6 @@ export function resetWorkInProgress(
     workInProgress.dependencies = null;
 
     workInProgress.stateNode = null;
-
-    if (enableProfilerTimer) {
-      // Note: We don't reset the actualTime counts. It's useful to accumulate
-      // actual time across multiple render passes.
-      workInProgress.selfBaseDuration = 0;
-      workInProgress.treeBaseDuration = 0;
-    }
   } else {
     // Reset to the cloned values that createWorkInProgress would've.
     workInProgress.childLanes = current.childLanes;
@@ -498,23 +374,10 @@ export function resetWorkInProgress(
     workInProgress.dependencies =
       currentDependencies === null
         ? null
-        : __DEV__
-          ? {
-              lanes: currentDependencies.lanes,
-              firstContext: currentDependencies.firstContext,
-              _debugThenableState: currentDependencies._debugThenableState,
-            }
-          : {
-              lanes: currentDependencies.lanes,
-              firstContext: currentDependencies.firstContext,
-            };
-
-    if (enableProfilerTimer) {
-      // Note: We don't reset the actualTime counts. It's useful to accumulate
-      // actual time across multiple render passes.
-      workInProgress.selfBaseDuration = current.selfBaseDuration;
-      workInProgress.treeBaseDuration = current.treeBaseDuration;
-    }
+        : {
+            lanes: currentDependencies.lanes,
+            firstContext: currentDependencies.firstContext,
+          };
   }
 
   return workInProgress;
@@ -537,14 +400,6 @@ export function createHostRootFiber(
     mode = NoMode;
   }
 
-  if (enableProfilerTimer && isDevToolsPresent) {
-    // Always collect profile timings when DevTools are present.
-    // This enables DevTools to start capturing timing at any point–
-    // Without some nodes in the tree having empty base times.
-    // 性能分析
-    mode |= ProfileMode;
-  }
-
   return createFiber(HostRoot, null, null, mode);
 }
 
@@ -563,13 +418,7 @@ export function createFiberFromTypeAndProps(
   if (typeof type === 'function') {
     if (shouldConstruct(type)) {
       fiberTag = ClassComponent;
-      if (__DEV__) {
-        resolvedType = resolveClassForHotReloading(resolvedType);
-      }
     } else {
-      if (__DEV__) {
-        resolvedType = resolveFunctionForHotReloading(resolvedType);
-      }
     }
   } else if (typeof type === 'string') {
     if (supportsResources && supportsSingletons) {
@@ -625,9 +474,6 @@ export function createFiberFromTypeAndProps(
         }
       // Fall through
       case REACT_TRACING_MARKER_TYPE:
-        if (enableTransitionTracing) {
-          return createFiberFromTracingMarker(pendingProps, mode, lanes, key);
-        }
       // Fall through
       default: {
         if (typeof type === 'object' && type !== null) {
@@ -641,9 +487,6 @@ export function createFiberFromTypeAndProps(
             // Fall through
             case REACT_FORWARD_REF_TYPE:
               fiberTag = ForwardRef;
-              if (__DEV__) {
-                resolvedType = resolveForwardRefForHotReloading(resolvedType);
-              }
               break getTag;
             case REACT_MEMO_TYPE:
               fiberTag = MemoComponent;
@@ -656,42 +499,7 @@ export function createFiberFromTypeAndProps(
         }
         let info = '';
         let typeString;
-        if (__DEV__) {
-          if (
-            type === undefined ||
-            (typeof type === 'object' &&
-              type !== null &&
-              Object.keys(type).length === 0)
-          ) {
-            info +=
-              ' You likely forgot to export your component from the file ' +
-              "it's defined in, or you might have mixed up default and named imports.";
-          }
-
-          if (type === null) {
-            typeString = 'null';
-          } else if (isArray(type)) {
-            typeString = 'array';
-          } else if (
-            type !== undefined &&
-            type.$$typeof === REACT_ELEMENT_TYPE
-          ) {
-            typeString = `<${
-              getComponentNameFromType(type.type) || 'Unknown'
-            } />`;
-            info =
-              ' Did you accidentally export a JSX literal instead of a component?';
-          } else {
-            typeString = typeof type;
-          }
-
-          const ownerName = owner ? getComponentNameFromOwner(owner) : null;
-          if (ownerName) {
-            info += '\n\nCheck the render method of `' + ownerName + '`.';
-          }
-        } else {
-          typeString = type === null ? 'null' : typeof type;
-        }
+        typeString = type === null ? 'null' : typeof type;
 
         // The type is invalid but it's conceptually a child that errored and not the
         // current component itself so we create a virtual child that throws in its
@@ -714,10 +522,6 @@ export function createFiberFromTypeAndProps(
   fiber.type = resolvedType;
   fiber.lanes = lanes;
 
-  if (__DEV__) {
-    fiber._debugOwner = owner;
-  }
-
   return fiber;
 }
 
@@ -727,9 +531,6 @@ export function createFiberFromElement(
   lanes: Lanes,
 ): Fiber {
   let owner = null;
-  if (__DEV__) {
-    owner = element._owner;
-  }
   const type = element.type;
   const key = element.key;
   const pendingProps = element.props;
@@ -741,11 +542,6 @@ export function createFiberFromElement(
     mode,
     lanes,
   );
-  if (__DEV__) {
-    fiber._debugOwner = element._owner;
-    fiber._debugStack = element._debugStack;
-    fiber._debugTask = element._debugTask;
-  }
   return fiber;
 }
 
@@ -780,25 +576,9 @@ function createFiberFromProfiler(
   lanes: Lanes,
   key: null | string,
 ): Fiber {
-  if (__DEV__) {
-    if (typeof pendingProps.id !== 'string') {
-      console.error(
-        'Profiler must specify an "id" of type `string` as a prop. Received the type `%s` instead.',
-        typeof pendingProps.id,
-      );
-    }
-  }
-
   const fiber = createFiber(Profiler, pendingProps, key, mode | ProfileMode);
   fiber.elementType = REACT_PROFILER_TYPE;
   fiber.lanes = lanes;
-
-  if (enableProfilerTimer) {
-    fiber.stateNode = {
-      effectDuration: 0,
-      passiveEffectDuration: 0,
-    };
-  }
 
   return fiber;
 }

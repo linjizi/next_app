@@ -7,37 +7,37 @@
  * @flow
  */
 
-import type {ReactNodeList} from 'shared/ReactTypes';
+import type { ReactNodeList } from "shared/ReactTypes";
 
-import {disableLegacyMode} from 'shared/ReactFeatureFlags';
-import {isValidContainer} from 'react-dom-bindings/src/client/ReactDOMContainer';
-import {createEventHandle} from 'react-dom-bindings/src/client/ReactDOMEventHandle';
-import {runWithPriority} from 'react-dom-bindings/src/client/ReactDOMUpdatePriority';
-import {flushSync as flushSyncIsomorphic} from '../shared/ReactDOMFlushSync';
+import { disableLegacyMode } from "shared/ReactFeatureFlags";
+import { isValidContainer } from "react-dom-bindings/src/client/ReactDOMContainer";
+import { createEventHandle } from "react-dom-bindings/src/client/ReactDOMEventHandle";
+import { runWithPriority } from "react-dom-bindings/src/client/ReactDOMUpdatePriority";
+import { flushSync as flushSyncIsomorphic } from "../shared/ReactDOMFlushSync";
 
 import {
   flushSyncFromReconciler as flushSyncWithoutWarningIfAlreadyRendering,
   isAlreadyRendering,
   injectIntoDevTools,
   findHostInstance,
-} from 'react-reconciler/src/ReactFiberReconciler';
-import {createPortal as createPortalImpl} from 'react-reconciler/src/ReactPortal';
-import {canUseDOM} from 'shared/ExecutionEnvironment';
-import ReactVersion from 'shared/ReactVersion';
+} from "react-reconciler/src/ReactFiberReconciler";
+import { createPortal as createPortalImpl } from "react-reconciler/src/ReactPortal";
+import { canUseDOM } from "shared/ExecutionEnvironment";
+import ReactVersion from "shared/ReactVersion";
 
-import {ensureCorrectIsomorphicReactVersion} from '../shared/ensureCorrectIsomorphicReactVersion';
+import { ensureCorrectIsomorphicReactVersion } from "../shared/ensureCorrectIsomorphicReactVersion";
 ensureCorrectIsomorphicReactVersion();
 
 import {
   getInstanceFromNode,
   getNodeFromInstance,
   getFiberCurrentPropsFromNode,
-} from 'react-dom-bindings/src/client/ReactDOMComponentTree';
+} from "react-dom-bindings/src/client/ReactDOMComponentTree";
 import {
   enqueueStateRestore,
   restoreStateIfNeeded,
-} from 'react-dom-bindings/src/events/ReactDOMControlledComponent';
-import Internals from '../ReactDOMSharedInternalsFB';
+} from "react-dom-bindings/src/events/ReactDOMControlledComponent";
+import Internals from "../ReactDOMSharedInternalsFB";
 
 export {
   prefetchDNS,
@@ -46,28 +46,28 @@ export {
   preloadModule,
   preinit,
   preinitModule,
-} from '../shared/ReactDOMFloat';
+} from "../shared/ReactDOMFloat";
 export {
   useFormStatus,
   useFormState,
   requestFormReset,
-} from 'react-dom-bindings/src/shared/ReactDOMFormActions';
+} from "react-dom-bindings/src/shared/ReactDOMFormActions";
 
-if (__DEV__) {
+if (false) {
   if (
-    typeof Map !== 'function' ||
+    typeof Map !== "function" ||
     // $FlowFixMe[prop-missing] Flow incorrectly thinks Map has no prototype
     Map.prototype == null ||
-    typeof Map.prototype.forEach !== 'function' ||
-    typeof Set !== 'function' ||
+    typeof Map.prototype.forEach !== "function" ||
+    typeof Set !== "function" ||
     // $FlowFixMe[prop-missing] Flow incorrectly thinks Set has no prototype
     Set.prototype == null ||
-    typeof Set.prototype.clear !== 'function' ||
-    typeof Set.prototype.forEach !== 'function'
+    typeof Set.prototype.clear !== "function" ||
+    typeof Set.prototype.forEach !== "function"
   ) {
     console.error(
-      'React depends on Map and Set built-in types. Make sure that you load a ' +
-        'polyfill in older browsers. https://react.dev/link/react-polyfills',
+      "React depends on Map and Set built-in types. Make sure that you load a " +
+        "polyfill in older browsers. https://react.dev/link/react-polyfills"
     );
   }
 }
@@ -75,10 +75,10 @@ if (__DEV__) {
 function createPortal(
   children: ReactNodeList,
   container: Element | DocumentFragment,
-  key: ?string = null,
+  key: ?string = null
 ): React$Portal {
   if (!isValidContainer(container)) {
-    throw new Error('Target container is not a DOM element.');
+    throw new Error("Target container is not a DOM element.");
   }
 
   // TODO: pass ReactDOM portal implementation as third argument
@@ -91,12 +91,12 @@ function createPortal(
 declare function flushSyncFromReconciler<R>(fn: () => R): R;
 declare function flushSyncFromReconciler(): void;
 function flushSyncFromReconciler<R>(fn: (() => R) | void): R | void {
-  if (__DEV__) {
+  if (false) {
     if (isAlreadyRendering()) {
       console.error(
-        'flushSync was called from inside a lifecycle method. React cannot ' +
-          'flush when React is already rendering. Consider moving this call to ' +
-          'a scheduler task or micro task.',
+        "flushSync was called from inside a lifecycle method. React cannot " +
+          "flush when React is already rendering. Consider moving this call to " +
+          "a scheduler task or micro task."
       );
     }
   }
@@ -109,7 +109,7 @@ const flushSync: typeof flushSyncIsomorphic = disableLegacyMode
   : flushSyncFromReconciler;
 
 function findDOMNode(
-  componentOrElement: React$Component<any, any>,
+  componentOrElement: React$Component<any, any>
 ): null | Element | Text {
   return findHostInstance(componentOrElement);
 }
@@ -149,27 +149,27 @@ Internals.Events /* Events */ = [
 
 const foundDevTools = injectIntoDevTools();
 
-if (__DEV__) {
+if (false) {
   if (!foundDevTools && canUseDOM && window.top === window.self) {
     // If we're in Chrome or Firefox, provide a download link if not installed.
     if (
-      (navigator.userAgent.indexOf('Chrome') > -1 &&
-        navigator.userAgent.indexOf('Edge') === -1) ||
-      navigator.userAgent.indexOf('Firefox') > -1
+      (navigator.userAgent.indexOf("Chrome") > -1 &&
+        navigator.userAgent.indexOf("Edge") === -1) ||
+      navigator.userAgent.indexOf("Firefox") > -1
     ) {
       const protocol = window.location.protocol;
       // Don't warn in exotic cases like chrome-extension://.
       if (/^(https?|file):$/.test(protocol)) {
         // eslint-disable-next-line react-internal/no-production-logging
         console.info(
-          '%cDownload the React DevTools ' +
-            'for a better development experience: ' +
-            'https://react.dev/link/react-devtools' +
-            (protocol === 'file:'
-              ? '\nYou might need to use a local HTTP server (instead of file://): ' +
-                'https://react.dev/link/react-devtools-faq'
-              : ''),
-          'font-weight:bold',
+          "%cDownload the React DevTools " +
+            "for a better development experience: " +
+            "https://react.dev/link/react-devtools" +
+            (protocol === "file:"
+              ? "\nYou might need to use a local HTTP server (instead of file://): " +
+                "https://react.dev/link/react-devtools-faq"
+              : ""),
+          "font-weight:bold"
         );
       }
     }

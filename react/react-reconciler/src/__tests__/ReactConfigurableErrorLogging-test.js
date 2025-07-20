@@ -7,7 +7,7 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactDOMClient;
@@ -21,23 +21,23 @@ async function fakeAct(cb) {
   Scheduler.unstable_flushAll();
 }
 
-describe('ReactConfigurableErrorLogging', () => {
+describe("ReactConfigurableErrorLogging", () => {
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
-    Scheduler = require('scheduler');
-    container = document.createElement('div');
-    if (__DEV__) {
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
+    Scheduler = require("scheduler");
+    container = document.createElement("div");
+    if (false) {
       act = React.act;
     }
   });
 
-  it('should log errors that occur during the begin phase', async () => {
+  it("should log errors that occur during the begin phase", async () => {
     class ErrorThrowingComponent extends React.Component {
       constructor(props) {
         super(props);
-        throw new Error('constructor error');
+        throw new Error("constructor error");
       }
       render() {
         return <div />;
@@ -59,31 +59,31 @@ describe('ReactConfigurableErrorLogging', () => {
           <span>
             <ErrorThrowingComponent />
           </span>
-        </div>,
+        </div>
       );
     });
 
     expect(uncaughtErrors).toEqual([
       expect.objectContaining({
-        message: 'constructor error',
+        message: "constructor error",
       }),
       expect.objectContaining({
         componentStack: expect.stringMatching(
           new RegExp(
-            '\\s+(in|at) ErrorThrowingComponent (.*)\n' +
-              '\\s+(in|at) span(.*)\n' +
-              '\\s+(in|at) div(.*)',
-          ),
+            "\\s+(in|at) ErrorThrowingComponent (.*)\n" +
+              "\\s+(in|at) span(.*)\n" +
+              "\\s+(in|at) div(.*)"
+          )
         ),
       }),
     ]);
     expect(caughtErrors).toEqual([]);
   });
 
-  it('should log errors that occur during the commit phase', async () => {
+  it("should log errors that occur during the commit phase", async () => {
     class ErrorThrowingComponent extends React.Component {
       componentDidMount() {
-        throw new Error('componentDidMount error');
+        throw new Error("componentDidMount error");
       }
       render() {
         return <div />;
@@ -105,32 +105,32 @@ describe('ReactConfigurableErrorLogging', () => {
           <span>
             <ErrorThrowingComponent />
           </span>
-        </div>,
+        </div>
       );
     });
 
     expect(uncaughtErrors).toEqual([
       expect.objectContaining({
-        message: 'componentDidMount error',
+        message: "componentDidMount error",
       }),
       expect.objectContaining({
         componentStack: expect.stringMatching(
           new RegExp(
-            '\\s+(in|at) ErrorThrowingComponent (.*)\n' +
-              '\\s+(in|at) span(.*)\n' +
-              '\\s+(in|at) div(.*)',
-          ),
+            "\\s+(in|at) ErrorThrowingComponent (.*)\n" +
+              "\\s+(in|at) span(.*)\n" +
+              "\\s+(in|at) div(.*)"
+          )
         ),
       }),
     ]);
     expect(caughtErrors).toEqual([]);
   });
 
-  it('should ignore errors thrown in log method to prevent cycle', async () => {
+  it("should ignore errors thrown in log method to prevent cycle", async () => {
     class ErrorBoundary extends React.Component {
-      state = {error: null};
+      state = { error: null };
       componentDidCatch(error) {
-        this.setState({error});
+        this.setState({ error });
       }
       render() {
         return this.state.error ? null : this.props.children;
@@ -138,7 +138,7 @@ describe('ReactConfigurableErrorLogging', () => {
     }
     class ErrorThrowingComponent extends React.Component {
       render() {
-        throw new Error('render error');
+        throw new Error("render error");
       }
     }
 
@@ -150,7 +150,7 @@ describe('ReactConfigurableErrorLogging', () => {
       },
       onCaughtError(error, errorInfo) {
         caughtErrors.push(error, errorInfo);
-        throw new Error('onCaughtError error');
+        throw new Error("onCaughtError error");
       },
     });
 
@@ -164,23 +164,23 @@ describe('ReactConfigurableErrorLogging', () => {
               <ErrorThrowingComponent />
             </span>
           </ErrorBoundary>
-        </div>,
+        </div>
       );
     });
 
     expect(uncaughtErrors).toEqual([]);
     expect(caughtErrors).toEqual([
       expect.objectContaining({
-        message: 'render error',
+        message: "render error",
       }),
       expect.objectContaining({
         componentStack: expect.stringMatching(
           new RegExp(
-            '\\s+(in|at) ErrorThrowingComponent (.*)\n' +
-              '\\s+(in|at) span(.*)\n' +
-              '\\s+(in|at) ErrorBoundary(.*)\n' +
-              '\\s+(in|at) div(.*)',
-          ),
+            "\\s+(in|at) ErrorThrowingComponent (.*)\n" +
+              "\\s+(in|at) span(.*)\n" +
+              "\\s+(in|at) ErrorBoundary(.*)\n" +
+              "\\s+(in|at) div(.*)"
+          )
         ),
         errorBoundary: ref.current,
       }),
@@ -189,12 +189,12 @@ describe('ReactConfigurableErrorLogging', () => {
     // The error thrown in caughtError should be rethrown with a clean stack
     expect(() => {
       jest.runAllTimers();
-    }).toThrow('onCaughtError error');
+    }).toThrow("onCaughtError error");
   });
 
-  it('does not log errors when inside real act', async () => {
+  it("does not log errors when inside real act", async () => {
     function ErrorThrowingComponent() {
-      throw new Error('render error');
+      throw new Error("render error");
     }
     const uncaughtErrors = [];
     const caughtErrors = [];
@@ -207,7 +207,7 @@ describe('ReactConfigurableErrorLogging', () => {
       },
     });
 
-    if (__DEV__) {
+    if (false) {
       global.IS_REACT_ACT_ENVIRONMENT = true;
 
       await expect(async () => {
@@ -217,10 +217,10 @@ describe('ReactConfigurableErrorLogging', () => {
               <span>
                 <ErrorThrowingComponent />
               </span>
-            </div>,
+            </div>
           );
         });
-      }).rejects.toThrow('render error');
+      }).rejects.toThrow("render error");
     }
 
     expect(uncaughtErrors).toEqual([]);

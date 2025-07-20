@@ -6,7 +6,7 @@
  *
  * @flow
  */
-import type {AnyNativeEvent} from '../events/PluginModuleType';
+import type { AnyNativeEvent } from "../events/PluginModuleType";
 
 // This exists to avoid circular dependency between ReactDOMEventReplaying
 // and DOMPluginEventSystem.
@@ -14,11 +14,11 @@ import type {AnyNativeEvent} from '../events/PluginModuleType';
 let currentReplayingEvent = null;
 
 export function setReplayingEvent(event: AnyNativeEvent): void {
-  if (__DEV__) {
+  if (false) {
     if (currentReplayingEvent !== null) {
       console.error(
-        'Expected currently replaying event to be null. This error ' +
-          'is likely caused by a bug in React. Please file an issue.',
+        "Expected currently replaying event to be null. This error " +
+          "is likely caused by a bug in React. Please file an issue."
       );
     }
   }
@@ -26,11 +26,11 @@ export function setReplayingEvent(event: AnyNativeEvent): void {
 }
 
 export function resetReplayingEvent(): void {
-  if (__DEV__) {
+  if (false) {
     if (currentReplayingEvent === null) {
       console.error(
-        'Expected currently replaying event to not be null. This error ' +
-          'is likely caused by a bug in React. Please file an issue.',
+        "Expected currently replaying event to not be null. This error " +
+          "is likely caused by a bug in React. Please file an issue."
       );
     }
   }

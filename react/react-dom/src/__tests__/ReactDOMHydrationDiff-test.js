@@ -7,55 +7,55 @@
  * @jest-environment ./scripts/jest/ReactDOMServerIntegrationEnvironment
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactDOMClient;
 let ReactDOMServer;
 let act;
 
-const util = require('util');
+const util = require("util");
 const realConsoleError = console.error;
 
 function errorHandler() {
   // forward to console.error but don't fail the tests
 }
 
-describe('ReactDOMServerHydration', () => {
+describe("ReactDOMServerHydration", () => {
   let container;
   let ownerStacks;
 
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
-    ReactDOMServer = require('react-dom/server');
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
+    ReactDOMServer = require("react-dom/server");
     act = React.act;
 
-    window.addEventListener('error', errorHandler);
+    window.addEventListener("error", errorHandler);
     ownerStacks = [];
     console.error = jest.fn(() => {
       const ownerStack = React.captureOwnerStack();
-      if (typeof ownerStack === 'string') {
-        ownerStacks.push(ownerStack === '' ? ' <empty>' : ownerStack);
+      if (typeof ownerStack === "string") {
+        ownerStacks.push(ownerStack === "" ? " <empty>" : ownerStack);
       } else {
-        ownerStacks.push(' ' + String(ownerStack));
+        ownerStacks.push(" " + String(ownerStack));
       }
     });
-    container = document.createElement('div');
+    container = document.createElement("div");
     document.body.appendChild(container);
   });
 
   afterEach(() => {
-    window.removeEventListener('error', errorHandler);
+    window.removeEventListener("error", errorHandler);
     document.body.removeChild(container);
     console.error = realConsoleError;
   });
 
   function normalizeCodeLocInfo(str) {
-    return typeof str === 'string'
+    return typeof str === "string"
       ? str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function (m, name) {
-          return '\n    in ' + name + ' (at **)';
+          return "\n    in " + name + " (at **)";
         })
       : str;
   }
@@ -65,10 +65,10 @@ describe('ReactDOMServerHydration', () => {
 
     if (ownerStack === undefined) {
       throw new Error(
-        'Expected an owner stack for message ' +
+        "Expected an owner stack for message " +
           index +
-          ':\n' +
-          util.format(...args),
+          ":\n" +
+          util.format(...args)
       );
     }
 
@@ -76,25 +76,25 @@ describe('ReactDOMServerHydration', () => {
     if (format instanceof Error) {
       if (format.cause instanceof Error) {
         return (
-          'Caught [' +
+          "Caught [" +
           format.message +
-          ']\n  Cause [' +
+          "]\n  Cause [" +
           format.cause.message +
-          ']\n  Owner Stack:' +
+          "]\n  Owner Stack:" +
           normalizeCodeLocInfo(ownerStack)
         );
       }
       return (
-        'Caught [' +
+        "Caught [" +
         format.message +
-        ']\n  Owner Stack:' +
+        "]\n  Owner Stack:" +
         normalizeCodeLocInfo(ownerStack)
       );
     }
     rest[rest.length - 1] = normalizeCodeLocInfo(rest[rest.length - 1]);
     return (
       util.format(format, ...rest) +
-      '\n  Owner Stack:' +
+      "\n  Owner Stack:" +
       normalizeCodeLocInfo(ownerStack)
     );
   }
@@ -105,7 +105,7 @@ describe('ReactDOMServerHydration', () => {
 
   function testMismatch(Mismatch) {
     const htmlString = ReactDOMServer.renderToString(
-      <Mismatch isClient={false} />,
+      <Mismatch isClient={false} />
     );
     container.innerHTML = htmlString;
     act(() => {
@@ -114,13 +114,13 @@ describe('ReactDOMServerHydration', () => {
     return formatConsoleErrors();
   }
 
-  describe('text mismatch', () => {
+  describe("text mismatch", () => {
     // @gate __DEV__
-    it('warns when client and server render different text', () => {
-      function Mismatch({isClient}) {
+    it("warns when client and server render different text", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
-            <main className="child">{isClient ? 'client' : 'server'}</main>
+            <main className="child">{isClient ? "client" : "server"}</main>
           </div>
         );
       }
@@ -152,8 +152,8 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when escaping on a checksum mismatch', () => {
-      function Mismatch({isClient}) {
+    it("warns when escaping on a checksum mismatch", () => {
+      function Mismatch({ isClient }) {
         if (isClient) {
           return (
             <div>This markup contains an nbsp entity: &nbsp; client text</div>
@@ -193,16 +193,16 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when client and server render different html', () => {
-      function Mismatch({isClient}) {
+    it("warns when client and server render different html", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
               className="child"
               dangerouslySetInnerHTML={{
                 __html: isClient
-                  ? '<span>client</span>'
-                  : '<span>server</span>',
+                  ? "<span>client</span>"
+                  : "<span>server</span>",
               }}
             />
           </div>
@@ -240,15 +240,15 @@ describe('ReactDOMServerHydration', () => {
     });
   });
 
-  describe('attribute mismatch', () => {
+  describe("attribute mismatch", () => {
     // @gate __DEV__
-    it('warns when client and server render different attributes', () => {
-      function Mismatch({isClient}) {
+    it("warns when client and server render different attributes", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
-              className={isClient ? 'child client' : 'child server'}
-              dir={isClient ? 'ltr' : 'rtl'}
+              className={isClient ? "child client" : "child server"}
+              dir={isClient ? "ltr" : "rtl"}
             />
           </div>
         );
@@ -284,14 +284,14 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when client renders extra attributes', () => {
-      function Mismatch({isClient}) {
+    it("warns when client renders extra attributes", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
               className="child"
               tabIndex={isClient ? 1 : null}
-              dir={isClient ? 'ltr' : null}
+              dir={isClient ? "ltr" : null}
             />
           </div>
         );
@@ -328,14 +328,14 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when server renders extra attributes', () => {
-      function Mismatch({isClient}) {
+    it("warns when server renders extra attributes", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
               className="child"
               tabIndex={isClient ? null : 1}
-              dir={isClient ? null : 'rtl'}
+              dir={isClient ? null : "rtl"}
             />
           </div>
         );
@@ -372,14 +372,14 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when both client and server render extra attributes', () => {
-      function Mismatch({isClient}) {
+    it("warns when both client and server render extra attributes", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
               className="child"
               tabIndex={isClient ? 1 : null}
-              dir={isClient ? null : 'rtl'}
+              dir={isClient ? null : "rtl"}
             />
           </div>
         );
@@ -416,8 +416,8 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when client and server render different styles', () => {
-      function Mismatch({isClient}) {
+    it("warns when client and server render different styles", () => {
+      function Mismatch({ isClient }) {
         return (
           <div className="parent">
             <main
@@ -459,24 +459,24 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('picks the DFS-first Fiber as the error Owner', () => {
-      function LeftMismatch({isClient}) {
-        return <div className={isClient ? 'client' : 'server'} />;
+    it("picks the DFS-first Fiber as the error Owner", () => {
+      function LeftMismatch({ isClient }) {
+        return <div className={isClient ? "client" : "server"} />;
       }
 
-      function LeftIndirection({isClient}) {
+      function LeftIndirection({ isClient }) {
         return <LeftMismatch isClient={isClient} />;
       }
 
-      function MiddleMismatch({isClient}) {
-        return <span className={isClient ? 'client' : 'server'} />;
+      function MiddleMismatch({ isClient }) {
+        return <span className={isClient ? "client" : "server"} />;
       }
 
-      function RightMisMatch({isClient}) {
-        return <p className={isClient ? 'client' : 'server'} />;
+      function RightMisMatch({ isClient }) {
+        return <p className={isClient ? "client" : "server"} />;
       }
 
-      function App({isClient}) {
+      function App({ isClient }) {
         return (
           <>
             <LeftIndirection isClient={isClient} />
@@ -527,11 +527,11 @@ describe('ReactDOMServerHydration', () => {
     });
   });
 
-  describe('extra nodes on the client', () => {
-    describe('extra elements on the client', () => {
+  describe("extra nodes on the client", () => {
+    describe("extra elements on the client", () => {
       // @gate __DEV__
-      it('warns when client renders an extra element as only child', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra element as only child", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {isClient && <main className="only" />}
@@ -564,8 +564,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra element in the beginning', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra element in the beginning", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {isClient && <header className="1" />}
@@ -602,8 +602,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra element in the middle', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra element in the middle", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
@@ -641,8 +641,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra element in the end', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra element in the end", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
@@ -679,11 +679,11 @@ describe('ReactDOMServerHydration', () => {
       });
     });
 
-    describe('extra text nodes on the client', () => {
+    describe("extra text nodes on the client", () => {
       // @gate __DEV__
-      it('warns when client renders an extra text node as only child', () => {
-        function Mismatch({isClient}) {
-          return <div className="parent">{isClient && 'only'}</div>;
+      it("warns when client renders an extra text node as only child", () => {
+        function Mismatch({ isClient }) {
+          return <div className="parent">{isClient && "only"}</div>;
         }
         expect(testMismatch(Mismatch)).toMatchInlineSnapshot(`
             [
@@ -712,12 +712,12 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra text node in the beginning', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra text node in the beginning", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
-              {isClient && 'second'}
+              {isClient && "second"}
               <footer className="3" />
             </div>
           );
@@ -751,11 +751,11 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra text node in the middle', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra text node in the middle", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
-              {isClient && 'first'}
+              {isClient && "first"}
               <main className="2" />
               <footer className="3" />
             </div>
@@ -789,13 +789,13 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra text node in the end', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra text node in the end", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
               <main className="2" />
-              {isClient && 'third'}
+              {isClient && "third"}
             </div>
           );
         }
@@ -828,11 +828,11 @@ describe('ReactDOMServerHydration', () => {
     });
   });
 
-  describe('extra nodes on the server', () => {
-    describe('extra elements on the server', () => {
+  describe("extra nodes on the server", () => {
+    describe("extra elements on the server", () => {
       // @gate __DEV__
-      it('warns when server renders an extra element as only child', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra element as only child", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {!isClient && <main className="only" />}
@@ -865,8 +865,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra element in the beginning', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra element in the beginning", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {!isClient && <header className="1" />}
@@ -903,8 +903,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra element in the middle', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra element in the middle", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
@@ -941,8 +941,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra element in the end', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra element in the end", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
@@ -977,11 +977,11 @@ describe('ReactDOMServerHydration', () => {
       });
     });
 
-    describe('extra text nodes on the server', () => {
+    describe("extra text nodes on the server", () => {
       // @gate __DEV__
-      it('warns when server renders an extra text node as only child', () => {
-        function Mismatch({isClient}) {
-          return <div className="parent">{!isClient && 'only'}</div>;
+      it("warns when server renders an extra text node as only child", () => {
+        function Mismatch({ isClient }) {
+          return <div className="parent">{!isClient && "only"}</div>;
         }
         expect(testMismatch(Mismatch)).toMatchInlineSnapshot(`
           [
@@ -1009,11 +1009,11 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra text node in the beginning', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra text node in the beginning", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
-              {!isClient && 'first'}
+              {!isClient && "first"}
               <main className="2" />
               <footer className="3" />
             </div>
@@ -1047,12 +1047,12 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra text node in the middle', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra text node in the middle", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
-              {!isClient && 'second'}
+              {!isClient && "second"}
               <footer className="3" />
             </div>
           );
@@ -1085,13 +1085,13 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra text node in the end', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra text node in the end", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <header className="1" />
               <main className="2" />
-              {!isClient && 'third'}
+              {!isClient && "third"}
             </div>
           );
         }
@@ -1122,15 +1122,15 @@ describe('ReactDOMServerHydration', () => {
     });
   });
 
-  describe('special nodes', () => {
-    describe('Suspense', () => {
+  describe("special nodes", () => {
+    describe("Suspense", () => {
       function Never() {
-        throw new Promise(resolve => {});
+        throw new Promise((resolve) => {});
       }
 
       // @gate __DEV__
-      it('warns when client renders an extra Suspense node in content mode', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra Suspense node in content mode", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {isClient && (
@@ -1167,8 +1167,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra Suspense node in content mode', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra Suspense node in content mode", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {!isClient && (
@@ -1205,8 +1205,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra Suspense node in fallback mode', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra Suspense node in fallback mode", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {isClient && (
@@ -1245,8 +1245,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra Suspense node in fallback mode', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra Suspense node in fallback mode", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {!isClient && (
@@ -1289,8 +1289,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra node inside Suspense content', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra node inside Suspense content", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <React.Suspense fallback={<p>Loading...</p>}>
@@ -1331,8 +1331,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra node inside Suspense content', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra node inside Suspense content", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <React.Suspense fallback={<p>Loading...</p>}>
@@ -1372,8 +1372,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when client renders an extra node inside Suspense fallback', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra node inside Suspense fallback", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <React.Suspense
@@ -1382,7 +1382,8 @@ describe('ReactDOMServerHydration', () => {
                     <p>Loading...</p>
                     {isClient && <br />}
                   </>
-                }>
+                }
+              >
                 <main className="only" />
                 <Never />
               </React.Suspense>
@@ -1401,8 +1402,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra node inside Suspense fallback', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra node inside Suspense fallback", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               <React.Suspense
@@ -1411,7 +1412,8 @@ describe('ReactDOMServerHydration', () => {
                     <p>Loading...</p>
                     {!isClient && <br />}
                   </>
-                }>
+                }
+              >
                 <main className="only" />
                 <Never />
               </React.Suspense>
@@ -1430,10 +1432,10 @@ describe('ReactDOMServerHydration', () => {
       });
     });
 
-    describe('Fragment', () => {
+    describe("Fragment", () => {
       // @gate __DEV__
-      it('warns when client renders an extra Fragment node', () => {
-        function Mismatch({isClient}) {
+      it("warns when client renders an extra Fragment node", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {isClient && (
@@ -1473,8 +1475,8 @@ describe('ReactDOMServerHydration', () => {
       });
 
       // @gate __DEV__
-      it('warns when server renders an extra Fragment node', () => {
-        function Mismatch({isClient}) {
+      it("warns when server renders an extra Fragment node", () => {
+        function Mismatch({ isClient }) {
           return (
             <div className="parent">
               {!isClient && (
@@ -1516,10 +1518,10 @@ describe('ReactDOMServerHydration', () => {
     });
   });
 
-  describe('misc cases', () => {
+  describe("misc cases", () => {
     // @gate __DEV__
-    it('warns when client renders an extra node deeper in the tree', () => {
-      function Mismatch({isClient}) {
+    it("warns when client renders an extra node deeper in the tree", () => {
+      function Mismatch({ isClient }) {
         return isClient ? <ProfileSettings /> : <MediaSettings />;
       }
 
@@ -1541,12 +1543,12 @@ describe('ReactDOMServerHydration', () => {
         );
       }
 
-      function Panel({type}) {
+      function Panel({ type }) {
         return (
           <>
             <header className="1" />
             <main className="2" />
-            {type === 'profile' && <footer className="3" />}
+            {type === "profile" && <footer className="3" />}
           </>
         );
       }
@@ -1584,8 +1586,8 @@ describe('ReactDOMServerHydration', () => {
     });
 
     // @gate __DEV__
-    it('warns when server renders an extra node deeper in the tree', () => {
-      function Mismatch({isClient}) {
+    it("warns when server renders an extra node deeper in the tree", () => {
+      function Mismatch({ isClient }) {
         return isClient ? <ProfileSettings /> : <MediaSettings />;
       }
 
@@ -1607,12 +1609,12 @@ describe('ReactDOMServerHydration', () => {
         );
       }
 
-      function Panel({type}) {
+      function Panel({ type }) {
         return (
           <>
             <header className="1" />
             <main className="2" />
-            {type !== 'profile' && <footer className="3" />}
+            {type !== "profile" && <footer className="3" />}
           </>
         );
       }

@@ -7,12 +7,12 @@
  * @flow
  */
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 import {
   enableViewTransition,
   enableGestureTransition,
-} from 'shared/ReactFeatureFlags';
-import {startTransition} from './ReactStartTransition';
+} from "shared/ReactFeatureFlags";
+import { startTransition } from "./ReactStartTransition";
 
 export type TransitionTypes = Array<string>;
 
@@ -28,18 +28,18 @@ export function addTransitionType(type: string): void {
       }
     } else {
       // We're in the async gap. Simulate an implicit startTransition around it.
-      if (__DEV__) {
+      if (false) {
         if (ReactSharedInternals.asyncTransitions === 0) {
           if (enableGestureTransition) {
             console.error(
-              'addTransitionType can only be called inside a `startTransition()` ' +
-                'or `startGestureTransition()` callback. ' +
-                'It must be associated with a specific Transition.',
+              "addTransitionType can only be called inside a `startTransition()` " +
+                "or `startGestureTransition()` callback. " +
+                "It must be associated with a specific Transition."
             );
           } else {
             console.error(
-              'addTransitionType can only be called inside a `startTransition()` ' +
-                'callback. It must be associated with a specific Transition.',
+              "addTransitionType can only be called inside a `startTransition()` " +
+                "callback. It must be associated with a specific Transition."
             );
           }
         }

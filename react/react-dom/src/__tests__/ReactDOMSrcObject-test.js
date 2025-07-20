@@ -8,14 +8,14 @@
  * @jest-environment ./scripts/jest/ReactDOMServerIntegrationEnvironment
  */
 
-'use strict';
+"use strict";
 
 // Polyfills for test environment
 global.ReadableStream =
-  require('web-streams-polyfill/ponyfill/es6').ReadableStream;
-global.TextEncoder = require('util').TextEncoder;
+  require("web-streams-polyfill/ponyfill/es6").ReadableStream;
+global.TextEncoder = require("util").TextEncoder;
 
-describe('ReactDOMSrcObject', () => {
+describe("ReactDOMSrcObject", () => {
   let React;
   let ReactDOMClient;
   let ReactDOMFizzServer;
@@ -26,15 +26,15 @@ describe('ReactDOMSrcObject', () => {
   beforeEach(() => {
     jest.resetModules();
 
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
-    ReactDOMFizzServer = require('react-dom/server.edge');
-    act = require('internal-test-utils').act;
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
+    ReactDOMFizzServer = require("react-dom/server.edge");
+    act = require("internal-test-utils").act;
 
     assertConsoleErrorDev =
-      require('internal-test-utils').assertConsoleErrorDev;
+      require("internal-test-utils").assertConsoleErrorDev;
 
-    container = document.createElement('div');
+    container = document.createElement("div");
     document.body.appendChild(container);
   });
 
@@ -44,7 +44,7 @@ describe('ReactDOMSrcObject', () => {
   });
 
   // @gate enableSrcObject
-  it('can render a Blob as an img src', async () => {
+  it("can render a Blob as an img src", async () => {
     const root = ReactDOMClient.createRoot(container);
     const ref = React.createRef();
 
@@ -57,7 +57,7 @@ describe('ReactDOMSrcObject', () => {
   });
 
   // @gate enableSrcObject
-  it('can render a Blob as a picture img src', async () => {
+  it("can render a Blob as a picture img src", async () => {
     const root = ReactDOMClient.createRoot(container);
     const ref = React.createRef();
 
@@ -66,7 +66,7 @@ describe('ReactDOMSrcObject', () => {
       root.render(
         <picture>
           <img src={blob} ref={ref} />
-        </picture>,
+        </picture>
       );
     });
 
@@ -74,7 +74,7 @@ describe('ReactDOMSrcObject', () => {
   });
 
   // @gate enableSrcObject
-  it('can render a Blob as a video and audio src', async () => {
+  it("can render a Blob as a video and audio src", async () => {
     const root = ReactDOMClient.createRoot(container);
     const videoRef = React.createRef();
     const audioRef = React.createRef();
@@ -85,7 +85,7 @@ describe('ReactDOMSrcObject', () => {
         <>
           <video src={blob} ref={videoRef} />
           <audio src={blob} ref={audioRef} />
-        </>,
+        </>
       );
     });
 
@@ -93,8 +93,8 @@ describe('ReactDOMSrcObject', () => {
     expect(audioRef.current.src).toMatch(/^blob:/);
   });
 
-  // @gate enableSrcObject || !__DEV__
-  it('warn when rendering a Blob as a source src of a video, audio or picture element', async () => {
+  // @gate enableSrcObject || !false
+  it("warn when rendering a Blob as a source src of a video, audio or picture element", async () => {
     const root = ReactDOMClient.createRoot(container);
     const videoRef = React.createRef();
     const audioRef = React.createRef();
@@ -114,42 +114,42 @@ describe('ReactDOMSrcObject', () => {
             <source src={blob} />
             <img />
           </picture>
-        </>,
+        </>
       );
     });
 
     assertConsoleErrorDev([
-      'Passing Blob, MediaSource or MediaStream to <source src> is not supported. ' +
-        'Pass it directly to <img src>, <video src> or <audio src> instead.',
-      'Passing Blob, MediaSource or MediaStream to <source src> is not supported. ' +
-        'Pass it directly to <img src>, <video src> or <audio src> instead.',
-      'Passing Blob, MediaSource or MediaStream to <source src> is not supported. ' +
-        'Pass it directly to <img src>, <video src> or <audio src> instead.',
+      "Passing Blob, MediaSource or MediaStream to <source src> is not supported. " +
+        "Pass it directly to <img src>, <video src> or <audio src> instead.",
+      "Passing Blob, MediaSource or MediaStream to <source src> is not supported. " +
+        "Pass it directly to <img src>, <video src> or <audio src> instead.",
+      "Passing Blob, MediaSource or MediaStream to <source src> is not supported. " +
+        "Pass it directly to <img src>, <video src> or <audio src> instead.",
     ]);
     expect(videoRef.current.firstChild.src).not.toMatch(/^blob:/);
-    expect(videoRef.current.firstChild.src).toContain('[object%20Blob]'); // toString:ed
+    expect(videoRef.current.firstChild.src).toContain("[object%20Blob]"); // toString:ed
     expect(audioRef.current.firstChild.src).not.toMatch(/^blob:/);
-    expect(audioRef.current.firstChild.src).toContain('[object%20Blob]'); // toString:ed
+    expect(audioRef.current.firstChild.src).toContain("[object%20Blob]"); // toString:ed
     expect(pictureRef.current.firstChild.src).not.toMatch(/^blob:/);
-    expect(pictureRef.current.firstChild.src).toContain('[object%20Blob]'); // toString:ed
+    expect(pictureRef.current.firstChild.src).toContain("[object%20Blob]"); // toString:ed
   });
 
   async function readContent(stream) {
     const reader = stream.getReader();
-    let content = '';
+    let content = "";
     while (true) {
-      const {done, value} = await reader.read();
+      const { done, value } = await reader.read();
       if (done) {
         return content;
       }
-      content += Buffer.from(value).toString('utf8');
+      content += Buffer.from(value).toString("utf8");
     }
   }
 
   // @gate enableSrcObject
-  it('can SSR a Blob as an img src', async () => {
+  it("can SSR a Blob as an img src", async () => {
     const blob = new Blob([new Uint8Array([69, 230, 156, 181, 68, 75])], {
-      type: 'image/jpeg',
+      type: "image/jpeg",
     });
 
     const ref = React.createRef();
@@ -161,32 +161,32 @@ describe('ReactDOMSrcObject', () => {
     const stream = await ReactDOMFizzServer.renderToReadableStream(<App />);
     container.innerHTML = await readContent(stream);
 
-    expect(container.firstChild.src).toBe('data:image/jpeg;base64,ReactURL');
+    expect(container.firstChild.src).toBe("data:image/jpeg;base64,ReactURL");
 
     await act(() => {
       ReactDOMClient.hydrateRoot(container, <App />);
     });
 
-    expect(container.firstChild.src).toBe('data:image/jpeg;base64,ReactURL');
+    expect(container.firstChild.src).toBe("data:image/jpeg;base64,ReactURL");
   });
 
   // @gate enableSrcObject
-  it('errors in DEV when mismatching a Blob during hydration', async () => {
+  it("errors in DEV when mismatching a Blob during hydration", async () => {
     const blob = new Blob([new Uint8Array([69, 230, 156, 181, 68, 75])], {
-      type: 'image/jpeg',
+      type: "image/jpeg",
     });
 
     const ref = React.createRef();
 
     const stream = await ReactDOMFizzServer.renderToReadableStream(
-      <img src={blob} ref={ref} />,
+      <img src={blob} ref={ref} />
     );
     container.innerHTML = await readContent(stream);
 
-    expect(container.firstChild.src).toBe('data:image/jpeg;base64,ReactURL');
+    expect(container.firstChild.src).toBe("data:image/jpeg;base64,ReactURL");
 
     const clientBlob = new Blob([new Uint8Array([69, 230, 156, 181, 68])], {
-      type: 'image/jpeg',
+      type: "image/jpeg",
     });
 
     await act(() => {
@@ -199,19 +199,19 @@ describe('ReactDOMSrcObject', () => {
         "- A server/client branch `if (typeof window !== 'undefined')`.\n" +
         "- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n" +
         "- Date formatting in a user's locale which doesn't match the server.\n" +
-        '- External changing data without sending a snapshot of it along with the HTML.\n' +
-        '- Invalid HTML tag nesting.\n\n' +
-        'It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n' +
-        'https://react.dev/link/hydration-mismatch\n\n' +
-        '  <img\n' +
-        '+   src={Blob:image/jpeg}\n' +
+        "- External changing data without sending a snapshot of it along with the HTML.\n" +
+        "- Invalid HTML tag nesting.\n\n" +
+        "It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n" +
+        "https://react.dev/link/hydration-mismatch\n\n" +
+        "  <img\n" +
+        "+   src={Blob:image/jpeg}\n" +
         '-   src="data:image/jpeg;base64,ReactURL"\n' +
-        '    ref={{current:null}}\n' +
-        '  >\n' +
-        '\n    in img (at **)',
+        "    ref={{current:null}}\n" +
+        "  >\n" +
+        "\n    in img (at **)",
     ]);
 
     // The original URL left in place.
-    expect(container.firstChild.src).toBe('data:image/jpeg;base64,ReactURL');
+    expect(container.firstChild.src).toBe("data:image/jpeg;base64,ReactURL");
   });
 });

@@ -7,14 +7,14 @@
  * @flow
  */
 
-import type {Fiber} from './ReactFiber';
+import type { Fiber } from "./ReactFiber";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
-import {warnsIfNotActing} from './ReactFiberConfig';
+import { warnsIfNotActing } from "./ReactFiberConfig";
 
 export function isLegacyActEnvironment(fiber: Fiber): boolean {
-  if (__DEV__) {
+  if (false) {
     // Legacy mode. We preserve the behavior of React 17's act. It assumes an
     // act environment whenever `jest` is defined, but you can still turn off
     // spurious warnings by setting IS_REACT_ACT_ENVIRONMENT explicitly
@@ -22,13 +22,13 @@ export function isLegacyActEnvironment(fiber: Fiber): boolean {
 
     const isReactActEnvironmentGlobal =
       // $FlowFixMe[cannot-resolve-name] Flow doesn't know about IS_REACT_ACT_ENVIRONMENT global
-      typeof IS_REACT_ACT_ENVIRONMENT !== 'undefined'
+      typeof IS_REACT_ACT_ENVIRONMENT !== "undefined"
         ? // $FlowFixMe[cannot-resolve-name]
           IS_REACT_ACT_ENVIRONMENT
         : undefined;
 
     // $FlowFixMe[cannot-resolve-name] - Flow doesn't know about jest
-    const jestIsDefined = typeof jest !== 'undefined';
+    const jestIsDefined = typeof jest !== "undefined";
     return (
       warnsIfNotActing && jestIsDefined && isReactActEnvironmentGlobal !== false
     );
@@ -37,10 +37,10 @@ export function isLegacyActEnvironment(fiber: Fiber): boolean {
 }
 
 export function isConcurrentActEnvironment(): void | boolean {
-  if (__DEV__) {
+  if (false) {
     const isReactActEnvironmentGlobal =
       // $FlowFixMe[cannot-resolve-name] Flow doesn't know about IS_REACT_ACT_ENVIRONMENT global
-      typeof IS_REACT_ACT_ENVIRONMENT !== 'undefined'
+      typeof IS_REACT_ACT_ENVIRONMENT !== "undefined"
         ? // $FlowFixMe[cannot-resolve-name]
           IS_REACT_ACT_ENVIRONMENT
         : undefined;
@@ -51,8 +51,8 @@ export function isConcurrentActEnvironment(): void | boolean {
     ) {
       // TODO: Include link to relevant documentation page.
       console.error(
-        'The current testing environment is not configured to support ' +
-          'act(...)',
+        "The current testing environment is not configured to support " +
+          "act(...)"
       );
     }
     return isReactActEnvironmentGlobal;

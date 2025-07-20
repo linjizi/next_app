@@ -17,13 +17,13 @@ import type {
   Awaited,
   ReactComponentInfo,
   ReactDebugInfo,
-} from 'shared/ReactTypes';
-import type {TransitionTypes} from 'react/src/ReactTransitionType';
-import type {WorkTag} from './ReactWorkTags';
-import type {TypeOfMode} from './ReactTypeOfMode';
-import type {Flags} from './ReactFiberFlags';
-import type {Lane, Lanes, LaneMap} from './ReactFiberLane';
-import type {RootTag} from './ReactRootTags';
+} from "shared/ReactTypes";
+import type { TransitionTypes } from "react/src/ReactTransitionType";
+import type { WorkTag } from "./ReactWorkTags";
+import type { TypeOfMode } from "./ReactTypeOfMode";
+import type { Flags } from "./ReactFiberFlags";
+import type { Lane, Lanes, LaneMap } from "./ReactFiberLane";
+import type { RootTag } from "./ReactRootTags";
 import type {
   Container,
   Instance,
@@ -32,37 +32,37 @@ import type {
   ActivityInstance,
   SuspenseInstance,
   TransitionStatus,
-} from './ReactFiberConfig';
-import type {Cache} from './ReactFiberCacheComponent';
-import type {Transition} from 'react/src/ReactStartTransition';
-import type {TracingMarkerInstance} from './ReactFiberTracingMarkerComponent';
-import type {ConcurrentUpdate} from './ReactFiberConcurrentUpdates';
-import type {ComponentStackNode} from 'react-server/src/ReactFizzComponentStack';
-import type {ThenableState} from './ReactFiberThenable';
-import type {ScheduledGesture} from './ReactFiberGestureScheduler';
+} from "./ReactFiberConfig";
+import type { Cache } from "./ReactFiberCacheComponent";
+import type { Transition } from "react/src/ReactStartTransition";
+import type { TracingMarkerInstance } from "./ReactFiberTracingMarkerComponent";
+import type { ConcurrentUpdate } from "./ReactFiberConcurrentUpdates";
+import type { ComponentStackNode } from "react-server/src/ReactFizzComponentStack";
+import type { ThenableState } from "./ReactFiberThenable";
+import type { ScheduledGesture } from "./ReactFiberGestureScheduler";
 
 // Unwind Circular: moved from ReactFiberHooks.old
 export type HookType =
-  | 'useState'
-  | 'useReducer'
-  | 'useContext'
-  | 'useRef'
-  | 'useEffect'
-  | 'useEffectEvent'
-  | 'useInsertionEffect'
-  | 'useLayoutEffect'
-  | 'useCallback'
-  | 'useMemo'
-  | 'useImperativeHandle'
-  | 'useDebugValue'
-  | 'useDeferredValue'
-  | 'useTransition'
-  | 'useSyncExternalStore'
-  | 'useId'
-  | 'useCacheRefresh'
-  | 'useOptimistic'
-  | 'useFormState'
-  | 'useActionState';
+  | "useState"
+  | "useReducer"
+  | "useContext"
+  | "useRef"
+  | "useEffect"
+  | "useEffectEvent"
+  | "useInsertionEffect"
+  | "useLayoutEffect"
+  | "useCallback"
+  | "useMemo"
+  | "useImperativeHandle"
+  | "useDebugValue"
+  | "useDeferredValue"
+  | "useTransition"
+  | "useSyncExternalStore"
+  | "useId"
+  | "useCacheRefresh"
+  | "useOptimistic"
+  | "useFormState"
+  | "useActionState";
 
 export type ContextDependency<T> = {
   context: ReactContext<T>,
@@ -133,7 +133,7 @@ export type Fiber = {
   // I'll avoid adding an owner field for prod and model that as functions.
   ref:
     | null
-    | (((handle: mixed) => void) & {_stringRef: ?string, ...})
+    | (((handle: mixed) => void) & { _stringRef: ?string, ... })
     | RefObject,
 
   refCleanup: null | (() => void),
@@ -196,7 +196,7 @@ export type Fiber = {
   // Conceptual aliases
   // workInProgress : Fiber ->  alternate The alternate used for reuse happens
   // to be the same as work in progress.
-  // __DEV__ only
+  // false only
 
   _debugInfo?: ReactDebugInfo | null,
   _debugOwner?: ReactComponentInfo | Fiber | null,
@@ -267,18 +267,18 @@ type BaseFiberRootProperties = {
 
   onUncaughtError: (
     error: mixed,
-    errorInfo: {+componentStack?: ?string},
+    errorInfo: { +componentStack?: ?string }
   ) => void,
   onCaughtError: (
     error: mixed,
     errorInfo: {
       +componentStack?: ?string,
       +errorBoundary?: ?React$Component<any, any>,
-    },
+    }
   ) => void,
   onRecoverableError: (
     error: mixed,
-    errorInfo: {+componentStack?: ?string},
+    errorInfo: { +componentStack?: ?string }
   ) => void,
 
   // enableDefaultTransitionIndicator only
@@ -304,7 +304,7 @@ type UpdaterTrackingOnlyFiberRootProperties = {
 
 export type SuspenseHydrationCallbacks = {
   +onHydrated?: (
-    hydrationBoundary: SuspenseInstance | ActivityInstance,
+    hydrationBoundary: SuspenseInstance | ActivityInstance
   ) => void,
   +onDeleted?: (hydrationBoundary: SuspenseInstance | ActivityInstance) => void,
   ...
@@ -321,7 +321,7 @@ export type TransitionTracingCallbacks = {
     transitionName: string,
     startTime: number,
     currentTime: number,
-    pending: Array<{name: null | string}>,
+    pending: Array<{ name: null | string }>
   ) => void,
   onTransitionIncomplete?: (
     transitionName: string,
@@ -330,19 +330,19 @@ export type TransitionTracingCallbacks = {
       type: string,
       name?: string | null,
       endTime: number,
-    }>,
+    }>
   ) => void,
   onTransitionComplete?: (
     transitionName: string,
     startTime: number,
-    endTime: number,
+    endTime: number
   ) => void,
   onMarkerProgress?: (
     transitionName: string,
     marker: string,
     startTime: number,
     currentTime: number,
-    pending: Array<{name: null | string}>,
+    pending: Array<{ name: null | string }>
   ) => void,
   onMarkerIncomplete?: (
     transitionName: string,
@@ -352,13 +352,13 @@ export type TransitionTracingCallbacks = {
       type: string,
       name?: string | null,
       endTime: number,
-    }>,
+    }>
   ) => void,
   onMarkerComplete?: (
     transitionName: string,
     marker: string,
     startTime: number,
-    endTime: number,
+    endTime: number
   ) => void,
 };
 
@@ -391,8 +391,8 @@ export type FiberRoot = {
   ...ProfilerCommitHooksOnlyFiberRootProperties,
 };
 
-type BasicStateAction<S> = (S => S) | S;
-type Dispatch<A> = A => void;
+type BasicStateAction<S> = ((S) => S) | S;
+type Dispatch<A> = (A) => void;
 
 export type Dispatcher = {
   use: <T>(Usable<T>) => T,
@@ -401,41 +401,41 @@ export type Dispatcher = {
   useReducer<S, I, A>(
     reducer: (S, A) => S,
     initialArg: I,
-    init?: (I) => S,
+    init?: (I) => S
   ): [S, Dispatch<A>],
   useContext<T>(context: ReactContext<T>): T,
-  useRef<T>(initialValue: T): {current: T},
+  useRef<T>(initialValue: T): { current: T },
   useEffect(
     create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
+    deps: Array<mixed> | void | null
   ): void,
   // TODO: Non-nullable once `enableUseEffectEventHook` is on everywhere.
   useEffectEvent?: <Args, F: (...Array<Args>) => mixed>(callback: F) => F,
   useInsertionEffect(
     create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
+    deps: Array<mixed> | void | null
   ): void,
   useLayoutEffect(
     create: () => (() => void) | void,
-    deps: Array<mixed> | void | null,
+    deps: Array<mixed> | void | null
   ): void,
   useCallback<T>(callback: T, deps: Array<mixed> | void | null): T,
   useMemo<T>(nextCreate: () => T, deps: Array<mixed> | void | null): T,
   useImperativeHandle<T>(
-    ref: {current: T | null} | ((inst: T | null) => mixed) | null | void,
+    ref: { current: T | null } | ((inst: T | null) => mixed) | null | void,
     create: () => T,
-    deps: Array<mixed> | void | null,
+    deps: Array<mixed> | void | null
   ): void,
   useDebugValue<T>(value: T, formatterFn: ?(value: T) => mixed): void,
   useDeferredValue<T>(value: T, initialValue?: T): T,
   useTransition(): [
     boolean,
-    (callback: () => void, options?: StartTransitionOptions) => void,
+    (callback: () => void, options?: StartTransitionOptions) => void
   ],
   useSyncExternalStore<T>(
     subscribe: (() => void) => () => void,
     getSnapshot: () => T,
-    getServerSnapshot?: () => T,
+    getServerSnapshot?: () => T
   ): T,
   useId(): string,
   useCacheRefresh: () => <T>(?() => T, ?T) => void,
@@ -443,17 +443,17 @@ export type Dispatcher = {
   useHostTransitionStatus: () => TransitionStatus,
   useOptimistic: <S, A>(
     passthrough: S,
-    reducer: ?(S, A) => S,
+    reducer: ?(S, A) => S
   ) => [S, (A) => void],
   useFormState: <S, P>(
     action: (Awaited<S>, P) => S,
     initialState: Awaited<S>,
-    permalink?: string,
+    permalink?: string
   ) => [Awaited<S>, (P) => void, boolean],
   useActionState: <S, P>(
     action: (Awaited<S>, P) => S,
     initialState: Awaited<S>,
-    permalink?: string,
+    permalink?: string
   ) => [Awaited<S>, (P) => void, boolean],
 };
 

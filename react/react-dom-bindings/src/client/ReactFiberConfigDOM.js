@@ -7,16 +7,16 @@
  * @flow
  */
 
-import type {DOMEventName} from '../events/DOMEventNames';
-import type {Fiber, FiberRoot} from 'react-reconciler/src/ReactInternalTypes';
+import type { DOMEventName } from "../events/DOMEventNames";
+import type { Fiber, FiberRoot } from "react-reconciler/src/ReactInternalTypes";
 import type {
   BoundingRect,
   IntersectionObserverOptions,
   ObserveVisibleRectsCallback,
-} from 'react-reconciler/src/ReactTestSelectors';
-import type {ReactContext, ReactScopeInstance} from 'shared/ReactTypes';
-import type {AncestorInfoDev} from './validateDOMNesting';
-import type {FormStatus} from 'react-dom-bindings/src/shared/ReactDOMFormActions';
+} from "react-reconciler/src/ReactTestSelectors";
+import type { ReactContext, ReactScopeInstance } from "shared/ReactTypes";
+import type { AncestorInfoDev } from "./validateDOMNesting";
+import type { FormStatus } from "react-dom-bindings/src/shared/ReactDOMFormActions";
 import type {
   CrossOriginEnum,
   PreloadImplOptions,
@@ -24,30 +24,30 @@ import type {
   PreinitStyleOptions,
   PreinitScriptOptions,
   PreinitModuleScriptOptions,
-} from 'react-dom/src/shared/ReactDOMTypes';
-import type {TransitionTypes} from 'react/src/ReactTransitionType';
+} from "react-dom/src/shared/ReactDOMTypes";
+import type { TransitionTypes } from "react/src/ReactTransitionType";
 
-import {NotPending} from '../shared/ReactDOMFormActions';
+import { NotPending } from "../shared/ReactDOMFormActions";
 
-import {setSrcObject} from './ReactDOMSrcObject';
+import { setSrcObject } from "./ReactDOMSrcObject";
 
-import {getCurrentRootHostContainer} from 'react-reconciler/src/ReactFiberHostContext';
-import {runWithFiberInDEV} from 'react-reconciler/src/ReactCurrentFiber';
+import { getCurrentRootHostContainer } from "react-reconciler/src/ReactFiberHostContext";
+import { runWithFiberInDEV } from "react-reconciler/src/ReactCurrentFiber";
 
-import hasOwnProperty from 'shared/hasOwnProperty';
-import {checkAttributeStringCoercion} from 'shared/CheckStringCoercion';
-import {REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
+import hasOwnProperty from "shared/hasOwnProperty";
+import { checkAttributeStringCoercion } from "shared/CheckStringCoercion";
+import { REACT_CONTEXT_TYPE } from "shared/ReactSymbols";
 import {
   isFiberContainedBy,
   isFiberFollowing,
   isFiberPreceding,
-} from 'react-reconciler/src/ReactFiberTreeReflection';
+} from "react-reconciler/src/ReactFiberTreeReflection";
 
 export {
   setCurrentUpdatePriority,
   getCurrentUpdatePriority,
   resolveUpdatePriority,
-} from './ReactDOMUpdatePriority';
+} from "./ReactDOMUpdatePriority";
 import {
   precacheFiberNode,
   updateFiberProps,
@@ -62,17 +62,17 @@ import {
   isMarkedHoistable,
   markNodeAsHoistable,
   isOwnedInstance,
-} from './ReactDOMComponentTree';
+} from "./ReactDOMComponentTree";
 import {
   traverseFragmentInstance,
   getFragmentParentHostFiber,
   getNextSiblingHostFiber,
   getInstanceFromHostFiber,
   traverseFragmentInstanceDeeply,
-} from 'react-reconciler/src/ReactFiberTreeReflection';
+} from "react-reconciler/src/ReactFiberTreeReflection";
 
-export {detachDeletedInstance};
-import {hasRole} from './DOMAccessibilityRoles';
+export { detachDeletedInstance };
+import { hasRole } from "./DOMAccessibilityRoles";
 import {
   setInitialProperties,
   updateProperties,
@@ -82,22 +82,25 @@ import {
   getPropsFromElement,
   diffHydratedText,
   trapClickOnNonInteractiveElement,
-} from './ReactDOMComponent';
-import {hydrateInput} from './ReactDOMInput';
-import {hydrateTextarea} from './ReactDOMTextarea';
-import {hydrateSelect} from './ReactDOMSelect';
-import {getSelectionInformation, restoreSelection} from './ReactInputSelection';
-import setTextContent from './setTextContent';
+} from "./ReactDOMComponent";
+import { hydrateInput } from "./ReactDOMInput";
+import { hydrateTextarea } from "./ReactDOMTextarea";
+import { hydrateSelect } from "./ReactDOMSelect";
+import {
+  getSelectionInformation,
+  restoreSelection,
+} from "./ReactInputSelection";
+import setTextContent from "./setTextContent";
 import {
   validateDOMNesting,
   validateTextNesting,
   updatedAncestorInfoDev,
-} from './validateDOMNesting';
+} from "./validateDOMNesting";
 import {
   isEnabled as ReactBrowserEventEmitterIsEnabled,
   setEnabled as ReactBrowserEventEmitterSetEnabled,
-} from '../events/ReactDOMEventListener';
-import {SVG_NAMESPACE, MATH_NAMESPACE} from './DOMNamespaces';
+} from "../events/ReactDOMEventListener";
+import { SVG_NAMESPACE, MATH_NAMESPACE } from "./DOMNamespaces";
 import {
   ELEMENT_NODE,
   TEXT_NODE,
@@ -105,12 +108,12 @@ import {
   DOCUMENT_NODE,
   DOCUMENT_TYPE_NODE,
   DOCUMENT_FRAGMENT_NODE,
-} from './HTMLNodeType';
+} from "./HTMLNodeType";
 
 import {
   flushEventReplaying,
   retryIfBlockedOn,
-} from '../events/ReactDOMEventReplaying';
+} from "../events/ReactDOMEventReplaying";
 
 import {
   enableCreateEventHandleAPI,
@@ -123,26 +126,26 @@ import {
   enableSrcObject,
   enableViewTransition,
   enableHydrationChangeEvent,
-} from 'shared/ReactFeatureFlags';
+} from "shared/ReactFeatureFlags";
 import {
   HostComponent,
   HostHoistable,
   HostText,
   HostSingleton,
-} from 'react-reconciler/src/ReactWorkTags';
-import {listenToAllSupportedEvents} from '../events/DOMPluginEventSystem';
-import {validateLinkPropsForStyleResource} from '../shared/ReactDOMResourceValidation';
-import escapeSelectorAttributeValueInsideDoubleQuotes from './escapeSelectorAttributeValueInsideDoubleQuotes';
-import {flushSyncWork as flushSyncWorkOnAllRoots} from 'react-reconciler/src/ReactFiberWorkLoop';
-import {requestFormReset as requestFormResetOnFiber} from 'react-reconciler/src/ReactFiberHooks';
+} from "react-reconciler/src/ReactWorkTags";
+import { listenToAllSupportedEvents } from "../events/DOMPluginEventSystem";
+import { validateLinkPropsForStyleResource } from "../shared/ReactDOMResourceValidation";
+import escapeSelectorAttributeValueInsideDoubleQuotes from "./escapeSelectorAttributeValueInsideDoubleQuotes";
+import { flushSyncWork as flushSyncWorkOnAllRoots } from "react-reconciler/src/ReactFiberWorkLoop";
+import { requestFormReset as requestFormResetOnFiber } from "react-reconciler/src/ReactFiberHooks";
 
-import ReactDOMSharedInternals from 'shared/ReactDOMSharedInternals';
+import ReactDOMSharedInternals from "shared/ReactDOMSharedInternals";
 
-export {default as rendererVersion} from 'shared/ReactVersion';
+export { default as rendererVersion } from "shared/ReactVersion";
 
-import noop from 'shared/noop';
+import noop from "shared/noop";
 
-export const rendererPackageName = 'react-dom';
+export const rendererPackageName = "react-dom";
 export const extraDevToolsConfig = null;
 
 export type Type = string;
@@ -156,14 +159,14 @@ export type Props = {
   style?: {
     display?: string,
     viewTransitionName?: string,
-    'view-transition-name'?: string,
+    "view-transition-name"?: string,
     viewTransitionClass?: string,
-    'view-transition-class'?: string,
+    "view-transition-class"?: string,
     margin?: string,
     marginTop?: string,
-    'margin-top'?: string,
+    "margin-top"?: string,
     marginBottom?: string,
-    'margin-bottom'?: string,
+    "margin-bottom"?: string,
     ...
   },
   bottom?: null | number,
@@ -179,7 +182,7 @@ export type Props = {
   multiple?: boolean,
   src?: string | Blob | MediaSource | MediaStream, // TODO: Response
   srcSet?: string,
-  loading?: 'eager' | 'lazy',
+  loading?: "eager" | "lazy",
   onLoad?: (event: any) => void,
   ...
 };
@@ -204,9 +207,9 @@ export type EventTargetChildElement = {
 };
 
 export type Container =
-  | interface extends Element {_reactRootContainer?: FiberRoot}
-  | interface extends Document {_reactRootContainer?: FiberRoot}
-  | interface extends DocumentFragment {_reactRootContainer?: FiberRoot};
+  | interface extends Element { _reactRootContainer?: FiberRoot }
+  | interface extends Document { _reactRootContainer?: FiberRoot }
+  | interface extends DocumentFragment { _reactRootContainer?: FiberRoot };
 export type Instance = Element;
 export type TextInstance = Text;
 
@@ -253,24 +256,24 @@ type SelectionInformation = {
   selectionRange: mixed,
 };
 
-const SUPPRESS_HYDRATION_WARNING = 'suppressHydrationWarning';
+const SUPPRESS_HYDRATION_WARNING = "suppressHydrationWarning";
 
-const ACTIVITY_START_DATA = '&';
-const ACTIVITY_END_DATA = '/&';
-const SUSPENSE_START_DATA = '$';
-const SUSPENSE_END_DATA = '/$';
-const SUSPENSE_PENDING_START_DATA = '$?';
-const SUSPENSE_QUEUED_START_DATA = '$~';
-const SUSPENSE_FALLBACK_START_DATA = '$!';
-const PREAMBLE_CONTRIBUTION_HTML = 'html';
-const PREAMBLE_CONTRIBUTION_BODY = 'body';
-const PREAMBLE_CONTRIBUTION_HEAD = 'head';
-const FORM_STATE_IS_MATCHING = 'F!';
-const FORM_STATE_IS_NOT_MATCHING = 'F';
+const ACTIVITY_START_DATA = "&";
+const ACTIVITY_END_DATA = "/&";
+const SUSPENSE_START_DATA = "$";
+const SUSPENSE_END_DATA = "/$";
+const SUSPENSE_PENDING_START_DATA = "$?";
+const SUSPENSE_QUEUED_START_DATA = "$~";
+const SUSPENSE_FALLBACK_START_DATA = "$!";
+const PREAMBLE_CONTRIBUTION_HTML = "html";
+const PREAMBLE_CONTRIBUTION_BODY = "body";
+const PREAMBLE_CONTRIBUTION_HEAD = "head";
+const FORM_STATE_IS_MATCHING = "F!";
+const FORM_STATE_IS_NOT_MATCHING = "F";
 
-const DOCUMENT_READY_STATE_LOADING = 'loading';
+const DOCUMENT_READY_STATE_LOADING = "loading";
 
-const STYLE = 'style';
+const STYLE = "style";
 
 opaque type HostContextNamespace = 0 | 1 | 2;
 export const HostContextNamespaceNone: HostContextNamespace = 0;
@@ -280,10 +283,10 @@ const HostContextNamespaceMath: HostContextNamespace = 2;
 let eventsEnabled: ?boolean = null;
 let selectionInformation: null | SelectionInformation = null;
 
-export * from 'react-reconciler/src/ReactFiberConfigWithNoPersistence';
+export * from "react-reconciler/src/ReactFiberConfigWithNoPersistence";
 
 function getOwnerDocumentFromRootContainer(
-  rootContainerElement: Element | Document | DocumentFragment,
+  rootContainerElement: Element | Document | DocumentFragment
 ): Document {
   return rootContainerElement.nodeType === DOCUMENT_NODE
     ? (rootContainerElement: any)
@@ -291,7 +294,7 @@ function getOwnerDocumentFromRootContainer(
 }
 
 export function getRootHostContext(
-  rootContainerInstance: Container,
+  rootContainerInstance: Container
 ): HostContext {
   let type;
   let context: HostContextProd;
@@ -299,7 +302,7 @@ export function getRootHostContext(
   switch (nodeType) {
     case DOCUMENT_NODE:
     case DOCUMENT_FRAGMENT_NODE: {
-      type = nodeType === DOCUMENT_NODE ? '#document' : '#fragment';
+      type = nodeType === DOCUMENT_NODE ? "#document" : "#fragment";
       const root = (rootContainerInstance: any).documentElement;
       if (root) {
         const namespaceURI = root.namespaceURI;
@@ -320,10 +323,10 @@ export function getRootHostContext(
       const namespaceURI = container.namespaceURI;
       if (!namespaceURI) {
         switch (type) {
-          case 'svg':
+          case "svg":
             context = HostContextNamespaceSvg;
             break;
-          case 'math':
+          case "math":
             context = HostContextNamespaceMath;
             break;
           default:
@@ -337,10 +340,10 @@ export function getRootHostContext(
       break;
     }
   }
-  if (__DEV__) {
+  if (false) {
     const validatedTag = type.toLowerCase();
     const ancestorInfo = updatedAncestorInfoDev(null, validatedTag);
-    return {context, ancestorInfo};
+    return { context, ancestorInfo };
   }
   return context;
 }
@@ -358,20 +361,20 @@ function getOwnHostContext(namespaceURI: string): HostContextNamespace {
 
 function getChildHostContextProd(
   parentNamespace: HostContextNamespace,
-  type: string,
+  type: string
 ): HostContextNamespace {
   if (parentNamespace === HostContextNamespaceNone) {
     // No (or default) parent namespace: potential entry point.
     switch (type) {
-      case 'svg':
+      case "svg":
         return HostContextNamespaceSvg;
-      case 'math':
+      case "math":
         return HostContextNamespaceMath;
       default:
         return HostContextNamespaceNone;
     }
   }
-  if (parentNamespace === HostContextNamespaceSvg && type === 'foreignObject') {
+  if (parentNamespace === HostContextNamespaceSvg && type === "foreignObject") {
     // We're leaving SVG.
     return HostContextNamespaceNone;
   }
@@ -381,16 +384,16 @@ function getChildHostContextProd(
 
 export function getChildHostContext(
   parentHostContext: HostContext,
-  type: string,
+  type: string
 ): HostContext {
-  if (__DEV__) {
+  if (false) {
     const parentHostContextDev = ((parentHostContext: any): HostContextDev);
     const context = getChildHostContextProd(parentHostContextDev.context, type);
     const ancestorInfo = updatedAncestorInfoDev(
       parentHostContextDev.ancestorInfo,
-      type,
+      type
     );
-    return {context, ancestorInfo};
+    return { context, ancestorInfo };
   }
   const parentNamespace = ((parentHostContext: any): HostContextProd);
   return getChildHostContextProd(parentNamespace, type);
@@ -419,7 +422,7 @@ export function beforeActiveInstanceBlur(internalInstanceHandle: Object): void {
     ReactBrowserEventEmitterSetEnabled(true);
     dispatchBeforeDetachedBlur(
       (selectionInformation: any).focusedElem,
-      internalInstanceHandle,
+      internalInstanceHandle
     );
     ReactBrowserEventEmitterSetEnabled(false);
   }
@@ -444,10 +447,10 @@ export function createHoistableInstance(
   type: string,
   props: Props,
   rootContainerInstance: Container,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): Instance {
   const ownerDocument = getOwnerDocumentFromRootContainer(
-    rootContainerInstance,
+    rootContainerInstance
   );
 
   const domElement: Instance = ownerDocument.createElement(type);
@@ -477,10 +480,10 @@ export function createInstance(
   props: Props,
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): Instance {
   let hostContextProd: HostContextProd;
-  if (__DEV__) {
+  if (false) {
     // TODO: take namespace into account when validating.
     const hostContextDev: HostContextDev = (hostContext: any);
     validateDOMNesting(type, hostContextDev.ancestorInfo);
@@ -490,7 +493,7 @@ export function createInstance(
   }
 
   const ownerDocument = getOwnerDocumentFromRootContainer(
-    rootContainerInstance,
+    rootContainerInstance
   );
 
   let domElement: Instance;
@@ -503,43 +506,45 @@ export function createInstance(
       break;
     default:
       switch (type) {
-        case 'svg': {
+        case "svg": {
           domElement = ownerDocument.createElementNS(SVG_NAMESPACE, type);
           break;
         }
-        case 'math': {
+        case "math": {
           domElement = ownerDocument.createElementNS(MATH_NAMESPACE, type);
           break;
         }
-        case 'script': {
+        case "script": {
           // Create the script via .innerHTML so its "parser-inserted" flag is
           // set to true and it does not execute
-          const div = ownerDocument.createElement('div');
-          if (__DEV__) {
+          const div = ownerDocument.createElement("div");
+          if (false) {
             if (enableTrustedTypesIntegration && !didWarnScriptTags) {
               console.error(
-                'Encountered a script tag while rendering React component. ' +
-                  'Scripts inside React components are never executed when rendering ' +
-                  'on the client. Consider using template tag instead ' +
-                  '(https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template).',
+                "Encountered a script tag while rendering React component. " +
+                  "Scripts inside React components are never executed when rendering " +
+                  "on the client. Consider using template tag instead " +
+                  "(https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template)."
               );
               didWarnScriptTags = true;
             }
           }
-          div.innerHTML = '<script><' + '/script>';
+          div.innerHTML = "<script><" + "/script>";
           // This is guaranteed to yield a script element.
           const firstChild = ((div.firstChild: any): HTMLScriptElement);
           domElement = div.removeChild(firstChild);
           break;
         }
-        case 'select': {
-          if (typeof props.is === 'string') {
-            domElement = ownerDocument.createElement('select', {is: props.is});
+        case "select": {
+          if (typeof props.is === "string") {
+            domElement = ownerDocument.createElement("select", {
+              is: props.is,
+            });
           } else {
             // Separate else branch instead of using `props.is || undefined` above because of a Firefox bug.
             // See discussion in https://github.com/facebook/react/pull/6896
             // and discussion in https://bugzilla.mozilla.org/show_bug.cgi?id=1276240
-            domElement = ownerDocument.createElement('select');
+            domElement = ownerDocument.createElement("select");
           }
           if (props.multiple) {
             domElement.multiple = true;
@@ -553,8 +558,8 @@ export function createInstance(
           break;
         }
         default: {
-          if (typeof props.is === 'string') {
-            domElement = ownerDocument.createElement(type, {is: props.is});
+          if (typeof props.is === "string") {
+            domElement = ownerDocument.createElement(type, { is: props.is });
           } else {
             // Separate else branch instead of using `props.is || undefined` above because of a Firefox bug.
             // See discussion in https://github.com/facebook/react/pull/6896
@@ -562,30 +567,30 @@ export function createInstance(
             domElement = ownerDocument.createElement(type);
           }
 
-          if (__DEV__) {
-            if (type.indexOf('-') === -1) {
+          if (false) {
+            if (type.indexOf("-") === -1) {
               // We're not SVG/MathML and we don't have a dash, so we're not a custom element
               // Even if you use `is`, these should be of known type and lower case.
               if (type !== type.toLowerCase()) {
                 console.error(
-                  '<%s /> is using incorrect casing. ' +
-                    'Use PascalCase for React components, ' +
-                    'or lowercase for HTML elements.',
-                  type,
+                  "<%s /> is using incorrect casing. " +
+                    "Use PascalCase for React components, " +
+                    "or lowercase for HTML elements.",
+                  type
                 );
               }
               if (
                 // $FlowFixMe[method-unbinding]
                 Object.prototype.toString.call(domElement) ===
-                  '[object HTMLUnknownElement]' &&
+                  "[object HTMLUnknownElement]" &&
                 !hasOwnProperty.call(warnedUnknownTags, type)
               ) {
                 warnedUnknownTags[type] = true;
                 console.error(
-                  'The tag <%s> is unrecognized in this browser. ' +
-                    'If you meant to render a React component, start its name with ' +
-                    'an uppercase letter.',
-                  type,
+                  "The tag <%s> is unrecognized in this browser. " +
+                    "If you meant to render a React component, start its name with " +
+                    "an uppercase letter.",
+                  type
                 );
               }
             }
@@ -600,14 +605,14 @@ export function createInstance(
 
 export function cloneMutableInstance(
   instance: Instance,
-  keepChildren: boolean,
+  keepChildren: boolean
 ): Instance {
   return instance.cloneNode(keepChildren);
 }
 
 export function appendInitialChild(
   parentInstance: Instance,
-  child: Instance | TextInstance,
+  child: Instance | TextInstance
 ): void {
   // Note: This should not use moveBefore() because initial are appended while disconnected.
   parentInstance.appendChild(child);
@@ -617,16 +622,16 @@ export function finalizeInitialChildren(
   domElement: Instance,
   type: string,
   props: Props,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): boolean {
   setInitialProperties(domElement, type, props);
   switch (type) {
-    case 'button':
-    case 'input':
-    case 'select':
-    case 'textarea':
+    case "button":
+    case "input":
+    case "select":
+    case "textarea":
       return !!props.autoFocus;
-    case 'img':
+    case "img":
       return true;
     default:
       return false;
@@ -637,17 +642,17 @@ export function finalizeHydratedChildren(
   domElement: Instance,
   type: string,
   props: Props,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): boolean {
   // TOOD: Consider unifying this with hydrateInstance.
   if (!enableHydrationChangeEvent) {
     return false;
   }
   switch (type) {
-    case 'input':
-    case 'select':
-    case 'textarea':
-    case 'img':
+    case "input":
+    case "select":
+    case "textarea":
+    case "img":
       return true;
     default:
       return false;
@@ -656,12 +661,12 @@ export function finalizeHydratedChildren(
 
 export function shouldSetTextContent(type: string, props: Props): boolean {
   return (
-    type === 'textarea' ||
-    type === 'noscript' ||
-    typeof props.children === 'string' ||
-    typeof props.children === 'number' ||
-    typeof props.children === 'bigint' ||
-    (typeof props.dangerouslySetInnerHTML === 'object' &&
+    type === "textarea" ||
+    type === "noscript" ||
+    typeof props.children === "string" ||
+    typeof props.children === "number" ||
+    typeof props.children === "bigint" ||
+    (typeof props.dangerouslySetInnerHTML === "object" &&
       props.dangerouslySetInnerHTML !== null &&
       props.dangerouslySetInnerHTML.__html != null)
   );
@@ -671,28 +676,28 @@ export function createTextInstance(
   text: string,
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): TextInstance {
-  if (__DEV__) {
+  if (false) {
     const hostContextDev = ((hostContext: any): HostContextDev);
     const ancestor = hostContextDev.ancestorInfo.current;
     if (ancestor != null) {
       validateTextNesting(
         text,
         ancestor.tag,
-        hostContextDev.ancestorInfo.implicitRootScope,
+        hostContextDev.ancestorInfo.implicitRootScope
       );
     }
   }
   const textNode: TextInstance = getOwnerDocumentFromRootContainer(
-    rootContainerInstance,
+    rootContainerInstance
   ).createTextNode(text);
   precacheFiberNode(internalInstanceHandle, textNode);
   return textNode;
 }
 
 export function cloneMutableTextInstance(
-  textInstance: TextInstance,
+  textInstance: TextInstance
 ): TextInstance {
   return textInstance.cloneNode(false);
 }
@@ -700,7 +705,7 @@ export function cloneMutableTextInstance(
 let currentPopstateTransitionEvent: Event | null = null;
 export function shouldAttemptEagerTransition(): boolean {
   const event = window.event;
-  if (event && event.type === 'popstate') {
+  if (event && event.type === "popstate") {
     // This is a popstate event. Attempt to render any transition during this
     // event synchronously. Unless we already attempted during this event.
     if (event === currentPopstateTransitionEvent) {
@@ -743,17 +748,17 @@ export const warnsIfNotActing = true;
 // if a component just imports ReactDOM (e.g. for findDOMNode).
 // Some environments might not have setTimeout or clearTimeout.
 export const scheduleTimeout: any =
-  typeof setTimeout === 'function' ? setTimeout : (undefined: any);
+  typeof setTimeout === "function" ? setTimeout : (undefined: any);
 export const cancelTimeout: any =
-  typeof clearTimeout === 'function' ? clearTimeout : (undefined: any);
+  typeof clearTimeout === "function" ? clearTimeout : (undefined: any);
 export const noTimeout = -1;
-const localPromise = typeof Promise === 'function' ? Promise : undefined;
+const localPromise = typeof Promise === "function" ? Promise : undefined;
 const localRequestAnimationFrame =
-  typeof requestAnimationFrame === 'function'
+  typeof requestAnimationFrame === "function"
     ? requestAnimationFrame
     : scheduleTimeout;
 
-export {getClosestInstanceFromNode as getInstanceFromNode};
+export { getClosestInstanceFromNode as getInstanceFromNode };
 
 export function preparePortalMount(portalInstance: Instance): void {
   listenToAllSupportedEvents(portalInstance);
@@ -761,7 +766,7 @@ export function preparePortalMount(portalInstance: Instance): void {
 
 export function prepareScopeUpdate(
   scopeInstance: ReactScopeInstance,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
   if (enableScopeAPI) {
     precacheFiberNode(internalInstanceHandle, scopeInstance);
@@ -769,7 +774,7 @@ export function prepareScopeUpdate(
 }
 
 export function getInstanceFromScope(
-  scopeInstance: ReactScopeInstance,
+  scopeInstance: ReactScopeInstance
 ): null | Object {
   if (enableScopeAPI) {
     return getFiberFromScopeInstance(scopeInstance);
@@ -782,12 +787,12 @@ export function getInstanceFromScope(
 // -------------------
 export const supportsMicrotasks = true;
 export const scheduleMicrotask: any =
-  typeof queueMicrotask === 'function'
+  typeof queueMicrotask === "function"
     ? queueMicrotask
-    : typeof localPromise !== 'undefined'
-      ? callback =>
-          localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
-      : scheduleTimeout; // TODO: Determine the best fallback here.
+    : typeof localPromise !== "undefined"
+    ? (callback) =>
+        localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
+    : scheduleTimeout; // TODO: Determine the best fallback here.
 
 function handleErrorInNextTick(error: any) {
   setTimeout(() => {
@@ -805,7 +810,7 @@ export function commitMount(
   domElement: Instance,
   type: string,
   newProps: Props,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
   // Despite the naming that might imply otherwise, this method only
   // fires if there is an `Update` effect scheduled during mounting.
@@ -814,10 +819,10 @@ export function commitMount(
   // there are also other cases when this might happen (such as patching
   // up text content during hydration mismatch). So we'll check this again.
   switch (type) {
-    case 'button':
-    case 'input':
-    case 'select':
-    case 'textarea':
+    case "button":
+    case "input":
+    case "select":
+    case "textarea":
       if (newProps.autoFocus) {
         ((domElement: any):
           | HTMLButtonElement
@@ -826,7 +831,7 @@ export function commitMount(
           | HTMLTextAreaElement).focus();
       }
       return;
-    case 'img': {
+    case "img": {
       // The technique here is to assign the src or srcSet property to cause the browser
       // to issue a new load event. If it hasn't loaded yet it'll fire whenever the load actually completes.
       // If it has already loaded we missed it so the second load will still be the first one that executes
@@ -838,7 +843,7 @@ export function commitMount(
       // this heuristic in the future.
       if (newProps.src) {
         const src = (newProps: any).src;
-        if (enableSrcObject && typeof src === 'object') {
+        if (enableSrcObject && typeof src === "object") {
           // For object src, we can't just set the src again to the same blob URL because it might have
           // already revoked if it loaded before this. However, we can create a new blob URL and set that.
           // This is relatively cheap since the blob is already in memory but this might cause some
@@ -866,7 +871,7 @@ export function commitHydratedInstance(
   domElement: Instance,
   type: string,
   props: Props,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
   if (!enableHydrationChangeEvent) {
     return;
@@ -877,29 +882,29 @@ export function commitHydratedInstance(
   // would steal focus. It's only scheduled if finalizeHydratedChildren returns
   // true.
   switch (type) {
-    case 'input': {
+    case "input": {
       hydrateInput(
         domElement,
         props.value,
         props.defaultValue,
         props.checked,
-        props.defaultChecked,
+        props.defaultChecked
       );
       break;
     }
-    case 'select': {
+    case "select": {
       hydrateSelect(
         domElement,
         props.value,
         props.defaultValue,
-        props.multiple,
+        props.multiple
       );
       break;
     }
-    case 'textarea':
+    case "textarea":
       hydrateTextarea(domElement, props.value, props.defaultValue);
       break;
-    case 'img':
+    case "img":
       // TODO: Should we replay onLoad events?
       break;
   }
@@ -910,7 +915,7 @@ export function commitUpdate(
   type: string,
   oldProps: Props,
   newProps: Props,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
   // Diff and update the properties.
   updateProperties(domElement, type, oldProps, newProps);
@@ -921,13 +926,13 @@ export function commitUpdate(
 }
 
 export function resetTextContent(domElement: Instance): void {
-  setTextContent(domElement, '');
+  setTextContent(domElement, "");
 }
 
 export function commitTextUpdate(
   textInstance: TextInstance,
   oldText: string,
-  newText: string,
+  newText: string
 ): void {
   textInstance.nodeValue = newText;
 }
@@ -935,12 +940,12 @@ export function commitTextUpdate(
 const supportsMoveBefore =
   // $FlowFixMe[prop-missing]: We're doing the feature detection here.
   enableMoveBefore &&
-  typeof window !== 'undefined' &&
-  typeof window.Element.prototype.moveBefore === 'function';
+  typeof window !== "undefined" &&
+  typeof window.Element.prototype.moveBefore === "function";
 
 export function appendChild(
   parentInstance: Instance,
-  child: Instance | TextInstance,
+  child: Instance | TextInstance
 ): void {
   if (supportsMoveBefore && child.parentNode !== null) {
     // $FlowFixMe[prop-missing]: We've checked this with supportsMoveBefore.
@@ -951,7 +956,7 @@ export function appendChild(
 }
 
 function warnForReactChildrenConflict(container: Container): void {
-  if (__DEV__) {
+  if (false) {
     if ((container: any).__reactWarnedAboutChildrenConflict) {
       return;
     }
@@ -960,26 +965,26 @@ function warnForReactChildrenConflict(container: Container): void {
       const fiber = getInstanceFromNode(container);
       if (fiber !== null) {
         if (
-          typeof props.children === 'string' ||
-          typeof props.children === 'number'
+          typeof props.children === "string" ||
+          typeof props.children === "number"
         ) {
           (container: any).__reactWarnedAboutChildrenConflict = true;
           // Run the warning with the Fiber of the container for context of where the children are specified.
           // We could also maybe use the Portal. The current execution context is the child being added.
           runWithFiberInDEV(fiber, () => {
             console.error(
-              'Cannot use a ref on a React element as a container to `createRoot` or `createPortal` ' +
+              "Cannot use a ref on a React element as a container to `createRoot` or `createPortal` " +
                 'if that element also sets "children" text content using React. It should be a leaf with no children. ' +
-                "Otherwise it's ambiguous which children should be used.",
+                "Otherwise it's ambiguous which children should be used."
             );
           });
         } else if (props.dangerouslySetInnerHTML != null) {
           (container: any).__reactWarnedAboutChildrenConflict = true;
           runWithFiberInDEV(fiber, () => {
             console.error(
-              'Cannot use a ref on a React element as a container to `createRoot` or `createPortal` ' +
+              "Cannot use a ref on a React element as a container to `createRoot` or `createPortal` " +
                 'if that element also sets "dangerouslySetInnerHTML" using React. It should be a leaf with no children. ' +
-                "Otherwise it's ambiguous which children should be used.",
+                "Otherwise it's ambiguous which children should be used."
             );
           });
         }
@@ -990,9 +995,9 @@ function warnForReactChildrenConflict(container: Container): void {
 
 export function appendChildToContainer(
   container: Container,
-  child: Instance | TextInstance,
+  child: Instance | TextInstance
 ): void {
-  if (__DEV__) {
+  if (false) {
     warnForReactChildrenConflict(container);
   }
   let parentNode: DocumentFragment | Element;
@@ -1010,7 +1015,7 @@ export function appendChildToContainer(
       parentNode.insertBefore(child, container);
     }
     return;
-  } else if (container.nodeName === 'HTML') {
+  } else if (container.nodeName === "HTML") {
     parentNode = (container.ownerDocument.body: any);
   } else {
     parentNode = (container: any);
@@ -1043,7 +1048,7 @@ export function appendChildToContainer(
 export function insertBefore(
   parentInstance: Instance,
   child: Instance | TextInstance,
-  beforeChild: Instance | TextInstance | SuspenseInstance | ActivityInstance,
+  beforeChild: Instance | TextInstance | SuspenseInstance | ActivityInstance
 ): void {
   if (supportsMoveBefore && child.parentNode !== null) {
     // $FlowFixMe[prop-missing]: We've checked this with supportsMoveBefore.
@@ -1056,9 +1061,9 @@ export function insertBefore(
 export function insertInContainerBefore(
   container: Container,
   child: Instance | TextInstance,
-  beforeChild: Instance | TextInstance | SuspenseInstance | ActivityInstance,
+  beforeChild: Instance | TextInstance | SuspenseInstance | ActivityInstance
 ): void {
-  if (__DEV__) {
+  if (false) {
     warnForReactChildrenConflict(container);
   }
   let parentNode: DocumentFragment | Element;
@@ -1069,7 +1074,7 @@ export function insertInContainerBefore(
     container.nodeType === COMMENT_NODE
   ) {
     parentNode = (container.parentNode: any);
-  } else if (container.nodeName === 'HTML') {
+  } else if (container.nodeName === "HTML") {
     parentNode = (container.ownerDocument.body: any);
   } else {
     parentNode = (container: any);
@@ -1083,21 +1088,21 @@ export function insertInContainerBefore(
 }
 
 export function isSingletonScope(type: string): boolean {
-  return type === 'head';
+  return type === "head";
 }
 
 function createEvent(type: DOMEventName, bubbles: boolean): Event {
-  const event = document.createEvent('Event');
+  const event = document.createEvent("Event");
   event.initEvent(((type: any): string), bubbles, false);
   return event;
 }
 
 function dispatchBeforeDetachedBlur(
   target: HTMLElement,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
   if (enableCreateEventHandleAPI) {
-    const event = createEvent('beforeblur', true);
+    const event = createEvent("beforeblur", true);
     // Dispatch "beforeblur" directly on the target,
     // so it gets picked up by the event system and
     // can propagate through the React internal tree.
@@ -1109,7 +1114,7 @@ function dispatchBeforeDetachedBlur(
 
 function dispatchAfterDetachedBlur(target: HTMLElement): void {
   if (enableCreateEventHandleAPI) {
-    const event = createEvent('afterblur', false);
+    const event = createEvent("afterblur", false);
     // So we know what was detached, make the relatedTarget the
     // detached target on the "afterblur" event.
     (event: any).relatedTarget = target;
@@ -1120,14 +1125,14 @@ function dispatchAfterDetachedBlur(target: HTMLElement): void {
 
 export function removeChild(
   parentInstance: Instance,
-  child: Instance | TextInstance | SuspenseInstance | ActivityInstance,
+  child: Instance | TextInstance | SuspenseInstance | ActivityInstance
 ): void {
   parentInstance.removeChild(child);
 }
 
 export function removeChildFromContainer(
   container: Container,
-  child: Instance | TextInstance | SuspenseInstance | ActivityInstance,
+  child: Instance | TextInstance | SuspenseInstance | ActivityInstance
 ): void {
   let parentNode: DocumentFragment | Element;
   if (container.nodeType === DOCUMENT_NODE) {
@@ -1137,7 +1142,7 @@ export function removeChildFromContainer(
     container.nodeType === COMMENT_NODE
   ) {
     parentNode = (container.parentNode: any);
-  } else if (container.nodeName === 'HTML') {
+  } else if (container.nodeName === "HTML") {
     parentNode = (container.ownerDocument.body: any);
   } else {
     parentNode = (container: any);
@@ -1147,7 +1152,7 @@ export function removeChildFromContainer(
 
 function clearHydrationBoundary(
   parentInstance: Instance,
-  hydrationInstance: SuspenseInstance | ActivityInstance,
+  hydrationInstance: SuspenseInstance | ActivityInstance
 ): void {
   let node: Node = hydrationInstance;
   // Delete all nodes within this suspense boundary.
@@ -1205,21 +1210,21 @@ function clearHydrationBoundary(
 
 export function clearActivityBoundary(
   parentInstance: Instance,
-  activityInstance: ActivityInstance,
+  activityInstance: ActivityInstance
 ): void {
   clearHydrationBoundary(parentInstance, activityInstance);
 }
 
 export function clearSuspenseBoundary(
   parentInstance: Instance,
-  suspenseInstance: SuspenseInstance,
+  suspenseInstance: SuspenseInstance
 ): void {
   clearHydrationBoundary(parentInstance, suspenseInstance);
 }
 
 function clearHydrationBoundaryFromContainer(
   container: Container,
-  hydrationInstance: SuspenseInstance | ActivityInstance,
+  hydrationInstance: SuspenseInstance | ActivityInstance
 ): void {
   let parentNode: DocumentFragment | Element;
   if (container.nodeType === DOCUMENT_NODE) {
@@ -1229,7 +1234,7 @@ function clearHydrationBoundaryFromContainer(
     container.nodeType === COMMENT_NODE
   ) {
     parentNode = (container.parentNode: any);
-  } else if (container.nodeName === 'HTML') {
+  } else if (container.nodeName === "HTML") {
     parentNode = (container.ownerDocument.body: any);
   } else {
     parentNode = (container: any);
@@ -1241,21 +1246,21 @@ function clearHydrationBoundaryFromContainer(
 
 export function clearActivityBoundaryFromContainer(
   container: Container,
-  activityInstance: ActivityInstance,
+  activityInstance: ActivityInstance
 ): void {
   clearHydrationBoundaryFromContainer(container, activityInstance);
 }
 
 export function clearSuspenseBoundaryFromContainer(
   container: Container,
-  suspenseInstance: SuspenseInstance,
+  suspenseInstance: SuspenseInstance
 ): void {
   clearHydrationBoundaryFromContainer(container, suspenseInstance);
 }
 
 function hideOrUnhideDehydratedBoundary(
   suspenseInstance: SuspenseInstance | ActivityInstance,
-  isHidden: boolean,
+  isHidden: boolean
 ) {
   let node: Node = suspenseInstance;
   // Unhide all nodes within this suspense boundary.
@@ -1263,23 +1268,25 @@ function hideOrUnhideDehydratedBoundary(
   do {
     const nextNode = node.nextSibling;
     if (node.nodeType === ELEMENT_NODE) {
-      const instance = ((node: any): HTMLElement & {_stashedDisplay?: string});
+      const instance = ((node: any): HTMLElement & {
+        _stashedDisplay?: string,
+      });
       if (isHidden) {
         instance._stashedDisplay = instance.style.display;
-        instance.style.display = 'none';
+        instance.style.display = "none";
       } else {
-        instance.style.display = instance._stashedDisplay || '';
-        if (instance.getAttribute('style') === '') {
-          instance.removeAttribute('style');
+        instance.style.display = instance._stashedDisplay || "";
+        if (instance.getAttribute("style") === "") {
+          instance.removeAttribute("style");
         }
       }
     } else if (node.nodeType === TEXT_NODE) {
-      const textNode = ((node: any): Text & {_stashedText?: string});
+      const textNode = ((node: any): Text & { _stashedText?: string });
       if (isHidden) {
         textNode._stashedText = textNode.nodeValue;
-        textNode.nodeValue = '';
+        textNode.nodeValue = "";
       } else {
-        textNode.nodeValue = textNode._stashedText || '';
+        textNode.nodeValue = textNode._stashedText || "";
       }
     }
     if (nextNode && nextNode.nodeType === COMMENT_NODE) {
@@ -1306,7 +1313,7 @@ function hideOrUnhideDehydratedBoundary(
 }
 
 export function hideDehydratedBoundary(
-  suspenseInstance: SuspenseInstance,
+  suspenseInstance: SuspenseInstance
 ): void {
   hideOrUnhideDehydratedBoundary(suspenseInstance, true);
 }
@@ -1317,19 +1324,19 @@ export function hideInstance(instance: Instance): void {
   instance = ((instance: any): HTMLElement);
   const style = instance.style;
   // $FlowFixMe[method-unbinding]
-  if (typeof style.setProperty === 'function') {
-    style.setProperty('display', 'none', 'important');
+  if (typeof style.setProperty === "function") {
+    style.setProperty("display", "none", "important");
   } else {
-    style.display = 'none';
+    style.display = "none";
   }
 }
 
 export function hideTextInstance(textInstance: TextInstance): void {
-  textInstance.nodeValue = '';
+  textInstance.nodeValue = "";
 }
 
 export function unhideDehydratedBoundary(
-  dehydratedInstance: SuspenseInstance | ActivityInstance,
+  dehydratedInstance: SuspenseInstance | ActivityInstance
 ): void {
   hideOrUnhideDehydratedBoundary(dehydratedInstance, false);
 }
@@ -1340,41 +1347,41 @@ export function unhideInstance(instance: Instance, props: Props): void {
   const display =
     styleProp !== undefined &&
     styleProp !== null &&
-    styleProp.hasOwnProperty('display')
+    styleProp.hasOwnProperty("display")
       ? styleProp.display
       : null;
   instance.style.display =
-    display == null || typeof display === 'boolean'
-      ? ''
+    display == null || typeof display === "boolean"
+      ? ""
       : // The value would've errored already if it wasn't safe.
         // eslint-disable-next-line react-internal/safe-string-coercion
-        ('' + display).trim();
+        ("" + display).trim();
 }
 
 export function unhideTextInstance(
   textInstance: TextInstance,
-  text: string,
+  text: string
 ): void {
   textInstance.nodeValue = text;
 }
 
 function warnForBlockInsideInline(instance: HTMLElement) {
-  if (__DEV__) {
+  if (false) {
     let nextNode = instance.firstChild;
     outer: while (nextNode != null) {
       let node: Node = nextNode;
       if (
         node.nodeType === ELEMENT_NODE &&
-        getComputedStyle((node: any)).display === 'block'
+        getComputedStyle((node: any)).display === "block"
       ) {
         console.error(
           "You're about to start a <ViewTransition> around a display: inline " +
-            'element <%s>, which itself has a display: block element <%s> inside it. ' +
-            'This might trigger a bug in Safari which causes the View Transition to ' +
-            'be skipped with a duplicate name error.\n' +
-            'https://bugs.webkit.org/show_bug.cgi?id=290923',
+            "element <%s>, which itself has a display: block element <%s> inside it. " +
+            "This might trigger a bug in Safari which causes the View Transition to " +
+            "be skipped with a duplicate name error.\n" +
+            "https://bugs.webkit.org/show_bug.cgi?id=290923",
           instance.tagName.toLocaleLowerCase(),
-          (node: any).tagName.toLocaleLowerCase(),
+          (node: any).tagName.toLocaleLowerCase()
         );
         break;
       }
@@ -1414,7 +1421,7 @@ function countClientRects(rects: Array<ClientRect>): number {
 export function applyViewTransitionName(
   instance: Instance,
   name: string,
-  className: ?string,
+  className: ?string
 ): void {
   instance = ((instance: any): HTMLElement);
   // $FlowFixMe[prop-missing]
@@ -1424,7 +1431,7 @@ export function applyViewTransitionName(
     instance.style.viewTransitionClass = className;
   }
   const computedStyle = getComputedStyle(instance);
-  if (computedStyle.display === 'inline') {
+  if (computedStyle.display === "inline") {
     // WebKit has a bug where assigning a name to display: inline elements errors
     // if they have display: block children. We try to work around this bug in the
     // simple case by converting it automatically to display: inline-block.
@@ -1439,12 +1446,12 @@ export function applyViewTransitionName(
       // If there's literally only one rect, then it's likely on a single line like an
       // inline-block. If it's multiple rects but all but one of them are empty it's
       // likely because it's a single block that caused a line break.
-      style.display = rects.length === 1 ? 'inline-block' : 'block';
+      style.display = rects.length === 1 ? "inline-block" : "block";
       // Margin doesn't apply to inline so should be zero. However, padding top/bottom
       // applies to inline-block positioning which we can offset by setting the margin
       // to the negative padding to get it back into original position.
-      style.marginTop = '-' + computedStyle.paddingTop;
-      style.marginBottom = '-' + computedStyle.paddingBottom;
+      style.marginTop = "-" + computedStyle.paddingTop;
+      style.marginBottom = "-" + computedStyle.paddingBottom;
     } else {
       // This case cannot be easily fixed if it has blocks but it's also fine if
       // it doesn't have blocks. So we only warn in DEV about this being an issue.
@@ -1455,64 +1462,64 @@ export function applyViewTransitionName(
 
 export function restoreViewTransitionName(
   instance: Instance,
-  props: Props,
+  props: Props
 ): void {
   instance = ((instance: any): HTMLElement);
   const style = instance.style;
   const styleProp = props[STYLE];
   const viewTransitionName =
     styleProp != null
-      ? styleProp.hasOwnProperty('viewTransitionName')
+      ? styleProp.hasOwnProperty("viewTransitionName")
         ? styleProp.viewTransitionName
-        : styleProp.hasOwnProperty('view-transition-name')
-          ? styleProp['view-transition-name']
-          : null
+        : styleProp.hasOwnProperty("view-transition-name")
+        ? styleProp["view-transition-name"]
+        : null
       : null;
   // $FlowFixMe[prop-missing]
   style.viewTransitionName =
-    viewTransitionName == null || typeof viewTransitionName === 'boolean'
-      ? ''
+    viewTransitionName == null || typeof viewTransitionName === "boolean"
+      ? ""
       : // The value would've errored already if it wasn't safe.
         // eslint-disable-next-line react-internal/safe-string-coercion
-        ('' + viewTransitionName).trim();
+        ("" + viewTransitionName).trim();
   const viewTransitionClass =
     styleProp != null
-      ? styleProp.hasOwnProperty('viewTransitionClass')
+      ? styleProp.hasOwnProperty("viewTransitionClass")
         ? styleProp.viewTransitionClass
-        : styleProp.hasOwnProperty('view-transition-class')
-          ? styleProp['view-transition-class']
-          : null
+        : styleProp.hasOwnProperty("view-transition-class")
+        ? styleProp["view-transition-class"]
+        : null
       : null;
   // $FlowFixMe[prop-missing]
   style.viewTransitionClass =
-    viewTransitionClass == null || typeof viewTransitionClass === 'boolean'
-      ? ''
+    viewTransitionClass == null || typeof viewTransitionClass === "boolean"
+      ? ""
       : // The value would've errored already if it wasn't safe.
         // eslint-disable-next-line react-internal/safe-string-coercion
-        ('' + viewTransitionClass).trim();
-  if (style.display === 'inline-block') {
+        ("" + viewTransitionClass).trim();
+  if (style.display === "inline-block") {
     // We might have overridden the style. Reset it to what it should be.
     if (styleProp == null) {
-      style.display = style.margin = '';
+      style.display = style.margin = "";
     } else {
       const display = styleProp.display;
       style.display =
-        display == null || typeof display === 'boolean' ? '' : display;
+        display == null || typeof display === "boolean" ? "" : display;
       const margin = styleProp.margin;
       if (margin != null) {
         style.margin = margin;
       } else {
-        const marginTop = styleProp.hasOwnProperty('marginTop')
+        const marginTop = styleProp.hasOwnProperty("marginTop")
           ? styleProp.marginTop
-          : styleProp['margin-top'];
+          : styleProp["margin-top"];
         style.marginTop =
-          marginTop == null || typeof marginTop === 'boolean' ? '' : marginTop;
-        const marginBottom = styleProp.hasOwnProperty('marginBottom')
+          marginTop == null || typeof marginTop === "boolean" ? "" : marginTop;
+        const marginBottom = styleProp.hasOwnProperty("marginBottom")
           ? styleProp.marginBottom
-          : styleProp['margin-bottom'];
+          : styleProp["margin-bottom"];
         style.marginBottom =
-          marginBottom == null || typeof marginBottom === 'boolean'
-            ? ''
+          marginBottom == null || typeof marginBottom === "boolean"
+            ? ""
             : marginBottom;
       }
     }
@@ -1522,7 +1529,7 @@ export function restoreViewTransitionName(
 export function cancelViewTransitionName(
   instance: Instance,
   oldName: string,
-  props: Props,
+  props: Props
 ): void {
   // To cancel the "new" state and paint this instance as part of the parent, all we have to do
   // is remove the view-transition-name before we exit startViewTransition.
@@ -1534,12 +1541,12 @@ export function cancelViewTransitionName(
   const documentElement = instance.ownerDocument.documentElement;
   if (documentElement !== null) {
     documentElement.animate(
-      {opacity: [0, 0], pointerEvents: ['none', 'none']},
+      { opacity: [0, 0], pointerEvents: ["none", "none"] },
       {
         duration: 0,
-        fill: 'forwards',
-        pseudoElement: '::view-transition-group(' + oldName + ')',
-      },
+        fill: "forwards",
+        pseudoElement: "::view-transition-group(" + oldName + ")",
+      }
     );
   }
 }
@@ -1554,9 +1561,9 @@ export function cancelRootViewTransitionName(rootContainer: Container): void {
     !disableCommentsAsDOMContainers &&
     rootContainer.nodeType === COMMENT_NODE
   ) {
-    if (__DEV__) {
+    if (false) {
       console.warn(
-        'Cannot cancel root view transition on a comment node. All view transitions will be globally scoped.',
+        "Cannot cancel root view transition on a comment node. All view transitions will be globally scoped."
       );
     }
     return;
@@ -1565,17 +1572,17 @@ export function cancelRootViewTransitionName(rootContainer: Container): void {
   if (
     documentElement !== null &&
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName === ''
+    documentElement.style.viewTransitionName === ""
   ) {
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName = 'none';
+    documentElement.style.viewTransitionName = "none";
     documentElement.animate(
-      {opacity: [0, 0], pointerEvents: ['none', 'none']},
+      { opacity: [0, 0], pointerEvents: ["none", "none"] },
       {
         duration: 0,
-        fill: 'forwards',
-        pseudoElement: '::view-transition-group(root)',
-      },
+        fill: "forwards",
+        pseudoElement: "::view-transition-group(root)",
+      }
     );
     // By default the root ::view-transition selector captures all pointer events,
     // which means nothing gets interactive. We want to let whatever is not animating
@@ -1585,12 +1592,12 @@ export function cancelRootViewTransitionName(rootContainer: Container): void {
     // that are running to block clicks so that they don't end up incorrectly hitting
     // whatever is below the animation.
     documentElement.animate(
-      {width: [0, 0], height: [0, 0]},
+      { width: [0, 0], height: [0, 0] },
       {
         duration: 0,
-        fill: 'forwards',
-        pseudoElement: '::view-transition',
-      },
+        fill: "forwards",
+        pseudoElement: "::view-transition",
+      }
     );
   }
 }
@@ -1599,7 +1606,7 @@ export function restoreRootViewTransitionName(rootContainer: Container): void {
   let containerInstance: Instance;
   if (rootContainer.nodeType === DOCUMENT_NODE) {
     containerInstance = (rootContainer: any).body;
-  } else if (rootContainer.nodeName === 'HTML') {
+  } else if (rootContainer.nodeName === "HTML") {
     containerInstance = (rootContainer.ownerDocument.body: any);
   } else {
     // If the container is not the whole document, then we ideally should probably
@@ -1614,21 +1621,21 @@ export function restoreRootViewTransitionName(rootContainer: Container): void {
   }
   if (
     // $FlowFixMe[prop-missing]
-    containerInstance.style.viewTransitionName === 'root'
+    containerInstance.style.viewTransitionName === "root"
   ) {
     // If we moved the root view transition name to the container in a gesture
     // we need to restore it now.
-    containerInstance.style.viewTransitionName = '';
+    containerInstance.style.viewTransitionName = "";
   }
   const documentElement: null | HTMLElement =
     containerInstance.ownerDocument.documentElement;
   if (
     documentElement !== null &&
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName === 'none'
+    documentElement.style.viewTransitionName === "none"
   ) {
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName = '';
+    documentElement.style.viewTransitionName = "";
   }
 }
 
@@ -1636,39 +1643,39 @@ function getComputedTransform(style: CSSStyleDeclaration): string {
   // Gets the merged transform of all the short hands.
   const computedStyle: any = style;
   let transform: string = computedStyle.transform;
-  if (transform === 'none') {
-    transform = '';
+  if (transform === "none") {
+    transform = "";
   }
   const scale: string = computedStyle.scale;
-  if (scale !== 'none' && scale !== '') {
-    const parts = scale.split(' ');
+  if (scale !== "none" && scale !== "") {
+    const parts = scale.split(" ");
     transform =
-      (parts.length === 3 ? 'scale3d' : 'scale') +
-      '(' +
-      parts.join(', ') +
-      ') ' +
+      (parts.length === 3 ? "scale3d" : "scale") +
+      "(" +
+      parts.join(", ") +
+      ") " +
       transform;
   }
   const rotate: string = computedStyle.rotate;
-  if (rotate !== 'none' && rotate !== '') {
-    const parts = rotate.split(' ');
+  if (rotate !== "none" && rotate !== "") {
+    const parts = rotate.split(" ");
     if (parts.length === 1) {
-      transform = 'rotate(' + parts[0] + ') ' + transform;
+      transform = "rotate(" + parts[0] + ") " + transform;
     } else if (parts.length === 2) {
       transform =
-        'rotate' + parts[0].toUpperCase() + '(' + parts[1] + ') ' + transform;
+        "rotate" + parts[0].toUpperCase() + "(" + parts[1] + ") " + transform;
     } else {
-      transform = 'rotate3d(' + parts.join(', ') + ') ' + transform;
+      transform = "rotate3d(" + parts.join(", ") + ") " + transform;
     }
   }
   const translate: string = computedStyle.translate;
-  if (translate !== 'none' && translate !== '') {
-    const parts = translate.split(' ');
+  if (translate !== "none" && translate !== "") {
+    const parts = translate.split(" ");
     transform =
-      (parts.length === 3 ? 'translate3d' : 'translate') +
-      '(' +
-      parts.join(', ') +
-      ') ' +
+      (parts.length === 3 ? "translate3d" : "translate") +
+      "(" +
+      parts.join(", ") +
+      ") " +
       transform;
   }
   return transform;
@@ -1676,38 +1683,38 @@ function getComputedTransform(style: CSSStyleDeclaration): string {
 
 function moveOutOfViewport(
   originalStyle: CSSStyleDeclaration,
-  element: HTMLElement,
+  element: HTMLElement
 ): void {
   // Apply a transform that safely puts the whole element outside the viewport
   // while still letting it paint its "old" state to a snapshot.
   const transform = getComputedTransform(originalStyle);
   // Clear the long form properties.
   // $FlowFixMe
-  element.style.translate = 'none';
+  element.style.translate = "none";
   // $FlowFixMe
-  element.style.scale = 'none';
+  element.style.scale = "none";
   // $FlowFixMe
-  element.style.rotate = 'none';
+  element.style.rotate = "none";
   // Apply a translate to move it way out of the viewport. This is applied first
   // so that it is in the coordinate space of the parent and not after applying
   // other transforms. That's why we need to merge the long form properties.
   // TODO: Ideally we'd adjust for the parent's rotate/scale. Otherwise when
   // we move back the ::view-transition-group we might overshoot or undershoot.
-  element.style.transform = 'translate(-20000px, -20000px) ' + transform;
+  element.style.transform = "translate(-20000px, -20000px) " + transform;
 }
 
 function moveOldFrameIntoViewport(keyframe: any): void {
   // In the resulting View Transition Animation, the first frame will be offset.
   const computedTransform: ?string = keyframe.transform;
   if (computedTransform != null) {
-    let transform = computedTransform === 'none' ? '' : computedTransform;
-    transform = 'translate(20000px, 20000px) ' + transform;
+    let transform = computedTransform === "none" ? "" : computedTransform;
+    transform = "translate(20000px, 20000px) " + transform;
     keyframe.transform = transform;
   }
 }
 
 export function cloneRootViewTransitionContainer(
-  rootContainer: Container,
+  rootContainer: Container
 ): Instance {
   // This implies that we're not going to animate the root document but instead
   // the clone so we first clear the name of the root container.
@@ -1718,23 +1725,23 @@ export function cloneRootViewTransitionContainer(
   if (
     documentElement !== null &&
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName === ''
+    documentElement.style.viewTransitionName === ""
   ) {
     // $FlowFixMe[prop-missing]
-    documentElement.style.viewTransitionName = 'none';
+    documentElement.style.viewTransitionName = "none";
   }
 
   let containerInstance: HTMLElement;
   if (rootContainer.nodeType === DOCUMENT_NODE) {
     containerInstance = (rootContainer: any).body;
-  } else if (rootContainer.nodeName === 'HTML') {
+  } else if (rootContainer.nodeName === "HTML") {
     containerInstance = (rootContainer.ownerDocument.body: any);
   } else if (
     !disableCommentsAsDOMContainers &&
     rootContainer.nodeType === COMMENT_NODE
   ) {
     throw new Error(
-      'Cannot use a startGestureTransition() with a comment node root.',
+      "Cannot use a startGestureTransition() with a comment node root."
     );
   } else {
     // If the container is not the whole document, then we ideally should probably
@@ -1745,7 +1752,7 @@ export function cloneRootViewTransitionContainer(
   const containerParent = containerInstance.parentNode;
   if (containerParent === null) {
     throw new Error(
-      'Cannot use a startGestureTransition() on a detached root.',
+      "Cannot use a startGestureTransition() on a detached root."
     );
   }
 
@@ -1754,8 +1761,8 @@ export function cloneRootViewTransitionContainer(
   const computedStyle = getComputedStyle(containerInstance);
 
   if (
-    computedStyle.position === 'absolute' ||
-    computedStyle.position === 'fixed'
+    computedStyle.position === "absolute" ||
+    computedStyle.position === "fixed"
   ) {
     // If the style is already absolute, we don't have to do anything because it'll appear
     // in the same place.
@@ -1766,7 +1773,7 @@ export function cloneRootViewTransitionContainer(
       positionedAncestor.parentNode != null &&
       positionedAncestor.parentNode.nodeType !== DOCUMENT_NODE
     ) {
-      if (getComputedStyle(positionedAncestor).position !== 'static') {
+      if (getComputedStyle(positionedAncestor).position !== "static") {
         break;
       }
       // $FlowFixMe: This is refined.
@@ -1784,26 +1791,26 @@ export function cloneRootViewTransitionContainer(
     const prevScale = containerInstanceStyle.scale;
     const prevRotate = containerInstanceStyle.rotate;
     const prevTransform = containerInstanceStyle.transform;
-    positionedAncestorStyle.translate = 'none';
-    positionedAncestorStyle.scale = 'none';
-    positionedAncestorStyle.rotate = 'none';
-    positionedAncestorStyle.transform = 'none';
-    containerInstanceStyle.translate = 'none';
-    containerInstanceStyle.scale = 'none';
-    containerInstanceStyle.rotate = 'none';
-    containerInstanceStyle.transform = 'none';
+    positionedAncestorStyle.translate = "none";
+    positionedAncestorStyle.scale = "none";
+    positionedAncestorStyle.rotate = "none";
+    positionedAncestorStyle.transform = "none";
+    containerInstanceStyle.translate = "none";
+    containerInstanceStyle.scale = "none";
+    containerInstanceStyle.rotate = "none";
+    containerInstanceStyle.transform = "none";
 
     const ancestorRect = positionedAncestor.getBoundingClientRect();
     const rect = containerInstance.getBoundingClientRect();
 
     const cloneStyle = clone.style;
-    cloneStyle.position = 'absolute';
-    cloneStyle.top = rect.top - ancestorRect.top + 'px';
-    cloneStyle.left = rect.left - ancestorRect.left + 'px';
-    cloneStyle.width = rect.width + 'px';
-    cloneStyle.height = rect.height + 'px';
-    cloneStyle.margin = '0px';
-    cloneStyle.boxSizing = 'border-box';
+    cloneStyle.position = "absolute";
+    cloneStyle.top = rect.top - ancestorRect.top + "px";
+    cloneStyle.left = rect.left - ancestorRect.left + "px";
+    cloneStyle.width = rect.width + "px";
+    cloneStyle.height = rect.height + "px";
+    cloneStyle.margin = "0px";
+    cloneStyle.boxSizing = "border-box";
 
     positionedAncestorStyle.translate = prevAncestorTranslate;
     positionedAncestorStyle.scale = prevAncestorScale;
@@ -1818,7 +1825,7 @@ export function cloneRootViewTransitionContainer(
   // For this transition the container will act as the root. Nothing outside of it should
   // be affected anyway. This lets us transition from the cloned container to the original.
   // $FlowFixMe[prop-missing]
-  clone.style.viewTransitionName = 'root';
+  clone.style.viewTransitionName = "root";
 
   // Move out of the viewport so that it's still painted for the snapshot but is not visible
   // for the frame where the snapshot happens.
@@ -1830,7 +1837,7 @@ export function cloneRootViewTransitionContainer(
   // important that it's after the existing node.
   containerInstance.parentNode.insertBefore(
     clone,
-    containerInstance.nextSibling,
+    containerInstance.nextSibling
   );
 
   return clone;
@@ -1838,12 +1845,12 @@ export function cloneRootViewTransitionContainer(
 
 export function removeRootViewTransitionClone(
   rootContainer: Container,
-  clone: Instance,
+  clone: Instance
 ): void {
   let containerInstance: Instance;
   if (rootContainer.nodeType === DOCUMENT_NODE) {
     containerInstance = (rootContainer: any).body;
-  } else if (rootContainer.nodeName === 'HTML') {
+  } else if (rootContainer.nodeName === "HTML") {
     containerInstance = (rootContainer.ownerDocument.body: any);
   } else {
     // If the container is not the whole document, then we ideally should probably
@@ -1853,14 +1860,14 @@ export function removeRootViewTransitionClone(
   const containerParent = containerInstance.parentNode;
   if (containerParent === null) {
     throw new Error(
-      'Cannot use a startGestureTransition() on a detached root.',
+      "Cannot use a startGestureTransition() on a detached root."
     );
   }
   // We assume that the clone is still within the same parent.
   containerParent.removeChild(clone);
 
   // Now the root is on the containerInstance itself until we call restoreRootViewTransitionName.
-  containerInstance.style.viewTransitionName = 'root';
+  containerInstance.style.viewTransitionName = "root";
 }
 
 export type InstanceMeasurement = {
@@ -1873,26 +1880,26 @@ export type InstanceMeasurement = {
 function createMeasurement(
   rect: ClientRect | DOMRect,
   computedStyle: CSSStyleDeclaration,
-  element: Element,
+  element: Element
 ): InstanceMeasurement {
   const ownerWindow = element.ownerDocument.defaultView;
   return {
     rect: rect,
     abs:
       // Absolutely positioned instances don't contribute their size to the parent.
-      computedStyle.position === 'absolute' ||
-      computedStyle.position === 'fixed',
+      computedStyle.position === "absolute" ||
+      computedStyle.position === "fixed",
     clip:
       // If a ViewTransition boundary acts as a clipping parent group we should
       // always mark it to animate if its children do so that we can clip them.
       // This doesn't actually have any effect yet until browsers implement
       // layered capture and nested view transitions.
-      computedStyle.clipPath !== 'none' ||
-      computedStyle.overflow !== 'visible' ||
-      computedStyle.filter !== 'none' ||
-      computedStyle.mask !== 'none' ||
-      computedStyle.mask !== 'none' ||
-      computedStyle.borderRadius !== '0px',
+      computedStyle.clipPath !== "none" ||
+      computedStyle.overflow !== "visible" ||
+      computedStyle.filter !== "none" ||
+      computedStyle.mask !== "none" ||
+      computedStyle.mask !== "none" ||
+      computedStyle.borderRadius !== "0px",
     view:
       // If the instance was within the bounds of the viewport. We don't care as
       // much about if it was fully occluded because then it can still pop out.
@@ -1917,21 +1924,21 @@ export function measureClonedInstance(instance: Instance): InstanceMeasurement {
     measuredRect.x + 20000,
     measuredRect.y + 20000,
     measuredRect.width,
-    measuredRect.height,
+    measuredRect.height
   );
   const computedStyle = getComputedStyle(instance);
   return createMeasurement(rect, computedStyle, instance);
 }
 
 export function wasInstanceInViewport(
-  measurement: InstanceMeasurement,
+  measurement: InstanceMeasurement
 ): boolean {
   return measurement.view;
 }
 
 export function hasInstanceChanged(
   oldMeasurement: InstanceMeasurement,
-  newMeasurement: InstanceMeasurement,
+  newMeasurement: InstanceMeasurement
 ): boolean {
   // Note: This is not guaranteed from the same instance in the case that the Instance of the
   // ViewTransition swaps out but it's still the same ViewTransition instance.
@@ -1952,7 +1959,7 @@ export function hasInstanceChanged(
 
 export function hasInstanceAffectedParent(
   oldMeasurement: InstanceMeasurement,
-  newMeasurement: InstanceMeasurement,
+  newMeasurement: InstanceMeasurement
 ): boolean {
   // Note: This is not guaranteed from the same instance in the case that the Instance of the
   // ViewTransition swaps out but it's still the same ViewTransition instance.
@@ -1970,7 +1977,7 @@ export function hasInstanceAffectedParent(
 function cancelAllViewTransitionAnimations(scope: Element) {
   // In Safari, we need to manually cancel all manually start animations
   // or it'll block or interfer with future transitions.
-  const animations = scope.getAnimations({subtree: true});
+  const animations = scope.getAnimations({ subtree: true });
   for (let i = 0; i < animations.length; i++) {
     const anim = animations[i];
     const effect: KeyframeEffect = (anim.effect: any);
@@ -1978,7 +1985,7 @@ function cancelAllViewTransitionAnimations(scope: Element) {
     const pseudo: ?string = effect.pseudoElement;
     if (
       pseudo != null &&
-      pseudo.startsWith('::view-transition') &&
+      pseudo.startsWith("::view-transition") &&
       effect.target === scope
     ) {
       anim.cancel();
@@ -1995,63 +2002,63 @@ const SUSPENSEY_FONT_TIMEOUT = 500;
 
 function customizeViewTransitionError(
   error: Object,
-  ignoreAbort: boolean,
+  ignoreAbort: boolean
 ): mixed {
-  if (typeof error === 'object' && error !== null) {
+  if (typeof error === "object" && error !== null) {
     switch (error.name) {
-      case 'TimeoutError': {
+      case "TimeoutError": {
         // We assume that the only reason a Timeout can happen is because the Navigation
         // promise. We expect any other work to either be fast or have a timeout (fonts).
-        if (__DEV__) {
+        if (false) {
           // eslint-disable-next-line react-internal/prod-error-codes
           return new Error(
-            'A ViewTransition timed out because a Navigation stalled. ' +
-              'This can happen if a Navigation is blocked on React itself. ' +
+            "A ViewTransition timed out because a Navigation stalled. " +
+              "This can happen if a Navigation is blocked on React itself. " +
               "Such as if it's resolved inside useEffect. " +
-              'This can be solved by moving the resolution to useLayoutEffect.',
-            {cause: error},
+              "This can be solved by moving the resolution to useLayoutEffect.",
+            { cause: error }
           );
         }
         break;
       }
-      case 'AbortError': {
+      case "AbortError": {
         if (ignoreAbort) {
           return null;
         }
-        if (__DEV__) {
+        if (false) {
           // eslint-disable-next-line react-internal/prod-error-codes
           return new Error(
-            'A ViewTransition was aborted early. This might be because you have ' +
-              'other View Transition libraries on the page and only one can run at ' +
+            "A ViewTransition was aborted early. This might be because you have " +
+              "other View Transition libraries on the page and only one can run at " +
               "a time. To avoid this, use only React's built-in <ViewTransition> " +
-              'to coordinate.',
-            {cause: error},
+              "to coordinate.",
+            { cause: error }
           );
         }
         break;
       }
-      case 'InvalidStateError': {
+      case "InvalidStateError": {
         if (
           error.message ===
-            'View transition was skipped because document visibility state is hidden.' ||
+            "View transition was skipped because document visibility state is hidden." ||
           error.message ===
-            'Skipping view transition because document visibility state has become hidden.' ||
+            "Skipping view transition because document visibility state has become hidden." ||
           error.message ===
-            'Skipping view transition because viewport size changed.'
+            "Skipping view transition because viewport size changed."
         ) {
           // Skip logging this. This is not considered an error.
           return null;
         }
-        if (__DEV__) {
+        if (false) {
           if (
-            error.message === 'Transition was aborted because of invalid state'
+            error.message === "Transition was aborted because of invalid state"
           ) {
             // Chrome doesn't include the reason in the message but logs it in the console..
             // Redirect the user to look there.
             // eslint-disable-next-line react-internal/prod-error-codes
             return new Error(
-              'A ViewTransition could not start. See the console for more details.',
-              {cause: error},
+              "A ViewTransition could not start. See the console for more details.",
+              { cause: error }
             );
           }
         }
@@ -2076,7 +2083,7 @@ export function startViewTransition(
   afterMutationCallback: () => void,
   spawnedWorkCallback: () => void,
   passiveCallback: () => mixed,
-  errorCallback: mixed => void,
+  errorCallback: (mixed) => void
 ): null | RunningViewTransition {
   const ownerDocument: Document =
     rootContainer.nodeType === DOCUMENT_NODE
@@ -2095,12 +2102,12 @@ export function startViewTransition(
         // $FlowFixMe[prop-missing]
         const previousFontLoadingStatus = ownerDocument.fonts.status;
         mutationCallback();
-        if (previousFontLoadingStatus === 'loaded') {
+        if (previousFontLoadingStatus === "loaded") {
           // Force layout calculation to trigger font loading.
           forceLayout(ownerDocument);
           if (
             // $FlowFixMe[prop-missing]
-            ownerDocument.fonts.status === 'loading'
+            ownerDocument.fonts.status === "loading"
           ) {
             // The mutation lead to new fonts being loaded. We should wait on them before continuing.
             // This avoids waiting for potentially unrelated fonts that were already loading before.
@@ -2109,8 +2116,8 @@ export function startViewTransition(
             const fontsReady = Promise.race([
               // $FlowFixMe[prop-missing]
               ownerDocument.fonts.ready,
-              new Promise(resolve =>
-                setTimeout(resolve, SUSPENSEY_FONT_TIMEOUT),
+              new Promise((resolve) =>
+                setTimeout(resolve, SUSPENSEY_FONT_TIMEOUT)
               ),
             ]).then(layoutCallback, layoutCallback);
             const allReady = pendingNavigation
@@ -2123,7 +2130,7 @@ export function startViewTransition(
         if (pendingNavigation) {
           return pendingNavigation.finished.then(
             afterMutationCallback,
-            afterMutationCallback,
+            afterMutationCallback
           );
         } else {
           afterMutationCallback();
@@ -2137,7 +2144,7 @@ export function startViewTransition(
     const readyCallback = () => {
       const documentElement: Element = (ownerDocument.documentElement: any);
       // Loop through all View Transition Animations.
-      const animations = documentElement.getAnimations({subtree: true});
+      const animations = documentElement.getAnimations({ subtree: true });
       for (let i = 0; i < animations.length; i++) {
         const animation = animations[i];
         const effect: KeyframeEffect = (animation.effect: any);
@@ -2145,7 +2152,7 @@ export function startViewTransition(
         const pseudoElement: ?string = effect.pseudoElement;
         if (
           pseudoElement != null &&
-          pseudoElement.startsWith('::view-transition')
+          pseudoElement.startsWith("::view-transition")
         ) {
           const keyframes = effect.getKeyframes();
           // Next, we're going to try to optimize this animation in case the auto-generated
@@ -2172,7 +2179,7 @@ export function startViewTransition(
             // We're clearing the keyframes in case we are going to apply the optimization.
             delete keyframe.width;
             delete keyframe.height;
-            if (keyframe.transform === 'none') {
+            if (keyframe.transform === "none") {
               delete keyframe.transform;
             }
           }
@@ -2189,7 +2196,7 @@ export function startViewTransition(
               // $FlowFixMe
               effect.target,
               // $FlowFixMe
-              effect.pseudoElement,
+              effect.pseudoElement
             );
             if (
               computedStyle.width !== width ||
@@ -2262,27 +2269,27 @@ export type RunningViewTransition = {
 };
 
 function mergeTranslate(translateA: ?string, translateB: ?string): string {
-  if (!translateA || translateA === 'none') {
-    return translateB || '';
+  if (!translateA || translateA === "none") {
+    return translateB || "";
   }
-  if (!translateB || translateB === 'none') {
-    return translateA || '';
+  if (!translateB || translateB === "none") {
+    return translateA || "";
   }
-  const partsA = translateA.split(' ');
-  const partsB = translateB.split(' ');
+  const partsA = translateA.split(" ");
+  const partsB = translateB.split(" ");
   let i;
-  let result = '';
+  let result = "";
   for (i = 0; i < partsA.length && i < partsB.length; i++) {
     if (i > 0) {
-      result += ' ';
+      result += " ";
     }
-    result += 'calc(' + partsA[i] + ' + ' + partsB[i] + ')';
+    result += "calc(" + partsA[i] + " + " + partsB[i] + ")";
   }
   for (; i < partsA.length; i++) {
-    result += ' ' + partsA[i];
+    result += " " + partsA[i];
   }
   for (; i < partsB.length; i++) {
-    result += ' ' + partsB[i];
+    result += " " + partsB[i];
   }
   return result;
 }
@@ -2296,7 +2303,7 @@ function animateGesture(
   rangeStart: number,
   rangeEnd: number,
   moveFirstFrameIntoViewport: boolean,
-  moveAllFramesIntoViewport: boolean,
+  moveAllFramesIntoViewport: boolean
 ) {
   let width;
   let height;
@@ -2320,13 +2327,13 @@ function animateGesture(
     }
     // Chrome returns "auto" for width/height which is not a valid value to
     // animate to. Similarly, transform: "none" is actually lack of transform.
-    if (keyframe.width === 'auto') {
+    if (keyframe.width === "auto") {
       delete keyframe.width;
     }
-    if (keyframe.height === 'auto') {
+    if (keyframe.height === "auto") {
       delete keyframe.height;
     }
-    if (keyframe.transform === 'none') {
+    if (keyframe.transform === "none") {
       delete keyframe.transform;
     }
     if (moveAllFramesIntoViewport) {
@@ -2339,21 +2346,21 @@ function animateGesture(
         // TODO: If the "transform" was manually overridden on the pseudo
         // element itself and no longer the auto generated one, then we shouldn't
         // adjust it. I'm not sure how to detect this.
-        if (keyframe.translate == null || keyframe.translate === '') {
+        if (keyframe.translate == null || keyframe.translate === "") {
           // TODO: If there's a CSS rule targeting translate on the pseudo element
           // already we need to merge it.
           const elementTranslate: ?string = (getComputedStyle(
             targetElement,
-            pseudoElement,
+            pseudoElement
           ): any).translate;
           keyframe.translate = mergeTranslate(
             elementTranslate,
-            '20000px 20000px',
+            "20000px 20000px"
           );
         } else {
           keyframe.translate = mergeTranslate(
             keyframe.translate,
-            '20000px 20000px',
+            "20000px 20000px"
           );
         }
       }
@@ -2390,16 +2397,16 @@ function animateGesture(
       // We reset all easing functions to linear so that it feels like you
       // have direct impact on the transition and to avoid double bouncing
       // from scroll bouncing.
-      easing: 'linear',
+      easing: "linear",
       // We fill in both direction for overscroll.
-      fill: 'both', // TODO: Should we preserve the fill instead?
+      fill: "both", // TODO: Should we preserve the fill instead?
       // We play all gestures in reverse, except if we're in reverse direction
       // in which case we need to play it in reverse of the reverse.
-      direction: reverse ? 'normal' : 'reverse',
+      direction: reverse ? "normal" : "reverse",
       // Range start needs to be higher than range end. If it goes in reverse
       // we reverse the whole animation below.
-      rangeStart: (reverse ? rangeEnd : rangeStart) + '%',
-      rangeEnd: (reverse ? rangeStart : rangeEnd) + '%',
+      rangeStart: (reverse ? rangeEnd : rangeStart) + "%",
+      rangeEnd: (reverse ? rangeStart : rangeEnd) + "%",
     });
   } else {
     // Custom Timeline
@@ -2408,12 +2415,12 @@ function animateGesture(
       // We reset all easing functions to linear so that it feels like you
       // have direct impact on the transition and to avoid double bouncing
       // from scroll bouncing.
-      easing: 'linear',
+      easing: "linear",
       // We fill in both direction for overscroll.
-      fill: 'both', // TODO: Should we preserve the fill instead?
+      fill: "both", // TODO: Should we preserve the fill instead?
       // We play all gestures in reverse, except if we're in reverse direction
       // in which case we need to play it in reverse of the reverse.
-      direction: reverse ? 'normal' : 'reverse',
+      direction: reverse ? "normal" : "reverse",
       // We set the delay and duration to represent the span of the range.
       delay: reverse ? rangeEnd : rangeStart,
       duration: reverse ? rangeStart - rangeEnd : rangeEnd - rangeStart,
@@ -2434,7 +2441,7 @@ export function startGestureTransition(
   transitionTypes: null | TransitionTypes,
   mutationCallback: () => void,
   animateCallback: () => void,
-  errorCallback: mixed => void,
+  errorCallback: (mixed) => void
 ): null | RunningViewTransition {
   const ownerDocument: Document =
     rootContainer.nodeType === DOCUMENT_NODE
@@ -2456,7 +2463,7 @@ export function startGestureTransition(
     const readyCallback = () => {
       const documentElement: Element = (ownerDocument.documentElement: any);
       // Loop through all View Transition Animations.
-      const animations = documentElement.getAnimations({subtree: true});
+      const animations = documentElement.getAnimations({ subtree: true });
       // First do a pass to collect all known group and new items so we can look
       // up if they exist later.
       const foundGroups: Set<string> = new Set();
@@ -2468,18 +2475,18 @@ export function startGestureTransition(
         // $FlowFixMe
         const pseudoElement: ?string = effect.pseudoElement;
         if (pseudoElement == null) {
-        } else if (pseudoElement.startsWith('::view-transition')) {
+        } else if (pseudoElement.startsWith("::view-transition")) {
           const timing = effect.getTiming();
           const duration =
-            typeof timing.duration === 'number' ? timing.duration : 0;
+            typeof timing.duration === "number" ? timing.duration : 0;
           // TODO: Consider interation count higher than 1.
           const durationWithDelay = timing.delay + duration;
           if (durationWithDelay > longestDuration) {
             longestDuration = durationWithDelay;
           }
-          if (pseudoElement.startsWith('::view-transition-group')) {
+          if (pseudoElement.startsWith("::view-transition-group")) {
             foundGroups.add(pseudoElement.slice(23));
-          } else if (pseudoElement.startsWith('::view-transition-new')) {
+          } else if (pseudoElement.startsWith("::view-transition-new")) {
             // TODO: This is not really a sufficient detection because if the new
             // pseudo element might exist but have animations disabled on it.
             foundNews.add(pseudoElement.slice(21));
@@ -2490,7 +2497,7 @@ export function startGestureTransition(
         (rangeEnd - rangeStart) / longestDuration;
       for (let i = 0; i < animations.length; i++) {
         const anim = animations[i];
-        if (anim.playState !== 'running') {
+        if (anim.playState !== "running") {
           continue;
         }
         const effect: KeyframeEffect = (anim.effect: any);
@@ -2498,7 +2505,7 @@ export function startGestureTransition(
         const pseudoElement: ?string = effect.pseudoElement;
         if (
           pseudoElement != null &&
-          pseudoElement.startsWith('::view-transition') &&
+          pseudoElement.startsWith("::view-transition") &&
           effect.target === documentElement
         ) {
           // Ideally we could mutate the existing animation but unfortunately
@@ -2507,7 +2514,7 @@ export function startGestureTransition(
           anim.cancel();
           let isGeneratedGroupAnim = false;
           let isExitGroupAnim = false;
-          if (pseudoElement.startsWith('::view-transition-group')) {
+          if (pseudoElement.startsWith("::view-transition-group")) {
             const groupName = pseudoElement.slice(23);
             if (foundNews.has(groupName)) {
               // If this has both "new" and "old" state we expect this to be an auto-generated
@@ -2518,7 +2525,7 @@ export function startGestureTransition(
               isGeneratedGroupAnim =
                 animationName != null &&
                 // $FlowFixMe[prop-missing]
-                animationName.startsWith('-ua-view-transition-group-anim-');
+                animationName.startsWith("-ua-view-transition-group-anim-");
             } else {
               // If this has only an "old" state then the pseudo element will be outside
               // the viewport. If any keyframes don't override "transform" we need to
@@ -2532,14 +2539,14 @@ export function startGestureTransition(
           // therefore the timing is from the rangeEnd to the start.
           const timing = effect.getTiming();
           const duration =
-            typeof timing.duration === 'number' ? timing.duration : 0;
+            typeof timing.duration === "number" ? timing.duration : 0;
           let adjustedRangeStart =
             rangeEnd - (duration + timing.delay) * durationToRangeMultipler;
           let adjustedRangeEnd =
             rangeEnd - timing.delay * durationToRangeMultipler;
           if (
-            timing.direction === 'reverse' ||
-            timing.direction === 'alternate-reverse'
+            timing.direction === "reverse" ||
+            timing.direction === "alternate-reverse"
           ) {
             // This animation was originally in reverse so we have to play it in flipped range.
             const temp = adjustedRangeStart;
@@ -2556,9 +2563,9 @@ export function startGestureTransition(
             adjustedRangeStart,
             adjustedRangeEnd,
             isGeneratedGroupAnim,
-            isExitGroupAnim,
+            isExitGroupAnim
           );
-          if (pseudoElement.startsWith('::view-transition-old')) {
+          if (pseudoElement.startsWith("::view-transition-old")) {
             const groupName = pseudoElement.slice(21);
             if (!foundGroups.has(groupName) && !foundNews.has(groupName)) {
               foundGroups.add(groupName);
@@ -2572,7 +2579,7 @@ export function startGestureTransition(
               // someone manually disabled the auto-generated animation. We need to
               // treat the old state as having the position of the "new" state which
               // will happen by default.
-              const pseudoElementName = '::view-transition-group' + groupName;
+              const pseudoElementName = "::view-transition-group" + groupName;
               animateGesture(
                 [{}, {}],
                 // $FlowFixMe: Always documentElement atm.
@@ -2583,7 +2590,7 @@ export function startGestureTransition(
                 rangeStart,
                 rangeEnd,
                 false,
-                true, // We let the helper apply the translate
+                true // We let the helper apply the translate
               );
             }
           }
@@ -2595,7 +2602,7 @@ export function startGestureTransition(
       // that never stops. This seems to keep all running Animations alive until
       // we explicitly abort (or something forces the View Transition to cancel).
       const blockingAnim = documentElement.animate([{}, {}], {
-        pseudoElement: '::view-transition',
+        pseudoElement: "::view-transition",
         duration: 1,
       });
       blockingAnim.pause();
@@ -2606,7 +2613,7 @@ export function startGestureTransition(
     // However, in Safari, that would cause a flicker because we're applying them late.
     // TODO: Think of a feature detection for this instead.
     const readyForAnimations =
-      navigator.userAgent.indexOf('Chrome') !== -1
+      navigator.userAgent.indexOf("Chrome") !== -1
         ? () => requestAnimationFrame(readyCallback)
         : readyCallback;
     const handleError = (error: mixed) => {
@@ -2667,20 +2674,20 @@ interface ViewTransitionPseudoElementType extends Animatable {
 function ViewTransitionPseudoElement(
   this: ViewTransitionPseudoElementType,
   pseudo: string,
-  name: string,
+  name: string
 ) {
   // TODO: Get the owner document from the root container.
   this._scope = (document.documentElement: any);
-  this._selector = '::view-transition-' + pseudo + '(' + name + ')';
+  this._selector = "::view-transition-" + pseudo + "(" + name + ")";
 }
 // $FlowFixMe[prop-missing]
 ViewTransitionPseudoElement.prototype.animate = function (
   this: ViewTransitionPseudoElementType,
   keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-  options?: number | KeyframeAnimationOptions,
+  options?: number | KeyframeAnimationOptions
 ): Animation {
   const opts: any =
-    typeof options === 'number'
+    typeof options === "number"
       ? {
           duration: options,
         }
@@ -2692,11 +2699,11 @@ ViewTransitionPseudoElement.prototype.animate = function (
 // $FlowFixMe[prop-missing]
 ViewTransitionPseudoElement.prototype.getAnimations = function (
   this: ViewTransitionPseudoElementType,
-  options?: GetAnimationsOptions,
+  options?: GetAnimationsOptions
 ): Animation[] {
   const scope = this._scope;
   const selector = this._selector;
-  const animations = scope.getAnimations({subtree: true});
+  const animations = scope.getAnimations({ subtree: true });
   const result = [];
   for (let i = 0; i < animations.length; i++) {
     const effect: null | {
@@ -2717,7 +2724,7 @@ ViewTransitionPseudoElement.prototype.getAnimations = function (
 };
 // $FlowFixMe[prop-missing]
 ViewTransitionPseudoElement.prototype.getComputedStyle = function (
-  this: ViewTransitionPseudoElementType,
+  this: ViewTransitionPseudoElementType
 ): CSSStyleDeclaration {
   const scope = this._scope;
   const selector = this._selector;
@@ -2725,14 +2732,14 @@ ViewTransitionPseudoElement.prototype.getComputedStyle = function (
 };
 
 export function createViewTransitionInstance(
-  name: string,
+  name: string
 ): ViewTransitionInstance {
   return {
     name: name,
-    group: new (ViewTransitionPseudoElement: any)('group', name),
-    imagePair: new (ViewTransitionPseudoElement: any)('image-pair', name),
-    old: new (ViewTransitionPseudoElement: any)('old', name),
-    new: new (ViewTransitionPseudoElement: any)('new', name),
+    group: new (ViewTransitionPseudoElement: any)("group", name),
+    imagePair: new (ViewTransitionPseudoElement: any)("image-pair", name),
+    old: new (ViewTransitionPseudoElement: any)("old", name),
+    new: new (ViewTransitionPseudoElement: any)("new", name),
   };
 }
 
@@ -2747,10 +2754,10 @@ export function getCurrentGestureOffset(timeline: GestureTimeline): number {
   const time = timeline.currentTime;
   if (time === null) {
     throw new Error(
-      'Cannot start a gesture with a disconnected AnimationTimeline.',
+      "Cannot start a gesture with a disconnected AnimationTimeline."
     );
   }
-  return typeof time === 'number' ? time : time.value;
+  return typeof time === "number" ? time : time.value;
 }
 
 type StoredEventListener = {
@@ -2766,12 +2773,12 @@ export type FragmentInstanceType = {
   addEventListener(
     type: string,
     listener: EventListener,
-    optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+    optionsOrUseCapture?: EventListenerOptionsOrUseCapture
   ): void,
   removeEventListener(
     type: string,
     listener: EventListener,
-    optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+    optionsOrUseCapture?: EventListenerOptionsOrUseCapture
   ): void,
   dispatchEvent(event: Event): boolean,
   focus(focusOptions?: FocusOptions): void,
@@ -2796,7 +2803,7 @@ FragmentInstance.prototype.addEventListener = function (
   this: FragmentInstanceType,
   type: string,
   listener: EventListener,
-  optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+  optionsOrUseCapture?: EventListenerOptionsOrUseCapture
 ): void {
   if (this._eventListeners === null) {
     this._eventListeners = [];
@@ -2809,13 +2816,13 @@ FragmentInstance.prototype.addEventListener = function (
   const isNewEventListener =
     indexOfEventListener(listeners, type, listener, optionsOrUseCapture) === -1;
   if (isNewEventListener) {
-    listeners.push({type, listener, optionsOrUseCapture});
+    listeners.push({ type, listener, optionsOrUseCapture });
     traverseFragmentInstance(
       this._fragmentFiber,
       addEventListenerToChild,
       type,
       listener,
-      optionsOrUseCapture,
+      optionsOrUseCapture
     );
   }
   this._eventListeners = listeners;
@@ -2824,7 +2831,7 @@ function addEventListenerToChild(
   child: Fiber,
   type: string,
   listener: EventListener,
-  optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+  optionsOrUseCapture?: EventListenerOptionsOrUseCapture
 ): boolean {
   const instance = getInstanceFromHostFiber<Instance>(child);
   instance.addEventListener(type, listener, optionsOrUseCapture);
@@ -2835,25 +2842,25 @@ FragmentInstance.prototype.removeEventListener = function (
   this: FragmentInstanceType,
   type: string,
   listener: EventListener,
-  optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+  optionsOrUseCapture?: EventListenerOptionsOrUseCapture
 ): void {
   const listeners = this._eventListeners;
   if (listeners === null) {
     return;
   }
-  if (typeof listeners !== 'undefined' && listeners.length > 0) {
+  if (typeof listeners !== "undefined" && listeners.length > 0) {
     traverseFragmentInstance(
       this._fragmentFiber,
       removeEventListenerFromChild,
       type,
       listener,
-      optionsOrUseCapture,
+      optionsOrUseCapture
     );
     const index = indexOfEventListener(
       listeners,
       type,
       listener,
-      optionsOrUseCapture,
+      optionsOrUseCapture
     );
     if (this._eventListeners !== null) {
       this._eventListeners.splice(index, 1);
@@ -2864,7 +2871,7 @@ function removeEventListenerFromChild(
   child: Fiber,
   type: string,
   listener: EventListener,
-  optionsOrUseCapture?: EventListenerOptionsOrUseCapture,
+  optionsOrUseCapture?: EventListenerOptionsOrUseCapture
 ): boolean {
   const instance = getInstanceFromHostFiber<Instance>(child);
   instance.removeEventListener(type, listener, optionsOrUseCapture);
@@ -2873,7 +2880,7 @@ function removeEventListenerFromChild(
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.dispatchEvent = function (
   this: FragmentInstanceType,
-  event: Event,
+  event: Event
 ): boolean {
   const parentHostFiber = getFragmentParentHostFiber(this._fragmentFiber);
   if (parentHostFiber === null) {
@@ -2886,10 +2893,10 @@ FragmentInstance.prototype.dispatchEvent = function (
     (eventListeners !== null && eventListeners.length > 0) ||
     !event.bubbles
   ) {
-    const temp = document.createTextNode('');
+    const temp = document.createTextNode("");
     if (eventListeners) {
       for (let i = 0; i < eventListeners.length; i++) {
-        const {type, listener, optionsOrUseCapture} = eventListeners[i];
+        const { type, listener, optionsOrUseCapture } = eventListeners[i];
         temp.addEventListener(type, listener, optionsOrUseCapture);
       }
     }
@@ -2897,7 +2904,7 @@ FragmentInstance.prototype.dispatchEvent = function (
     const cancelable = temp.dispatchEvent(event);
     if (eventListeners) {
       for (let i = 0; i < eventListeners.length; i++) {
-        const {type, listener, optionsOrUseCapture} = eventListeners[i];
+        const { type, listener, optionsOrUseCapture } = eventListeners[i];
         temp.removeEventListener(type, listener, optionsOrUseCapture);
       }
     }
@@ -2910,17 +2917,17 @@ FragmentInstance.prototype.dispatchEvent = function (
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.focus = function (
   this: FragmentInstanceType,
-  focusOptions?: FocusOptions,
+  focusOptions?: FocusOptions
 ): void {
   traverseFragmentInstanceDeeply(
     this._fragmentFiber,
     setFocusOnFiberIfFocusable,
-    focusOptions,
+    focusOptions
   );
 };
 function setFocusOnFiberIfFocusable(
   fiber: Fiber,
-  focusOptions?: FocusOptions,
+  focusOptions?: FocusOptions
 ): boolean {
   const instance = getInstanceFromHostFiber<Instance>(fiber);
   return setFocusIfFocusable(instance, focusOptions);
@@ -2928,13 +2935,13 @@ function setFocusOnFiberIfFocusable(
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.focusLast = function (
   this: FragmentInstanceType,
-  focusOptions?: FocusOptions,
+  focusOptions?: FocusOptions
 ): void {
   const children: Array<Fiber> = [];
   traverseFragmentInstanceDeeply(
     this._fragmentFiber,
     collectChildren,
-    children,
+    children
   );
   for (let i = children.length - 1; i >= 0; i--) {
     const child = children[i];
@@ -2953,7 +2960,7 @@ FragmentInstance.prototype.blur = function (this: FragmentInstanceType): void {
   //   does not contain document.activeElement
   traverseFragmentInstance(
     this._fragmentFiber,
-    blurActiveElementWithinFragment,
+    blurActiveElementWithinFragment
   );
 };
 function blurActiveElementWithinFragment(child: Fiber): boolean {
@@ -2970,7 +2977,7 @@ function blurActiveElementWithinFragment(child: Fiber): boolean {
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.observeUsing = function (
   this: FragmentInstanceType,
-  observer: IntersectionObserver | ResizeObserver,
+  observer: IntersectionObserver | ResizeObserver
 ): void {
   if (this._observers === null) {
     this._observers = new Set();
@@ -2980,7 +2987,7 @@ FragmentInstance.prototype.observeUsing = function (
 };
 function observeChild(
   child: Fiber,
-  observer: IntersectionObserver | ResizeObserver,
+  observer: IntersectionObserver | ResizeObserver
 ) {
   const instance = getInstanceFromHostFiber<Instance>(child);
   observer.observe(instance);
@@ -2989,13 +2996,13 @@ function observeChild(
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.unobserveUsing = function (
   this: FragmentInstanceType,
-  observer: IntersectionObserver | ResizeObserver,
+  observer: IntersectionObserver | ResizeObserver
 ): void {
   if (this._observers === null || !this._observers.has(observer)) {
-    if (__DEV__) {
+    if (false) {
       console.error(
-        'You are calling unobserveUsing() with an observer that is not being observed with this fragment ' +
-          'instance. First attach the observer with observeUsing()',
+        "You are calling unobserveUsing() with an observer that is not being observed with this fragment " +
+          "instance. First attach the observer with observeUsing()"
       );
     }
   } else {
@@ -3005,7 +3012,7 @@ FragmentInstance.prototype.unobserveUsing = function (
 };
 function unobserveChild(
   child: Fiber,
-  observer: IntersectionObserver | ResizeObserver,
+  observer: IntersectionObserver | ResizeObserver
 ) {
   const instance = getInstanceFromHostFiber<Instance>(child);
   observer.unobserve(instance);
@@ -3013,7 +3020,7 @@ function unobserveChild(
 }
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.getClientRects = function (
-  this: FragmentInstanceType,
+  this: FragmentInstanceType
 ): Array<DOMRect> {
   const rects: Array<DOMRect> = [];
   traverseFragmentInstance(this._fragmentFiber, collectClientRects, rects);
@@ -3028,7 +3035,7 @@ function collectClientRects(child: Fiber, rects: Array<DOMRect>): boolean {
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.getRootNode = function (
   this: FragmentInstanceType,
-  getRootNodeOptions?: {composed: boolean},
+  getRootNodeOptions?: { composed: boolean }
 ): Document | ShadowRoot | FragmentInstanceType {
   const parentHostFiber = getFragmentParentHostFiber(this._fragmentFiber);
   if (parentHostFiber === null) {
@@ -3044,7 +3051,7 @@ FragmentInstance.prototype.getRootNode = function (
 // $FlowFixMe[prop-missing]
 FragmentInstance.prototype.compareDocumentPosition = function (
   this: FragmentInstanceType,
-  otherNode: Instance,
+  otherNode: Instance
 ): number {
   const parentHostFiber = getFragmentParentHostFiber(this._fragmentFiber);
   if (parentHostFiber === null) {
@@ -3093,7 +3100,7 @@ FragmentInstance.prototype.compareDocumentPosition = function (
 
   const firstElement = getInstanceFromHostFiber<Instance>(children[0]);
   const lastElement = getInstanceFromHostFiber<Instance>(
-    children[children.length - 1],
+    children[children.length - 1]
   );
   const firstResult = firstElement.compareDocumentPosition(otherNode);
   const lastResult = lastElement.compareDocumentPosition(otherNode);
@@ -3124,7 +3131,7 @@ FragmentInstance.prototype.compareDocumentPosition = function (
       this._fragmentFiber,
       children[0],
       children[children.length - 1],
-      otherNode,
+      otherNode
     );
   if (documentPositionMatchesFiberPosition) {
     return result;
@@ -3137,7 +3144,7 @@ function validateDocumentPositionWithFiberTree(
   fragmentFiber: Fiber,
   precedingBoundaryFiber: Fiber,
   followingBoundaryFiber: Fiber,
-  otherNode: Instance,
+  otherNode: Instance
 ): boolean {
   const otherFiber = getClosestInstanceFromNode(otherNode);
   if (documentPosition & Node.DOCUMENT_POSITION_CONTAINED_BY) {
@@ -3170,24 +3177,26 @@ function validateDocumentPositionWithFiberTree(
 }
 
 function normalizeListenerOptions(
-  opts: ?EventListenerOptionsOrUseCapture,
+  opts: ?EventListenerOptionsOrUseCapture
 ): string {
   if (opts == null) {
-    return '0';
+    return "0";
   }
 
-  if (typeof opts === 'boolean') {
-    return `c=${opts ? '1' : '0'}`;
+  if (typeof opts === "boolean") {
+    return `c=${opts ? "1" : "0"}`;
   }
 
-  return `c=${opts.capture ? '1' : '0'}&o=${opts.once ? '1' : '0'}&p=${opts.passive ? '1' : '0'}`;
+  return `c=${opts.capture ? "1" : "0"}&o=${opts.once ? "1" : "0"}&p=${
+    opts.passive ? "1" : "0"
+  }`;
 }
 
 function indexOfEventListener(
   eventListeners: Array<StoredEventListener>,
   type: string,
   listener: EventListener,
-  optionsOrUseCapture: void | EventListenerOptionsOrUseCapture,
+  optionsOrUseCapture: void | EventListenerOptionsOrUseCapture
 ): number {
   for (let i = 0; i < eventListeners.length; i++) {
     const item = eventListeners[i];
@@ -3204,31 +3213,31 @@ function indexOfEventListener(
 }
 
 export function createFragmentInstance(
-  fragmentFiber: Fiber,
+  fragmentFiber: Fiber
 ): FragmentInstanceType {
   return new (FragmentInstance: any)(fragmentFiber);
 }
 
 export function updateFragmentInstanceFiber(
   fragmentFiber: Fiber,
-  instance: FragmentInstanceType,
+  instance: FragmentInstanceType
 ): void {
   instance._fragmentFiber = fragmentFiber;
 }
 
 export function commitNewChildToFragmentInstance(
   childInstance: Instance,
-  fragmentInstance: FragmentInstanceType,
+  fragmentInstance: FragmentInstanceType
 ): void {
   const eventListeners = fragmentInstance._eventListeners;
   if (eventListeners !== null) {
     for (let i = 0; i < eventListeners.length; i++) {
-      const {type, listener, optionsOrUseCapture} = eventListeners[i];
+      const { type, listener, optionsOrUseCapture } = eventListeners[i];
       childInstance.addEventListener(type, listener, optionsOrUseCapture);
     }
   }
   if (fragmentInstance._observers !== null) {
-    fragmentInstance._observers.forEach(observer => {
+    fragmentInstance._observers.forEach((observer) => {
       observer.observe(childInstance);
     });
   }
@@ -3236,12 +3245,12 @@ export function commitNewChildToFragmentInstance(
 
 export function deleteChildFromFragmentInstance(
   childElement: Instance,
-  fragmentInstance: FragmentInstanceType,
+  fragmentInstance: FragmentInstanceType
 ): void {
   const eventListeners = fragmentInstance._eventListeners;
   if (eventListeners !== null) {
     for (let i = 0; i < eventListeners.length; i++) {
-      const {type, listener, optionsOrUseCapture} = eventListeners[i];
+      const { type, listener, optionsOrUseCapture } = eventListeners[i];
       childElement.removeEventListener(type, listener, optionsOrUseCapture);
     }
   }
@@ -3253,13 +3262,13 @@ export function clearContainer(container: Container): void {
     clearContainerSparingly(container);
   } else if (nodeType === ELEMENT_NODE) {
     switch (container.nodeName) {
-      case 'HEAD':
-      case 'HTML':
-      case 'BODY':
+      case "HEAD":
+      case "HTML":
+      case "BODY":
         clearContainerSparingly(container);
         return;
       default: {
-        container.textContent = '';
+        container.textContent = "";
       }
     }
   }
@@ -3275,9 +3284,9 @@ function clearContainerSparingly(container: Node) {
     node = nextNode;
     nextNode = nextNode.nextSibling;
     switch (node.nodeName) {
-      case 'HTML':
-      case 'HEAD':
-      case 'BODY': {
+      case "HTML":
+      case "HEAD":
+      case "BODY": {
         const element: Element = (node: any);
         clearContainerSparingly(element);
         // If these singleton instances had previously been rendered with React they
@@ -3299,13 +3308,13 @@ function clearContainerSparingly(container: Node) {
       // edge case.
       //
       // Style tags are retained because they may likely come from 3rd party scripts and extensions
-      case 'SCRIPT':
-      case 'STYLE': {
+      case "SCRIPT":
+      case "STYLE": {
         continue;
       }
       // Stylesheet tags are retained because they may likely come from 3rd party scripts and extensions
-      case 'LINK': {
-        if (((node: any): HTMLLinkElement).rel.toLowerCase() === 'stylesheet') {
+      case "LINK": {
+        if (((node: any): HTMLLinkElement).rel.toLowerCase() === "stylesheet") {
           continue;
         }
       }
@@ -3322,10 +3331,10 @@ function clearHead(head: Element): void {
     const nodeName = node.nodeName;
     if (
       isMarkedHoistable(node) ||
-      nodeName === 'SCRIPT' ||
-      nodeName === 'STYLE' ||
-      (nodeName === 'LINK' &&
-        ((node: any): HTMLLinkElement).rel.toLowerCase() === 'stylesheet')
+      nodeName === "SCRIPT" ||
+      nodeName === "STYLE" ||
+      (nodeName === "LINK" &&
+        ((node: any): HTMLLinkElement).rel.toLowerCase() === "stylesheet")
     ) {
       // retain these nodes
     } else {
@@ -3343,7 +3352,7 @@ function clearHead(head: Element): void {
 export function bindInstance(
   instance: Instance,
   props: Props,
-  internalInstanceHandle: mixed,
+  internalInstanceHandle: mixed
 ) {
   precacheFiberNode((internalInstanceHandle: any), instance);
   updateFiberProps(instance, props);
@@ -3359,7 +3368,7 @@ export function canHydrateInstance(
   instance: HydratableInstance,
   type: string,
   props: Props,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | Instance {
   while (instance.nodeType === ELEMENT_NODE) {
     const element: Element = (instance: any);
@@ -3367,7 +3376,7 @@ export function canHydrateInstance(
     if (element.nodeName.toLowerCase() !== type.toLowerCase()) {
       if (!inRootOrSingleton) {
         // Usually we error for mismatched tags.
-        if (element.nodeName === 'INPUT' && (element: any).type === 'hidden') {
+        if (element.nodeName === "INPUT" && (element: any).type === "hidden") {
           // If we have extra hidden inputs, we don't mismatch. This allows us to embed
           // extra form data in the original form.
         } else {
@@ -3377,14 +3386,14 @@ export function canHydrateInstance(
       // In root or singleton parents we skip past mismatched instances.
     } else if (!inRootOrSingleton) {
       // Match
-      if (type === 'input' && (element: any).type === 'hidden') {
-        if (__DEV__) {
-          checkAttributeStringCoercion(anyProps.name, 'name');
+      if (type === "input" && (element: any).type === "hidden") {
+        if (false) {
+          checkAttributeStringCoercion(anyProps.name, "name");
         }
-        const name = anyProps.name == null ? null : '' + anyProps.name;
+        const name = anyProps.name == null ? null : "" + anyProps.name;
         if (
-          anyProps.type !== 'hidden' ||
-          element.getAttribute('name') !== name
+          anyProps.type !== "hidden" ||
+          element.getAttribute("name") !== name
         ) {
           // Skip past hidden inputs unless that's what we're looking for. This allows us
           // embed extra form data in the original form.
@@ -3407,34 +3416,34 @@ export function canHydrateInstance(
         // case 'title':
         //We assume all titles are matchable. You should only have one in the Document, at least in a hoistable scope
         // and if you are a HostComponent with type title we must either be in an <svg> context or this title must have an `itemProp` prop.
-        case 'meta': {
+        case "meta": {
           // The only way to opt out of hoisting meta tags is to give it an itemprop attribute. We assume there will be
           // not 3rd party meta tags that are prepended, accepting the cases where this isn't true because meta tags
           // are usually only functional for SSR so even in a rare case where we did bind to an injected tag the runtime
           // implications are minimal
-          if (!element.hasAttribute('itemprop')) {
+          if (!element.hasAttribute("itemprop")) {
             // This is a Hoistable
             break;
           }
           return element;
         }
-        case 'link': {
+        case "link": {
           // Links come in many forms and we do expect 3rd parties to inject them into <head> / <body>. We exclude known resources
           // and then use high-entroy attributes like href which are almost always used and almost always unique to filter out unlikely
           // matches.
-          const rel = element.getAttribute('rel');
-          if (rel === 'stylesheet' && element.hasAttribute('data-precedence')) {
+          const rel = element.getAttribute("rel");
+          if (rel === "stylesheet" && element.hasAttribute("data-precedence")) {
             // This is a stylesheet resource
             break;
           } else if (
             rel !== anyProps.rel ||
-            element.getAttribute('href') !==
-              (anyProps.href == null || anyProps.href === ''
+            element.getAttribute("href") !==
+              (anyProps.href == null || anyProps.href === ""
                 ? null
                 : anyProps.href) ||
-            element.getAttribute('crossorigin') !==
+            element.getAttribute("crossorigin") !==
               (anyProps.crossOrigin == null ? null : anyProps.crossOrigin) ||
-            element.getAttribute('title') !==
+            element.getAttribute("title") !==
               (anyProps.title == null ? null : anyProps.title)
           ) {
             // rel + href should usually be enough to uniquely identify a link however crossOrigin can vary for rel preconnect
@@ -3443,35 +3452,35 @@ export function canHydrateInstance(
           }
           return element;
         }
-        case 'style': {
+        case "style": {
           // Styles are hard to match correctly. We can exclude known resources but otherwise we accept the fact that a non-hoisted style tags
           // in <head> or <body> are likely never going to be unmounted given their position in the document and the fact they likely hold global styles
-          if (element.hasAttribute('data-precedence')) {
+          if (element.hasAttribute("data-precedence")) {
             // This is a style resource
             break;
           }
           return element;
         }
-        case 'script': {
+        case "script": {
           // Scripts are a little tricky, we exclude known resources and then similar to links try to use high-entropy attributes
           // to reject poor matches. One challenge with scripts are inline scripts. We don't attempt to check text content which could
           // in theory lead to a hydration error later if a 3rd party injected an inline script before the React rendered nodes.
           // Falling back to client rendering if this happens should be seemless though so we will try this hueristic and revisit later
           // if we learn it is problematic
-          const srcAttr = element.getAttribute('src');
+          const srcAttr = element.getAttribute("src");
           if (
             srcAttr !== (anyProps.src == null ? null : anyProps.src) ||
-            element.getAttribute('type') !==
+            element.getAttribute("type") !==
               (anyProps.type == null ? null : anyProps.type) ||
-            element.getAttribute('crossorigin') !==
+            element.getAttribute("crossorigin") !==
               (anyProps.crossOrigin == null ? null : anyProps.crossOrigin)
           ) {
             // This script is for a different src/type/crossOrigin. It may be a script resource
             // or it may just be a mistmatch
             if (
               srcAttr &&
-              element.hasAttribute('async') &&
-              !element.hasAttribute('itemprop')
+              element.hasAttribute("async") &&
+              !element.hasAttribute("itemprop")
             ) {
               // This is an async script resource
               break;
@@ -3504,16 +3513,16 @@ export function canHydrateInstance(
 export function canHydrateTextInstance(
   instance: HydratableInstance,
   text: string,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | TextInstance {
   // Empty strings are not parsed by HTML so there won't be a correct match here.
-  if (text === '') return null;
+  if (text === "") return null;
 
   while (instance.nodeType !== TEXT_NODE) {
     if (
       instance.nodeType === ELEMENT_NODE &&
-      instance.nodeName === 'INPUT' &&
-      (instance: any).type === 'hidden'
+      instance.nodeName === "INPUT" &&
+      (instance: any).type === "hidden"
     ) {
       // If we have extra hidden inputs, we don't mismatch. This allows us to
       // embed extra form data in the original form.
@@ -3532,7 +3541,7 @@ export function canHydrateTextInstance(
 
 function canHydrateHydrationBoundary(
   instance: HydratableInstance,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | SuspenseInstance | ActivityInstance {
   while (instance.nodeType !== COMMENT_NODE) {
     if (!inRootOrSingleton) {
@@ -3550,11 +3559,11 @@ function canHydrateHydrationBoundary(
 
 export function canHydrateActivityInstance(
   instance: HydratableInstance,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | ActivityInstance {
   const hydratableInstance = canHydrateHydrationBoundary(
     instance,
-    inRootOrSingleton,
+    inRootOrSingleton
   );
   if (
     hydratableInstance !== null &&
@@ -3567,11 +3576,11 @@ export function canHydrateActivityInstance(
 
 export function canHydrateSuspenseInstance(
   instance: HydratableInstance,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | SuspenseInstance {
   const hydratableInstance = canHydrateHydrationBoundary(
     instance,
-    inRootOrSingleton,
+    inRootOrSingleton
   );
   if (
     hydratableInstance !== null &&
@@ -3590,7 +3599,7 @@ export function isSuspenseInstancePending(instance: SuspenseInstance): boolean {
 }
 
 export function isSuspenseInstanceFallback(
-  instance: SuspenseInstance,
+  instance: SuspenseInstance
 ): boolean {
   return (
     instance.data === SUSPENSE_FALLBACK_START_DATA ||
@@ -3600,7 +3609,7 @@ export function isSuspenseInstanceFallback(
 }
 
 export function getSuspenseInstanceFallbackErrorDetails(
-  instance: SuspenseInstance,
+  instance: SuspenseInstance
 ): {
   digest: ?string,
   message?: string,
@@ -3612,13 +3621,13 @@ export function getSuspenseInstanceFallbackErrorDetails(
   let digest, message, stack, componentStack;
   if (dataset) {
     digest = dataset.dgst;
-    if (__DEV__) {
+    if (false) {
       message = dataset.msg;
       stack = dataset.stck;
       componentStack = dataset.cstck;
     }
   }
-  if (__DEV__) {
+  if (false) {
     return {
       message,
       digest,
@@ -3635,7 +3644,7 @@ export function getSuspenseInstanceFallbackErrorDetails(
 
 export function registerSuspenseInstanceRetry(
   instance: SuspenseInstance,
-  callback: () => void,
+  callback: () => void
 ) {
   const ownerDocument = instance.ownerDocument;
   if (instance.data === SUSPENSE_QUEUED_START_DATA) {
@@ -3659,16 +3668,16 @@ export function registerSuspenseInstanceRetry(
     // the Fizz runtime to trigger if it ends up resolving this boundary
     const listener = () => {
       callback();
-      ownerDocument.removeEventListener('DOMContentLoaded', listener);
+      ownerDocument.removeEventListener("DOMContentLoaded", listener);
     };
-    ownerDocument.addEventListener('DOMContentLoaded', listener);
+    ownerDocument.addEventListener("DOMContentLoaded", listener);
     instance._reactRetry = listener;
   }
 }
 
 export function canHydrateFormStateMarker(
   instance: HydratableInstance,
-  inRootOrSingleton: boolean,
+  inRootOrSingleton: boolean
 ): null | FormStateMarkerInstance {
   while (instance.nodeType !== COMMENT_NODE) {
     if (!inRootOrSingleton) {
@@ -3692,7 +3701,7 @@ export function canHydrateFormStateMarker(
 }
 
 export function isFormStateMarkerMatching(
-  markerInstance: FormStateMarkerInstance,
+  markerInstance: FormStateMarkerInstance
 ): boolean {
   return markerInstance.data === FORM_STATE_IS_MATCHING;
 }
@@ -3726,19 +3735,19 @@ function getNextHydratable(node: ?Node) {
 }
 
 export function getNextHydratableSibling(
-  instance: HydratableInstance,
+  instance: HydratableInstance
 ): null | HydratableInstance {
   return getNextHydratable(instance.nextSibling);
 }
 
 export function getFirstHydratableChild(
-  parentInstance: Instance,
+  parentInstance: Instance
 ): null | HydratableInstance {
   return getNextHydratable(parentInstance.firstChild);
 }
 
 export function getFirstHydratableChildWithinContainer(
-  parentContainer: Container,
+  parentContainer: Container
 ): null | HydratableInstance {
   let parentElement: Element;
   switch (parentContainer.nodeType) {
@@ -3746,7 +3755,7 @@ export function getFirstHydratableChildWithinContainer(
       parentElement = (parentContainer: any).body;
       break;
     default: {
-      if (parentContainer.nodeName === 'HTML') {
+      if (parentContainer.nodeName === "HTML") {
         parentElement = (parentContainer: any).ownerDocument.body;
       } else {
         parentElement = (parentContainer: any);
@@ -3757,13 +3766,13 @@ export function getFirstHydratableChildWithinContainer(
 }
 
 export function getFirstHydratableChildWithinActivityInstance(
-  parentInstance: ActivityInstance,
+  parentInstance: ActivityInstance
 ): null | HydratableInstance {
   return getNextHydratable(parentInstance.nextSibling);
 }
 
 export function getFirstHydratableChildWithinSuspenseInstance(
-  parentInstance: SuspenseInstance,
+  parentInstance: SuspenseInstance
 ): null | HydratableInstance {
   return getNextHydratable(parentInstance.nextSibling);
 }
@@ -3778,7 +3787,7 @@ let previousHydratableOnEnteringScopedSingleton: null | HydratableInstance =
 export function getFirstHydratableChildWithinSingleton(
   type: string,
   singletonInstance: Instance,
-  currentHydratableInstance: null | HydratableInstance,
+  currentHydratableInstance: null | HydratableInstance
 ): null | HydratableInstance {
   if (isSingletonScope(type)) {
     previousHydratableOnEnteringScopedSingleton = currentHydratableInstance;
@@ -3790,7 +3799,7 @@ export function getFirstHydratableChildWithinSingleton(
 
 export function getNextHydratableSiblingAfterSingleton(
   type: string,
-  currentHydratableInstance: null | HydratableInstance,
+  currentHydratableInstance: null | HydratableInstance
 ): null | HydratableInstance {
   if (isSingletonScope(type)) {
     const previousHydratableInstance =
@@ -3803,8 +3812,8 @@ export function getNextHydratableSiblingAfterSingleton(
 }
 
 export function describeHydratableInstanceForDevWarnings(
-  instance: HydratableInstance,
-): string | {type: string, props: $ReadOnly<Props>} {
+  instance: HydratableInstance
+): string | { type: string, props: $ReadOnly<Props> } {
   // Reverse engineer a pseudo react-element from hydratable instance
   if (instance.nodeType === ELEMENT_NODE) {
     // Reverse engineer a set of props that can print for dev warnings
@@ -3815,12 +3824,12 @@ export function describeHydratableInstanceForDevWarnings(
   } else if (instance.nodeType === COMMENT_NODE) {
     if (instance.data === ACTIVITY_START_DATA) {
       return {
-        type: 'Activity',
+        type: "Activity",
         props: {},
       };
     }
     return {
-      type: 'Suspense',
+      type: "Suspense",
       props: {},
     };
   } else {
@@ -3831,9 +3840,9 @@ export function describeHydratableInstanceForDevWarnings(
 export function validateHydratableInstance(
   type: string,
   props: Props,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): boolean {
-  if (__DEV__) {
+  if (false) {
     // TODO: take namespace into account when validating.
     const hostContextDev: HostContextDev = (hostContext: any);
     return validateDOMNesting(type, hostContextDev.ancestorInfo);
@@ -3846,7 +3855,7 @@ export function hydrateInstance(
   type: string,
   props: Props,
   hostContext: HostContext,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): boolean {
   precacheFiberNode(internalInstanceHandle, instance);
   // TODO: Possibly defer this until the commit phase where all the events
@@ -3861,23 +3870,23 @@ export function diffHydratedPropsForDevWarnings(
   instance: Instance,
   type: string,
   props: Props,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): null | $ReadOnly<Props> {
   return diffHydratedProperties(instance, type, props, hostContext);
 }
 
 export function validateHydratableTextInstance(
   text: string,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): boolean {
-  if (__DEV__) {
+  if (false) {
     const hostContextDev = ((hostContext: any): HostContextDev);
     const ancestor = hostContextDev.ancestorInfo.current;
     if (ancestor != null) {
       return validateTextNesting(
         text,
         ancestor.tag,
-        hostContextDev.ancestorInfo.implicitRootScope,
+        hostContextDev.ancestorInfo.implicitRootScope
       );
     }
   }
@@ -3888,7 +3897,7 @@ export function hydrateTextInstance(
   textInstance: TextInstance,
   text: string,
   internalInstanceHandle: Object,
-  parentInstanceProps: null | Props,
+  parentInstanceProps: null | Props
 ): boolean {
   precacheFiberNode(internalInstanceHandle, textInstance);
 
@@ -3899,7 +3908,7 @@ export function hydrateTextInstance(
 export function diffHydratedTextForDevWarnings(
   textInstance: TextInstance,
   text: string,
-  parentProps: null | Props,
+  parentProps: null | Props
 ): null | string {
   if (
     parentProps === null ||
@@ -3912,20 +3921,20 @@ export function diffHydratedTextForDevWarnings(
 
 export function hydrateActivityInstance(
   activityInstance: ActivityInstance,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ) {
   precacheFiberNode(internalInstanceHandle, activityInstance);
 }
 
 export function hydrateSuspenseInstance(
   suspenseInstance: SuspenseInstance,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ) {
   precacheFiberNode(internalInstanceHandle, suspenseInstance);
 }
 
 function getNextHydratableInstanceAfterHydrationBoundary(
-  hydrationInstance: SuspenseInstance | ActivityInstance,
+  hydrationInstance: SuspenseInstance | ActivityInstance
 ): null | HydratableInstance {
   let node = hydrationInstance.nextSibling;
   // Skip past all nodes within this suspense boundary.
@@ -3958,13 +3967,13 @@ function getNextHydratableInstanceAfterHydrationBoundary(
 }
 
 export function getNextHydratableInstanceAfterActivityInstance(
-  activityInstance: ActivityInstance,
+  activityInstance: ActivityInstance
 ): null | HydratableInstance {
   return getNextHydratableInstanceAfterHydrationBoundary(activityInstance);
 }
 
 export function getNextHydratableInstanceAfterSuspenseInstance(
-  suspenseInstance: SuspenseInstance,
+  suspenseInstance: SuspenseInstance
 ): null | HydratableInstance {
   return getNextHydratableInstanceAfterHydrationBoundary(suspenseInstance);
 }
@@ -3973,7 +3982,7 @@ export function getNextHydratableInstanceAfterSuspenseInstance(
 // SuspenseInstance. I.e. if its previous sibling is a Comment with
 // SUSPENSE_x_START_DATA. Otherwise, null.
 export function getParentHydrationBoundary(
-  targetInstance: Node,
+  targetInstance: Node
 ): null | SuspenseInstance | ActivityInstance {
   let node = targetInstance.previousSibling;
   // Skip past all nodes within this suspense boundary.
@@ -4010,14 +4019,14 @@ export function commitHydratedContainer(container: Container): void {
 }
 
 export function commitHydratedActivityInstance(
-  activityInstance: ActivityInstance,
+  activityInstance: ActivityInstance
 ): void {
   // Retry if any event replaying was blocked on this.
   retryIfBlockedOn(activityInstance);
 }
 
 export function commitHydratedSuspenseInstance(
-  suspenseInstance: SuspenseInstance,
+  suspenseInstance: SuspenseInstance
 ): void {
   // Retry if any event replaying was blocked on this.
   retryIfBlockedOn(suspenseInstance);
@@ -4030,9 +4039,9 @@ export function flushHydrationEvents(): void {
 }
 
 export function shouldDeleteUnhydratedTailInstances(
-  parentType: string,
+  parentType: string
 ): boolean {
-  return parentType !== 'form' && parentType !== 'button';
+  return parentType !== "form" && parentType !== "button";
 }
 
 // -------------------
@@ -4077,7 +4086,7 @@ export function getTextContent(fiber: Fiber): string | null {
     case HostHoistable:
     case HostSingleton:
     case HostComponent:
-      let textContent = '';
+      let textContent = "";
       const childNodes = fiber.stateNode.childNodes;
       for (let i = 0; i < childNodes.length; i++) {
         const childNode = childNodes[i];
@@ -4099,7 +4108,7 @@ export function isHiddenSubtree(fiber: Fiber): boolean {
 
 export function setFocusIfFocusable(
   node: Instance,
-  focusOptions?: FocusOptions,
+  focusOptions?: FocusOptions
 ): boolean {
   // The logic for determining if an element is focusable is kind of complex,
   // and since we want to actually change focus anyway- we can just skip it.
@@ -4114,11 +4123,11 @@ export function setFocusIfFocusable(
 
   const element = ((node: any): HTMLElement);
   try {
-    element.addEventListener('focus', handleFocus);
+    element.addEventListener("focus", handleFocus);
     // $FlowFixMe[method-unbinding]
     (element.focus || HTMLElement.prototype.focus).call(element, focusOptions);
   } finally {
-    element.removeEventListener('focus', handleFocus);
+    element.removeEventListener("focus", handleFocus);
   }
 
   return didFocus;
@@ -4132,14 +4141,14 @@ type RectRatio = {
 export function setupIntersectionObserver(
   targets: Array<Instance>,
   callback: ObserveVisibleRectsCallback,
-  options?: IntersectionObserverOptions,
+  options?: IntersectionObserverOptions
 ): {
   disconnect: () => void,
   observe: (instance: Instance) => void,
   unobserve: (instance: Instance) => void,
 } {
   const rectRatioCache: Map<Instance, RectRatio> = new Map();
-  targets.forEach(target => {
+  targets.forEach((target) => {
     rectRatioCache.set(target, {
       rect: getBoundingRect(target),
       ratio: 0,
@@ -4147,8 +4156,8 @@ export function setupIntersectionObserver(
   });
 
   const handleIntersection = (entries: Array<IntersectionObserverEntry>) => {
-    entries.forEach(entry => {
-      const {boundingClientRect, intersectionRatio, target} = entry;
+    entries.forEach((entry) => {
+      const { boundingClientRect, intersectionRatio, target } = entry;
       rectRatioCache.set(target, {
         rect: {
           x: boundingClientRect.left,
@@ -4164,20 +4173,20 @@ export function setupIntersectionObserver(
   };
 
   const observer = new IntersectionObserver(handleIntersection, options);
-  targets.forEach(target => {
+  targets.forEach((target) => {
     observer.observe((target: any));
   });
 
   return {
     disconnect: () => observer.disconnect(),
-    observe: target => {
+    observe: (target) => {
       rectRatioCache.set(target, {
         rect: getBoundingRect(target),
         ratio: 0,
       });
       observer.observe((target: any));
     },
-    unobserve: target => {
+    unobserve: (target) => {
       rectRatioCache.delete(target);
       observer.unobserve((target: any));
     },
@@ -4186,7 +4195,7 @@ export function setupIntersectionObserver(
 
 export function requestPostPaintCallback(callback: (time: number) => void) {
   localRequestAnimationFrame(() => {
-    localRequestAnimationFrame(time => callback(time));
+    localRequestAnimationFrame((time) => callback(time));
   });
 }
 
@@ -4197,7 +4206,7 @@ export function requestPostPaintCallback(callback: (time: number) => void) {
 export const supportsSingletons = true;
 
 export function isHostSingletonType(type: string): boolean {
-  return type === 'html' || type === 'head' || type === 'body';
+  return type === "html" || type === "head" || type === "body";
 }
 
 export function resolveSingletonInstance(
@@ -4205,54 +4214,54 @@ export function resolveSingletonInstance(
   props: Props,
   rootContainerInstance: Container,
   hostContext: HostContext,
-  validateDOMNestingDev: boolean,
+  validateDOMNestingDev: boolean
 ): Instance {
-  if (__DEV__) {
+  if (false) {
     const hostContextDev = ((hostContext: any): HostContextDev);
     if (validateDOMNestingDev) {
       validateDOMNesting(type, hostContextDev.ancestorInfo);
     }
   }
   const ownerDocument = getOwnerDocumentFromRootContainer(
-    rootContainerInstance,
+    rootContainerInstance
   );
   switch (type) {
-    case 'html': {
+    case "html": {
       const documentElement = ownerDocument.documentElement;
       if (!documentElement) {
         throw new Error(
-          'React expected an <html> element (document.documentElement) to exist in the Document but one was' +
-            ' not found. React never removes the documentElement for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          "React expected an <html> element (document.documentElement) to exist in the Document but one was" +
+            " not found. React never removes the documentElement for any Document it renders into so" +
+            " the cause is likely in some other script running on this page."
         );
       }
       return documentElement;
     }
-    case 'head': {
+    case "head": {
       const head = ownerDocument.head;
       if (!head) {
         throw new Error(
-          'React expected a <head> element (document.head) to exist in the Document but one was' +
-            ' not found. React never removes the head for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          "React expected a <head> element (document.head) to exist in the Document but one was" +
+            " not found. React never removes the head for any Document it renders into so" +
+            " the cause is likely in some other script running on this page."
         );
       }
       return head;
     }
-    case 'body': {
+    case "body": {
       const body = ownerDocument.body;
       if (!body) {
         throw new Error(
-          'React expected a <body> element (document.body) to exist in the Document but one was' +
-            ' not found. React never removes the body for any Document it renders into so' +
-            ' the cause is likely in some other script running on this page.',
+          "React expected a <body> element (document.body) to exist in the Document but one was" +
+            " not found. React never removes the body for any Document it renders into so" +
+            " the cause is likely in some other script running on this page."
         );
       }
       return body;
     }
     default: {
       throw new Error(
-        'resolveSingletonInstance was called with an element type that is not supported. This is a bug in React.',
+        "resolveSingletonInstance was called with an element type that is not supported. This is a bug in React."
       );
     }
   }
@@ -4262,9 +4271,9 @@ export function acquireSingletonInstance(
   type: string,
   props: Props,
   instance: Instance,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): void {
-  if (__DEV__) {
+  if (false) {
     if (
       // If this instance is the container then it is invalid to acquire it as a singleton however
       // the DOM nesting validation will already warn for this and the message below isn't semantically
@@ -4276,24 +4285,24 @@ export function acquireSingletonInstance(
     ) {
       const tagName = instance.tagName.toLowerCase();
       console.error(
-        'You are mounting a new %s component when a previous one has not first unmounted. It is an' +
-          ' error to render more than one %s component at a time and attributes and children of these' +
-          ' components will likely fail in unpredictable ways. Please only render a single instance of' +
-          ' <%s> and if you need to mount a new one, ensure any previous ones have unmounted first.',
+        "You are mounting a new %s component when a previous one has not first unmounted. It is an" +
+          " error to render more than one %s component at a time and attributes and children of these" +
+          " components will likely fail in unpredictable ways. Please only render a single instance of" +
+          " <%s> and if you need to mount a new one, ensure any previous ones have unmounted first.",
         tagName,
         tagName,
-        tagName,
+        tagName
       );
     }
     switch (type) {
-      case 'html':
-      case 'head':
-      case 'body': {
+      case "html":
+      case "head":
+      case "body": {
         break;
       }
       default: {
         console.error(
-          'acquireSingletonInstance was called with an element type that is not supported. This is a bug in React.',
+          "acquireSingletonInstance was called with an element type that is not supported. This is a bug in React."
         );
       }
     }
@@ -4323,21 +4332,21 @@ export function releaseSingletonInstance(instance: Instance): void {
 
 export const supportsResources = true;
 
-type HoistableTagType = 'link' | 'meta' | 'title';
+type HoistableTagType = "link" | "meta" | "title";
 type TResource<
-  T: 'stylesheet' | 'style' | 'script' | 'void',
-  S: null | {...},
+  T: "stylesheet" | "style" | "script" | "void",
+  S: null | { ... }
 > = {
   type: T,
   instance: null | Instance,
   count: number,
   state: S,
 };
-type StylesheetResource = TResource<'stylesheet', StylesheetState>;
-type StyleTagResource = TResource<'style', null>;
+type StylesheetResource = TResource<"stylesheet", StylesheetState>;
+type StyleTagResource = TResource<"style", null>;
 type StyleResource = StyleTagResource | StylesheetResource;
-type ScriptResource = TResource<'script', null>;
-type VoidResource = TResource<'void', null>;
+type ScriptResource = TResource<"script", null>;
+type VoidResource = TResource<"void", null>;
 export type Resource = StyleResource | ScriptResource | VoidResource;
 
 type LoadingState = number;
@@ -4353,14 +4362,14 @@ type StylesheetState = {
 };
 
 type StyleTagProps = {
-  'data-href': string,
-  'data-precedence': string,
+  "data-href": string,
+  "data-precedence": string,
   [string]: mixed,
 };
 type StylesheetProps = {
-  rel: 'stylesheet',
+  rel: "stylesheet",
   href: string,
-  'data-precedence': string,
+  "data-precedence": string,
   [string]: mixed,
 };
 
@@ -4371,12 +4380,12 @@ type ScriptProps = {
 };
 
 type PreloadProps = {
-  rel: 'preload',
+  rel: "preload",
   href: ?string,
   [string]: mixed,
 };
 type PreloadModuleProps = {
-  rel: 'modulepreload',
+  rel: "modulepreload",
   href: string,
   [string]: mixed,
 };
@@ -4400,14 +4409,14 @@ export type HoistableRoot = Document | ShadowRoot;
 // getRootNode is missing from IE and old jsdom versions
 export function getHoistableRoot(container: Container): HoistableRoot {
   // $FlowFixMe[method-unbinding]
-  return typeof container.getRootNode === 'function'
+  return typeof container.getRootNode === "function"
     ? /* $FlowFixMe[incompatible-cast] Flow types this as returning a `Node`,
        * but it's either a `Document` or `ShadowRoot`. */
       (container.getRootNode(): Document | ShadowRoot)
     : container.nodeType === DOCUMENT_NODE
-      ? // $FlowFixMe[incompatible-cast] We've constrained this to be a Document which satisfies the return type
-        (container: Document)
-      : container.ownerDocument;
+    ? // $FlowFixMe[incompatible-cast] We've constrained this to be a Document which satisfies the return type
+      (container: Document)
+    : container.ownerDocument;
 }
 
 function getCurrentResourceRoot(): null | HoistableRoot {
@@ -4444,7 +4453,7 @@ function flushSyncWork() {
     return previousWasRendering || wasRendering;
   } else {
     throw new Error(
-      'flushSyncWork should not be called from builds that support legacy mode. This is a bug in React.',
+      "flushSyncWork should not be called from builds that support legacy mode. This is a bug in React."
     );
   }
 }
@@ -4454,7 +4463,7 @@ function requestFormReset(form: HTMLFormElement) {
   if (
     formInst !== null &&
     formInst.tag === HostComponent &&
-    formInst.type === 'form'
+    formInst.type === "form"
   ) {
     requestFormResetOnFiber(formInst);
   } else {
@@ -4472,31 +4481,31 @@ function requestFormReset(form: HTMLFormElement) {
 // and so we have to fall back to something universal. Currently we just refer to the global document.
 // This is notable because nowhere else in ReactDOM do we actually reference the global document or window
 // because we may be rendering inside an iframe.
-const globalDocument = typeof document === 'undefined' ? null : document;
+const globalDocument = typeof document === "undefined" ? null : document;
 function getGlobalDocument(): ?Document {
   return globalDocument;
 }
 
 function preconnectAs(
-  rel: 'preconnect' | 'dns-prefetch',
+  rel: "preconnect" | "dns-prefetch",
   href: string,
-  crossOrigin: ?CrossOriginEnum,
+  crossOrigin: ?CrossOriginEnum
 ) {
   const ownerDocument = getGlobalDocument();
-  if (ownerDocument && typeof href === 'string' && href) {
+  if (ownerDocument && typeof href === "string" && href) {
     const limitedEscapedHref =
       escapeSelectorAttributeValueInsideDoubleQuotes(href);
     let key = `link[rel="${rel}"][href="${limitedEscapedHref}"]`;
-    if (typeof crossOrigin === 'string') {
+    if (typeof crossOrigin === "string") {
       key += `[crossorigin="${crossOrigin}"]`;
     }
     if (!preconnectsSet.has(key)) {
       preconnectsSet.add(key);
 
-      const preconnectProps = {rel, crossOrigin, href};
+      const preconnectProps = { rel, crossOrigin, href };
       if (null === ownerDocument.querySelector(key)) {
-        const instance = ownerDocument.createElement('link');
-        setInitialProperties(instance, 'link', preconnectProps);
+        const instance = ownerDocument.createElement("link");
+        setInitialProperties(instance, "link", preconnectProps);
         markNodeAsHoistable(instance);
         (ownerDocument.head: any).appendChild(instance);
       }
@@ -4506,12 +4515,12 @@ function preconnectAs(
 
 function prefetchDNS(href: string) {
   previousDispatcher.D(/* prefetchDNS */ href);
-  preconnectAs('dns-prefetch', href, null);
+  preconnectAs("dns-prefetch", href, null);
 }
 
 function preconnect(href: string, crossOrigin?: ?CrossOriginEnum) {
   previousDispatcher.C(/* preconnect */ href, crossOrigin);
-  preconnectAs('preconnect', href, crossOrigin);
+  preconnectAs("preconnect", href, crossOrigin);
 }
 
 function preload(href: string, as: string, options?: ?PreloadImplOptions) {
@@ -4519,26 +4528,26 @@ function preload(href: string, as: string, options?: ?PreloadImplOptions) {
   const ownerDocument = getGlobalDocument();
   if (ownerDocument && href && as) {
     let preloadSelector = `link[rel="preload"][as="${escapeSelectorAttributeValueInsideDoubleQuotes(
-      as,
+      as
     )}"]`;
-    if (as === 'image') {
+    if (as === "image") {
       if (options && options.imageSrcSet) {
         preloadSelector += `[imagesrcset="${escapeSelectorAttributeValueInsideDoubleQuotes(
-          options.imageSrcSet,
+          options.imageSrcSet
         )}"]`;
-        if (typeof options.imageSizes === 'string') {
+        if (typeof options.imageSizes === "string") {
           preloadSelector += `[imagesizes="${escapeSelectorAttributeValueInsideDoubleQuotes(
-            options.imageSizes,
+            options.imageSizes
           )}"]`;
         }
       } else {
         preloadSelector += `[href="${escapeSelectorAttributeValueInsideDoubleQuotes(
-          href,
+          href
         )}"]`;
       }
     } else {
       preloadSelector += `[href="${escapeSelectorAttributeValueInsideDoubleQuotes(
-        href,
+        href
       )}"]`;
     }
     // Some preloads are keyed under their selector. This happens when the preload is for
@@ -4546,45 +4555,45 @@ function preload(href: string, as: string, options?: ?PreloadImplOptions) {
     // Here we figure out which key to use to determine if we have a preload already.
     let key = preloadSelector;
     switch (as) {
-      case 'style':
+      case "style":
         key = getStyleKey(href);
         break;
-      case 'script':
+      case "script":
         key = getScriptKey(href);
         break;
     }
     if (!preloadPropsMap.has(key)) {
       const preloadProps = Object.assign(
         ({
-          rel: 'preload',
+          rel: "preload",
           // There is a bug in Safari where imageSrcSet is not respected on preload links
           // so we omit the href here if we have imageSrcSet b/c safari will load the wrong image.
           // This harms older browers that do not support imageSrcSet by making their preloads not work
           // but this population is shrinking fast and is already small so we accept this tradeoff.
           href:
-            as === 'image' && options && options.imageSrcSet ? undefined : href,
+            as === "image" && options && options.imageSrcSet ? undefined : href,
           as,
         }: PreloadProps),
-        options,
+        options
       );
       preloadPropsMap.set(key, preloadProps);
 
       if (null === ownerDocument.querySelector(preloadSelector)) {
         if (
-          as === 'style' &&
+          as === "style" &&
           ownerDocument.querySelector(getStylesheetSelectorFromKey(key))
         ) {
           // We already have a stylesheet for this key. We don't need to preload it.
           return;
         } else if (
-          as === 'script' &&
+          as === "script" &&
           ownerDocument.querySelector(getScriptSelectorFromKey(key))
         ) {
           // We already have a stylesheet for this key. We don't need to preload it.
           return;
         }
-        const instance = ownerDocument.createElement('link');
-        setInitialProperties(instance, 'link', preloadProps);
+        const instance = ownerDocument.createElement("link");
+        setInitialProperties(instance, "link", preloadProps);
         markNodeAsHoistable(instance);
         (ownerDocument.head: any).appendChild(instance);
       }
@@ -4597,21 +4606,21 @@ function preloadModule(href: string, options?: ?PreloadModuleImplOptions) {
   const ownerDocument = getGlobalDocument();
   if (ownerDocument && href) {
     const as =
-      options && typeof options.as === 'string' ? options.as : 'script';
+      options && typeof options.as === "string" ? options.as : "script";
     const preloadSelector = `link[rel="modulepreload"][as="${escapeSelectorAttributeValueInsideDoubleQuotes(
-      as,
+      as
     )}"][href="${escapeSelectorAttributeValueInsideDoubleQuotes(href)}"]`;
     // Some preloads are keyed under their selector. This happens when the preload is for
     // an arbitrary type. Other preloads are keyed under the resource key they represent a preload for.
     // Here we figure out which key to use to determine if we have a preload already.
     let key = preloadSelector;
     switch (as) {
-      case 'audioworklet':
-      case 'paintworklet':
-      case 'serviceworker':
-      case 'sharedworker':
-      case 'worker':
-      case 'script': {
+      case "audioworklet":
+      case "paintworklet":
+      case "serviceworker":
+      case "sharedworker":
+      case "worker":
+      case "script": {
         key = getScriptKey(href);
         break;
       }
@@ -4620,28 +4629,28 @@ function preloadModule(href: string, options?: ?PreloadModuleImplOptions) {
     if (!preloadPropsMap.has(key)) {
       const props: PreloadModuleProps = Object.assign(
         ({
-          rel: 'modulepreload',
+          rel: "modulepreload",
           href,
         }: PreloadModuleProps),
-        options,
+        options
       );
       preloadPropsMap.set(key, props);
 
       if (null === ownerDocument.querySelector(preloadSelector)) {
         switch (as) {
-          case 'audioworklet':
-          case 'paintworklet':
-          case 'serviceworker':
-          case 'sharedworker':
-          case 'worker':
-          case 'script': {
+          case "audioworklet":
+          case "paintworklet":
+          case "serviceworker":
+          case "sharedworker":
+          case "worker":
+          case "script": {
             if (ownerDocument.querySelector(getScriptSelectorFromKey(key))) {
               return;
             }
           }
         }
-        const instance = ownerDocument.createElement('link');
-        setInitialProperties(instance, 'link', props);
+        const instance = ownerDocument.createElement("link");
+        setInitialProperties(instance, "link", props);
         markNodeAsHoistable(instance);
         (ownerDocument.head: any).appendChild(instance);
       }
@@ -4652,7 +4661,7 @@ function preloadModule(href: string, options?: ?PreloadModuleImplOptions) {
 function preinitStyle(
   href: string,
   precedence: ?string,
-  options?: ?PreinitStyleOptions,
+  options?: ?PreinitStyleOptions
 ) {
   previousDispatcher.S(/* preinitStyle */ href, precedence, options);
 
@@ -4661,7 +4670,7 @@ function preinitStyle(
     const styles = getResourcesFromRoot(ownerDocument).hoistableStyles;
 
     const key = getStyleKey(href);
-    precedence = precedence || 'default';
+    precedence = precedence || "default";
 
     // Check if this resource already exists
     let resource = styles.get(key);
@@ -4678,7 +4687,7 @@ function preinitStyle(
 
     // Attempt to hydrate instance from DOM
     let instance: null | Instance = ownerDocument.querySelector(
-      getStylesheetSelectorFromKey(key),
+      getStylesheetSelectorFromKey(key)
     );
     if (instance) {
       state.loading = Loaded | Inserted;
@@ -4686,28 +4695,28 @@ function preinitStyle(
       // Construct a new instance and insert it
       const stylesheetProps = Object.assign(
         ({
-          rel: 'stylesheet',
+          rel: "stylesheet",
           href,
-          'data-precedence': precedence,
+          "data-precedence": precedence,
         }: StylesheetProps),
-        options,
+        options
       );
       const preloadProps = preloadPropsMap.get(key);
       if (preloadProps) {
         adoptPreloadPropsForStylesheet(stylesheetProps, preloadProps);
       }
-      const link = (instance = ownerDocument.createElement('link'));
+      const link = (instance = ownerDocument.createElement("link"));
       markNodeAsHoistable(link);
-      setInitialProperties(link, 'link', stylesheetProps);
+      setInitialProperties(link, "link", stylesheetProps);
 
       (link: any)._p = new Promise((resolve, reject) => {
         link.onload = resolve;
         link.onerror = reject;
       });
-      link.addEventListener('load', () => {
+      link.addEventListener("load", () => {
         state.loading |= Loaded;
       });
-      link.addEventListener('error', () => {
+      link.addEventListener("error", () => {
         state.loading |= Errored;
       });
 
@@ -4717,7 +4726,7 @@ function preinitStyle(
 
     // Construct a Resource and cache it
     resource = {
-      type: 'stylesheet',
+      type: "stylesheet",
       instance,
       count: 1,
       state,
@@ -4746,7 +4755,7 @@ function preinitScript(src: string, options?: ?PreinitScriptOptions) {
 
     // Attempt to hydrate instance from DOM
     let instance: null | Instance = ownerDocument.querySelector(
-      getScriptSelectorFromKey(key),
+      getScriptSelectorFromKey(key)
     );
     if (!instance) {
       // Construct a new instance and insert it
@@ -4755,22 +4764,22 @@ function preinitScript(src: string, options?: ?PreinitScriptOptions) {
           src,
           async: true,
         }: ScriptProps),
-        options,
+        options
       );
       // Adopt certain preload props
       const preloadProps = preloadPropsMap.get(key);
       if (preloadProps) {
         adoptPreloadPropsForScript(scriptProps, preloadProps);
       }
-      instance = ownerDocument.createElement('script');
+      instance = ownerDocument.createElement("script");
       markNodeAsHoistable(instance);
-      setInitialProperties(instance, 'link', scriptProps);
+      setInitialProperties(instance, "link", scriptProps);
       (ownerDocument.head: any).appendChild(instance);
     }
 
     // Construct a Resource and cache it
     resource = {
-      type: 'script',
+      type: "script",
       instance,
       count: 1,
       state: null,
@@ -4782,7 +4791,7 @@ function preinitScript(src: string, options?: ?PreinitScriptOptions) {
 
 function preinitModuleScript(
   src: string,
-  options?: ?PreinitModuleScriptOptions,
+  options?: ?PreinitModuleScriptOptions
 ) {
   previousDispatcher.M(/* preinitModuleScript */ src, options);
 
@@ -4802,7 +4811,7 @@ function preinitModuleScript(
 
     // Attempt to hydrate instance from DOM
     let instance: null | Instance = ownerDocument.querySelector(
-      getScriptSelectorFromKey(key),
+      getScriptSelectorFromKey(key)
     );
     if (!instance) {
       // Construct a new instance and insert it
@@ -4810,24 +4819,24 @@ function preinitModuleScript(
         ({
           src,
           async: true,
-          type: 'module',
+          type: "module",
         }: ScriptProps),
-        options,
+        options
       );
       // Adopt certain preload props
       const preloadProps = preloadPropsMap.get(key);
       if (preloadProps) {
         adoptPreloadPropsForScript(scriptProps, preloadProps);
       }
-      instance = ownerDocument.createElement('script');
+      instance = ownerDocument.createElement("script");
       markNodeAsHoistable(instance);
-      setInitialProperties(instance, 'link', scriptProps);
+      setInitialProperties(instance, "link", scriptProps);
       (ownerDocument.head: any).appendChild(instance);
     }
 
     // Construct a Resource and cache it
     resource = {
-      type: 'script',
+      type: "script",
       instance,
       count: 1,
       state: null,
@@ -4844,7 +4853,7 @@ type StyleTagQualifyingProps = {
 };
 
 type StylesheetQualifyingProps = {
-  rel: 'stylesheet',
+  rel: "stylesheet",
   href: string,
   precedence: string,
   [string]: mixed,
@@ -4855,30 +4864,30 @@ export function getResource(
   type: string,
   currentProps: any,
   pendingProps: any,
-  currentResource: null | Resource,
+  currentResource: null | Resource
 ): null | Resource {
   const resourceRoot = getCurrentResourceRoot();
   if (!resourceRoot) {
     throw new Error(
-      '"resourceRoot" was expected to exist. This is a bug in React.',
+      '"resourceRoot" was expected to exist. This is a bug in React.'
     );
   }
   switch (type) {
-    case 'meta':
-    case 'title': {
+    case "meta":
+    case "title": {
       return null;
     }
-    case 'style': {
+    case "style": {
       if (
-        typeof pendingProps.precedence === 'string' &&
-        typeof pendingProps.href === 'string'
+        typeof pendingProps.precedence === "string" &&
+        typeof pendingProps.href === "string"
       ) {
         const key = getStyleKey(pendingProps.href);
         const styles = getResourcesFromRoot(resourceRoot).hoistableStyles;
         let resource = styles.get(key);
         if (!resource) {
           resource = {
-            type: 'style',
+            type: "style",
             instance: null,
             count: 0,
             state: null,
@@ -4888,17 +4897,17 @@ export function getResource(
         return resource;
       }
       return {
-        type: 'void',
+        type: "void",
         instance: null,
         count: 0,
         state: null,
       };
     }
-    case 'link': {
+    case "link": {
       if (
-        pendingProps.rel === 'stylesheet' &&
-        typeof pendingProps.href === 'string' &&
-        typeof pendingProps.precedence === 'string'
+        pendingProps.rel === "stylesheet" &&
+        typeof pendingProps.href === "string" &&
+        typeof pendingProps.precedence === "string"
       ) {
         const qualifiedProps: StylesheetQualifyingProps = pendingProps;
         const key = getStyleKey(qualifiedProps.href);
@@ -4910,7 +4919,7 @@ export function getResource(
           // We asserted this above but Flow can't figure out that the type satisfies
           const ownerDocument = getDocumentFromRoot(resourceRoot);
           resource = ({
-            type: 'stylesheet',
+            type: "stylesheet",
             instance: null,
             count: 0,
             state: {
@@ -4920,7 +4929,7 @@ export function getResource(
           }: StylesheetResource);
           styles.set(key, resource);
           const instance = ownerDocument.querySelector(
-            getStylesheetSelectorFromKey(key),
+            getStylesheetSelectorFromKey(key)
           );
           if (instance) {
             const loadingState: ?Promise<mixed> = (instance: any)._p;
@@ -4942,7 +4951,7 @@ export function getResource(
                 ownerDocument,
                 key,
                 preloadProps,
-                resource.state,
+                resource.state
               );
             }
           }
@@ -4950,18 +4959,18 @@ export function getResource(
         if (currentProps && currentResource === null) {
           // This node was previously an Instance type and is becoming a Resource type
           // For now we error because we don't support flavor changes
-          let diff = '';
-          if (__DEV__) {
+          let diff = "";
+          if (false) {
             diff = `
 
   - ${describeLinkForResourceErrorDEV(currentProps)}
   + ${describeLinkForResourceErrorDEV(pendingProps)}`;
           }
           throw new Error(
-            'Expected <link> not to update to be updated to a stylesheet with precedence.' +
-              ' Check the `rel`, `href`, and `precedence` props of this component.' +
-              ' Alternatively, check whether two different <link> components render in the same slot or share the same key.' +
-              diff,
+            "Expected <link> not to update to be updated to a stylesheet with precedence." +
+              " Check the `rel`, `href`, and `precedence` props of this component." +
+              " Alternatively, check whether two different <link> components render in the same slot or share the same key." +
+              diff
           );
         }
         return resource;
@@ -4969,31 +4978,31 @@ export function getResource(
         if (currentProps && currentResource !== null) {
           // This node was previously a Resource type and is becoming an Instance type
           // For now we error because we don't support flavor changes
-          let diff = '';
-          if (__DEV__) {
+          let diff = "";
+          if (false) {
             diff = `
 
   - ${describeLinkForResourceErrorDEV(currentProps)}
   + ${describeLinkForResourceErrorDEV(pendingProps)}`;
           }
           throw new Error(
-            'Expected stylesheet with precedence to not be updated to a different kind of <link>.' +
-              ' Check the `rel`, `href`, and `precedence` props of this component.' +
-              ' Alternatively, check whether two different <link> components render in the same slot or share the same key.' +
-              diff,
+            "Expected stylesheet with precedence to not be updated to a different kind of <link>." +
+              " Check the `rel`, `href`, and `precedence` props of this component." +
+              " Alternatively, check whether two different <link> components render in the same slot or share the same key." +
+              diff
           );
         }
         return null;
       }
     }
-    case 'script': {
+    case "script": {
       const async = pendingProps.async;
       const src = pendingProps.src;
       if (
-        typeof src === 'string' &&
+        typeof src === "string" &&
         async &&
-        typeof async !== 'function' &&
-        typeof async !== 'symbol'
+        typeof async !== "function" &&
+        typeof async !== "symbol"
       ) {
         const key = getScriptKey(src);
         const scripts = getResourcesFromRoot(resourceRoot).hoistableScripts;
@@ -5001,7 +5010,7 @@ export function getResource(
         let resource = scripts.get(key);
         if (!resource) {
           resource = {
-            type: 'script',
+            type: "script",
             instance: null,
             count: 0,
             state: null,
@@ -5011,7 +5020,7 @@ export function getResource(
         return resource;
       }
       return {
-        type: 'void',
+        type: "void",
         instance: null,
         count: 0,
         state: null,
@@ -5019,62 +5028,62 @@ export function getResource(
     }
     default: {
       throw new Error(
-        `getResource encountered a type it did not expect: "${type}". this is a bug in React.`,
+        `getResource encountered a type it did not expect: "${type}". this is a bug in React.`
       );
     }
   }
 }
 
 function describeLinkForResourceErrorDEV(props: any) {
-  if (__DEV__) {
+  if (false) {
     let describedProps = 0;
 
-    let description = '<link';
-    if (typeof props.rel === 'string') {
+    let description = "<link";
+    if (typeof props.rel === "string") {
       describedProps++;
       description += ` rel="${props.rel}"`;
-    } else if (hasOwnProperty.call(props, 'rel')) {
+    } else if (hasOwnProperty.call(props, "rel")) {
       describedProps++;
       description += ` rel="${
-        props.rel === null ? 'null' : 'invalid type ' + typeof props.rel
+        props.rel === null ? "null" : "invalid type " + typeof props.rel
       }"`;
     }
-    if (typeof props.href === 'string') {
+    if (typeof props.href === "string") {
       describedProps++;
       description += ` href="${props.href}"`;
-    } else if (hasOwnProperty.call(props, 'href')) {
+    } else if (hasOwnProperty.call(props, "href")) {
       describedProps++;
       description += ` href="${
-        props.href === null ? 'null' : 'invalid type ' + typeof props.href
+        props.href === null ? "null" : "invalid type " + typeof props.href
       }"`;
     }
-    if (typeof props.precedence === 'string') {
+    if (typeof props.precedence === "string") {
       describedProps++;
       description += ` precedence="${props.precedence}"`;
-    } else if (hasOwnProperty.call(props, 'precedence')) {
+    } else if (hasOwnProperty.call(props, "precedence")) {
       describedProps++;
       description += ` precedence={${
         props.precedence === null
-          ? 'null'
-          : 'invalid type ' + typeof props.precedence
+          ? "null"
+          : "invalid type " + typeof props.precedence
       }}`;
     }
     if (Object.getOwnPropertyNames(props).length > describedProps) {
-      description += ' ...';
+      description += " ...";
     }
-    description += ' />';
+    description += " />";
     return description;
   }
-  return '';
+  return "";
 }
 
 function styleTagPropsFromRawProps(
-  rawProps: StyleTagQualifyingProps,
+  rawProps: StyleTagQualifyingProps
 ): StyleTagProps {
   return {
     ...rawProps,
-    'data-href': rawProps.href,
-    'data-precedence': rawProps.precedence,
+    "data-href": rawProps.href,
+    "data-precedence": rawProps.precedence,
     href: null,
     precedence: null,
   };
@@ -5101,11 +5110,11 @@ function getPreloadStylesheetSelectorFromKey(key: string) {
 }
 
 function stylesheetPropsFromRawProps(
-  rawProps: StylesheetQualifyingProps,
+  rawProps: StylesheetQualifyingProps
 ): StylesheetProps {
   return {
     ...rawProps,
-    'data-precedence': rawProps.precedence,
+    "data-precedence": rawProps.precedence,
     precedence: null,
   };
 }
@@ -5113,32 +5122,32 @@ function preloadStylesheet(
   ownerDocument: Document,
   key: string,
   preloadProps: PreloadProps,
-  state: StylesheetState,
+  state: StylesheetState
 ) {
   const preloadEl = ownerDocument.querySelector(
-    getPreloadStylesheetSelectorFromKey(key),
+    getPreloadStylesheetSelectorFromKey(key)
   );
   if (preloadEl) {
     // If we find a preload already it was SSR'd and we won't have an actual
     // loading state to track. For now we will just assume it is loaded
     state.loading = Loaded;
   } else {
-    const instance = ownerDocument.createElement('link');
+    const instance = ownerDocument.createElement("link");
     state.preload = instance;
-    instance.addEventListener('load', () => (state.loading |= Loaded));
-    instance.addEventListener('error', () => (state.loading |= Errored));
-    setInitialProperties(instance, 'link', preloadProps);
+    instance.addEventListener("load", () => (state.loading |= Loaded));
+    instance.addEventListener("error", () => (state.loading |= Errored));
+    setInitialProperties(instance, "link", preloadProps);
     markNodeAsHoistable(instance);
     (ownerDocument.head: any).appendChild(instance);
   }
 }
 
 function preloadPropsFromStylesheet(
-  props: StylesheetQualifyingProps,
+  props: StylesheetQualifyingProps
 ): PreloadProps {
   return {
-    rel: 'preload',
-    as: 'style',
+    rel: "preload",
+    as: "style",
     href: props.href,
     crossOrigin: props.crossOrigin,
     integrity: props.integrity,
@@ -5154,23 +5163,23 @@ function getScriptKey(src: string): string {
 }
 
 function getScriptSelectorFromKey(key: string): string {
-  return 'script[async]' + key;
+  return "script[async]" + key;
 }
 
 export function acquireResource(
   hoistableRoot: HoistableRoot,
   resource: Resource,
-  props: any,
+  props: any
 ): null | Instance {
   resource.count++;
   if (resource.instance === null) {
     switch (resource.type) {
-      case 'style': {
+      case "style": {
         const qualifiedProps: StyleTagQualifyingProps = props;
 
         // Attempt to hydrate instance from DOM
         let instance: null | Instance = hoistableRoot.querySelector(
-          getStyleTagSelector(qualifiedProps.href),
+          getStyleTagSelector(qualifiedProps.href)
         );
         if (instance) {
           resource.instance = instance;
@@ -5180,10 +5189,10 @@ export function acquireResource(
 
         const styleProps = styleTagPropsFromRawProps(props);
         const ownerDocument = getDocumentFromRoot(hoistableRoot);
-        instance = ownerDocument.createElement('style');
+        instance = ownerDocument.createElement("style");
 
         markNodeAsHoistable(instance);
-        setInitialProperties(instance, 'style', styleProps);
+        setInitialProperties(instance, "style", styleProps);
 
         // TODO: `style` does not have loading state for tracking insertions. I
         // guess because these aren't suspensey? Not sure whether this is a
@@ -5194,7 +5203,7 @@ export function acquireResource(
 
         return instance;
       }
-      case 'stylesheet': {
+      case "stylesheet": {
         // This typing is enforce by `getResource`. If we change the logic
         // there for what qualifies as a stylesheet resource we need to ensure
         // this cast still makes sense;
@@ -5203,7 +5212,7 @@ export function acquireResource(
 
         // Attempt to hydrate instance from DOM
         let instance: null | Instance = hoistableRoot.querySelector(
-          getStylesheetSelectorFromKey(key),
+          getStylesheetSelectorFromKey(key)
         );
         if (instance) {
           resource.state.loading |= Inserted;
@@ -5220,21 +5229,21 @@ export function acquireResource(
 
         // Construct and insert a new instance
         const ownerDocument = getDocumentFromRoot(hoistableRoot);
-        instance = ownerDocument.createElement('link');
+        instance = ownerDocument.createElement("link");
         markNodeAsHoistable(instance);
         const linkInstance: HTMLLinkElement = (instance: any);
         (linkInstance: any)._p = new Promise((resolve, reject) => {
           linkInstance.onload = resolve;
           linkInstance.onerror = reject;
         });
-        setInitialProperties(instance, 'link', stylesheetProps);
+        setInitialProperties(instance, "link", stylesheetProps);
         resource.state.loading |= Inserted;
         insertStylesheet(instance, qualifiedProps.precedence, hoistableRoot);
         resource.instance = instance;
 
         return instance;
       }
-      case 'script': {
+      case "script": {
         // This typing is enforce by `getResource`. If we change the logic
         // there for what qualifies as a stylesheet resource we need to ensure
         // this cast still makes sense;
@@ -5243,7 +5252,7 @@ export function acquireResource(
 
         // Attempt to hydrate instance from DOM
         let instance: null | Instance = hoistableRoot.querySelector(
-          getScriptSelectorFromKey(key),
+          getScriptSelectorFromKey(key)
         );
         if (instance) {
           resource.instance = instance;
@@ -5254,26 +5263,26 @@ export function acquireResource(
         let scriptProps = borrowedScriptProps;
         const preloadProps = preloadPropsMap.get(key);
         if (preloadProps) {
-          scriptProps = {...borrowedScriptProps};
+          scriptProps = { ...borrowedScriptProps };
           adoptPreloadPropsForScript(scriptProps, preloadProps);
         }
 
         // Construct and insert a new instance
         const ownerDocument = getDocumentFromRoot(hoistableRoot);
-        instance = ownerDocument.createElement('script');
+        instance = ownerDocument.createElement("script");
         markNodeAsHoistable(instance);
-        setInitialProperties(instance, 'link', scriptProps);
+        setInitialProperties(instance, "link", scriptProps);
         (ownerDocument.head: any).appendChild(instance);
         resource.instance = instance;
 
         return instance;
       }
-      case 'void': {
+      case "void": {
         return null;
       }
       default: {
         throw new Error(
-          `acquireResource encountered a resource type it did not expect: "${resource.type}". this is a bug in React.`,
+          `acquireResource encountered a resource type it did not expect: "${resource.type}". this is a bug in React.`
         );
       }
     }
@@ -5291,7 +5300,7 @@ export function acquireResource(
     // `suspendResource` does all the same stuff as `acquireResource` except
     // for the insertion.
     if (
-      resource.type === 'stylesheet' &&
+      resource.type === "stylesheet" &&
       (resource.state.loading & Inserted) === NotLoaded
     ) {
       const qualifiedProps: StylesheetQualifyingProps = props;
@@ -5310,10 +5319,10 @@ export function releaseResource(resource: Resource): void {
 function insertStylesheet(
   instance: Element,
   precedence: string,
-  root: HoistableRoot,
+  root: HoistableRoot
 ): void {
   const nodes = root.querySelectorAll(
-    'link[rel="stylesheet"][data-precedence],style[data-precedence]',
+    'link[rel="stylesheet"][data-precedence],style[data-precedence]'
   );
   const last = nodes.length ? nodes[nodes.length - 1] : null;
   let prior = last;
@@ -5343,7 +5352,7 @@ function insertStylesheet(
 
 function adoptPreloadPropsForStylesheet(
   stylesheetProps: StylesheetProps,
-  preloadProps: PreloadProps | PreloadModuleProps,
+  preloadProps: PreloadProps | PreloadModuleProps
 ): void {
   if (stylesheetProps.crossOrigin == null)
     stylesheetProps.crossOrigin = preloadProps.crossOrigin;
@@ -5354,7 +5363,7 @@ function adoptPreloadPropsForStylesheet(
 
 function adoptPreloadPropsForScript(
   scriptProps: ScriptProps,
-  preloadProps: PreloadProps | PreloadModuleProps,
+  preloadProps: PreloadProps | PreloadModuleProps
 ): void {
   if (scriptProps.crossOrigin == null)
     scriptProps.crossOrigin = preloadProps.crossOrigin;
@@ -5372,24 +5381,24 @@ export function hydrateHoistable(
   hoistableRoot: HoistableRoot,
   type: HoistableTagType,
   props: any,
-  internalInstanceHandle: Object,
+  internalInstanceHandle: Object
 ): Instance {
   const ownerDocument = getDocumentFromRoot(hoistableRoot);
 
   let instance: ?Instance = null;
   getInstance: switch (type) {
-    case 'title': {
-      instance = ownerDocument.getElementsByTagName('title')[0];
+    case "title": {
+      instance = ownerDocument.getElementsByTagName("title")[0];
       if (
         !instance ||
         isOwnedInstance(instance) ||
         instance.namespaceURI === SVG_NAMESPACE ||
-        instance.hasAttribute('itemprop')
+        instance.hasAttribute("itemprop")
       ) {
         instance = ownerDocument.createElement(type);
         (ownerDocument.head: any).insertBefore(
           instance,
-          ownerDocument.querySelector('head > title'),
+          ownerDocument.querySelector("head > title")
         );
       }
       setInitialProperties(instance, type, props);
@@ -5397,22 +5406,22 @@ export function hydrateHoistable(
       markNodeAsHoistable(instance);
       return instance;
     }
-    case 'link': {
-      const cache = getHydratableHoistableCache('link', 'href', ownerDocument);
-      const key = type + (props.href || '');
+    case "link": {
+      const cache = getHydratableHoistableCache("link", "href", ownerDocument);
+      const key = type + (props.href || "");
       const maybeNodes = cache.get(key);
       if (maybeNodes) {
         const nodes = maybeNodes;
         for (let i = 0; i < nodes.length; i++) {
           const node = nodes[i];
           if (
-            node.getAttribute('href') !==
-              (props.href == null || props.href === '' ? null : props.href) ||
-            node.getAttribute('rel') !==
+            node.getAttribute("href") !==
+              (props.href == null || props.href === "" ? null : props.href) ||
+            node.getAttribute("rel") !==
               (props.rel == null ? null : props.rel) ||
-            node.getAttribute('title') !==
+            node.getAttribute("title") !==
               (props.title == null ? null : props.title) ||
-            node.getAttribute('crossorigin') !==
+            node.getAttribute("crossorigin") !==
               (props.crossOrigin == null ? null : props.crossOrigin)
           ) {
             // mismatch, try the next node;
@@ -5428,13 +5437,13 @@ export function hydrateHoistable(
       (ownerDocument.head: any).appendChild(instance);
       break;
     }
-    case 'meta': {
+    case "meta": {
       const cache = getHydratableHoistableCache(
-        'meta',
-        'content',
-        ownerDocument,
+        "meta",
+        "content",
+        ownerDocument
       );
-      const key = type + (props.content || '');
+      const key = type + (props.content || "");
       const maybeNodes = cache.get(key);
       if (maybeNodes) {
         const nodes = maybeNodes;
@@ -5444,19 +5453,19 @@ export function hydrateHoistable(
           // We coerce content to string because it is the most likely one to
           // use a `toString` capable value. For the rest we just do identity match
           // passing non-strings here is not really valid anyway.
-          if (__DEV__) {
-            checkAttributeStringCoercion(props.content, 'content');
+          if (false) {
+            checkAttributeStringCoercion(props.content, "content");
           }
           if (
-            node.getAttribute('content') !==
-              (props.content == null ? null : '' + props.content) ||
-            node.getAttribute('name') !==
+            node.getAttribute("content") !==
+              (props.content == null ? null : "" + props.content) ||
+            node.getAttribute("name") !==
               (props.name == null ? null : props.name) ||
-            node.getAttribute('property') !==
+            node.getAttribute("property") !==
               (props.property == null ? null : props.property) ||
-            node.getAttribute('http-equiv') !==
+            node.getAttribute("http-equiv") !==
               (props.httpEquiv == null ? null : props.httpEquiv) ||
-            node.getAttribute('charset') !==
+            node.getAttribute("charset") !==
               (props.charSet == null ? null : props.charSet)
           ) {
             // mismatch, try the next node;
@@ -5474,7 +5483,7 @@ export function hydrateHoistable(
     }
     default:
       throw new Error(
-        `getNodesForType encountered a type it did not expect: "${type}". This is a bug in React.`,
+        `getNodesForType encountered a type it did not expect: "${type}". This is a bug in React.`
       );
   }
 
@@ -5487,7 +5496,7 @@ export function hydrateHoistable(
 function getHydratableHoistableCache(
   type: HoistableTagType,
   keyAttribute: string,
-  ownerDocument: Document,
+  ownerDocument: Document
 ): KeyedTagCache {
   let cache: KeyedTagCache;
   let caches: DocumentTagCaches;
@@ -5519,10 +5528,10 @@ function getHydratableHoistableCache(
     const node = nodes[i];
     if (
       !isOwnedInstance(node) &&
-      (type !== 'link' || node.getAttribute('rel') !== 'stylesheet') &&
+      (type !== "link" || node.getAttribute("rel") !== "stylesheet") &&
       node.namespaceURI !== SVG_NAMESPACE
     ) {
-      const nodeKey = node.getAttribute(keyAttribute) || '';
+      const nodeKey = node.getAttribute(keyAttribute) || "";
       const key = type + nodeKey;
       const existing = cache.get(key);
       if (existing) {
@@ -5539,12 +5548,12 @@ function getHydratableHoistableCache(
 export function mountHoistable(
   hoistableRoot: HoistableRoot,
   type: HoistableTagType,
-  instance: Instance,
+  instance: Instance
 ): void {
   const ownerDocument = getDocumentFromRoot(hoistableRoot);
   (ownerDocument.head: any).insertBefore(
     instance,
-    type === 'title' ? ownerDocument.querySelector('head > title') : null,
+    type === "title" ? ownerDocument.querySelector("head > title") : null
   );
 }
 
@@ -5555,11 +5564,11 @@ export function unmountHoistable(instance: Instance): void {
 export function isHostHoistableType(
   type: string,
   props: RawProps,
-  hostContext: HostContext,
+  hostContext: HostContext
 ): boolean {
   let outsideHostContainerContext: boolean;
   let hostContextProd: HostContextProd;
-  if (__DEV__) {
+  if (false) {
     const hostContextDev: HostContextDev = (hostContext: any);
     // We can only render resources when we are not within the host container context
     outsideHostContainerContext =
@@ -5571,22 +5580,22 @@ export function isHostHoistableType(
 
   // Global opt out of hoisting for anything in SVG Namespace or anything with an itemProp inside an itemScope
   if (hostContextProd === HostContextNamespaceSvg || props.itemProp != null) {
-    if (__DEV__) {
+    if (false) {
       if (
         outsideHostContainerContext &&
         props.itemProp != null &&
-        (type === 'meta' ||
-          type === 'title' ||
-          type === 'style' ||
-          type === 'link' ||
-          type === 'script')
+        (type === "meta" ||
+          type === "title" ||
+          type === "style" ||
+          type === "link" ||
+          type === "script")
       ) {
         console.error(
-          'Cannot render a <%s> outside the main document if it has an `itemProp` prop. `itemProp` suggests the tag belongs to an' +
-            ' `itemScope` which can appear anywhere in the DOM. If you were intending for React to hoist this <%s> remove the `itemProp` prop.' +
-            ' Otherwise, try moving this tag into the <head> or <body> of the Document.',
+          "Cannot render a <%s> outside the main document if it has an `itemProp` prop. `itemProp` suggests the tag belongs to an" +
+            " `itemScope` which can appear anywhere in the DOM. If you were intending for React to hoist this <%s> remove the `itemProp` prop." +
+            " Otherwise, try moving this tag into the <head> or <body> of the Document.",
           type,
-          type,
+          type
         );
       }
     }
@@ -5594,24 +5603,24 @@ export function isHostHoistableType(
   }
 
   switch (type) {
-    case 'meta':
-    case 'title': {
+    case "meta":
+    case "title": {
       return true;
     }
-    case 'style': {
+    case "style": {
       if (
-        typeof props.precedence !== 'string' ||
-        typeof props.href !== 'string' ||
-        props.href === ''
+        typeof props.precedence !== "string" ||
+        typeof props.href !== "string" ||
+        props.href === ""
       ) {
-        if (__DEV__) {
+        if (false) {
           if (outsideHostContainerContext) {
             console.error(
-              'Cannot render a <style> outside the main document without knowing its precedence and a unique href key.' +
-                ' React can hoist and deduplicate <style> tags if you provide a `precedence` prop along with an `href` prop that' +
+              "Cannot render a <style> outside the main document without knowing its precedence and a unique href key." +
+                " React can hoist and deduplicate <style> tags if you provide a `precedence` prop along with an `href` prop that" +
                 ' does not conflict with the `href` values used in any other hoisted <style> or <link rel="stylesheet" ...> tags. ' +
-                ' Note that hoisting <style> tags is considered an advanced feature that most will not use directly.' +
-                ' Consider moving the <style> tag to the <head> or consider adding a `precedence="default"` and `href="some unique resource identifier"`.',
+                " Note that hoisting <style> tags is considered an advanced feature that most will not use directly." +
+                ' Consider moving the <style> tag to the <head> or consider adding a `precedence="default"` and `href="some unique resource identifier"`.'
             );
           }
         }
@@ -5619,36 +5628,36 @@ export function isHostHoistableType(
       }
       return true;
     }
-    case 'link': {
+    case "link": {
       if (
-        typeof props.rel !== 'string' ||
-        typeof props.href !== 'string' ||
-        props.href === '' ||
+        typeof props.rel !== "string" ||
+        typeof props.href !== "string" ||
+        props.href === "" ||
         props.onLoad ||
         props.onError
       ) {
-        if (__DEV__) {
+        if (false) {
           if (
-            props.rel === 'stylesheet' &&
-            typeof props.precedence === 'string'
+            props.rel === "stylesheet" &&
+            typeof props.precedence === "string"
           ) {
             validateLinkPropsForStyleResource(props);
           }
           if (outsideHostContainerContext) {
             if (
-              typeof props.rel !== 'string' ||
-              typeof props.href !== 'string' ||
-              props.href === ''
+              typeof props.rel !== "string" ||
+              typeof props.href !== "string" ||
+              props.href === ""
             ) {
               console.error(
-                'Cannot render a <link> outside the main document without a `rel` and `href` prop.' +
-                  ' Try adding a `rel` and/or `href` prop to this <link> or moving the link into the <head> tag',
+                "Cannot render a <link> outside the main document without a `rel` and `href` prop." +
+                  " Try adding a `rel` and/or `href` prop to this <link> or moving the link into the <head> tag"
               );
             } else if (props.onError || props.onLoad) {
               console.error(
-                'Cannot render a <link> with onLoad or onError listeners outside the main document.' +
-                  ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
-                  ' somewhere in the <body>.',
+                "Cannot render a <link> with onLoad or onError listeners outside the main document." +
+                  " Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or" +
+                  " somewhere in the <body>."
               );
             }
           }
@@ -5656,55 +5665,55 @@ export function isHostHoistableType(
         return false;
       }
       switch (props.rel) {
-        case 'stylesheet': {
-          const {precedence, disabled} = props;
-          if (__DEV__) {
-            if (typeof precedence !== 'string') {
+        case "stylesheet": {
+          const { precedence, disabled } = props;
+          if (false) {
+            if (typeof precedence !== "string") {
               if (outsideHostContainerContext) {
                 console.error(
                   'Cannot render a <link rel="stylesheet" /> outside the main document without knowing its precedence.' +
-                    ' Consider adding precedence="default" or moving it into the root <head> tag.',
+                    ' Consider adding precedence="default" or moving it into the root <head> tag.'
                 );
               }
             }
           }
-          return typeof precedence === 'string' && disabled == null;
+          return typeof precedence === "string" && disabled == null;
         }
         default: {
           return true;
         }
       }
     }
-    case 'script': {
+    case "script": {
       const isAsync =
         props.async &&
-        typeof props.async !== 'function' &&
-        typeof props.async !== 'symbol';
+        typeof props.async !== "function" &&
+        typeof props.async !== "symbol";
       if (
         !isAsync ||
         props.onLoad ||
         props.onError ||
         !props.src ||
-        typeof props.src !== 'string'
+        typeof props.src !== "string"
       ) {
-        if (__DEV__) {
+        if (false) {
           if (outsideHostContainerContext) {
             if (!isAsync) {
               console.error(
-                'Cannot render a sync or defer <script> outside the main document without knowing its order.' +
-                  ' Try adding async="" or moving it into the root <head> tag.',
+                "Cannot render a sync or defer <script> outside the main document without knowing its order." +
+                  ' Try adding async="" or moving it into the root <head> tag.'
               );
             } else if (props.onLoad || props.onError) {
               console.error(
-                'Cannot render a <script> with onLoad or onError listeners outside the main document.' +
-                  ' Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or' +
-                  ' somewhere in the <body>.',
+                "Cannot render a <script> with onLoad or onError listeners outside the main document." +
+                  " Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or" +
+                  " somewhere in the <body>."
               );
             } else {
               console.error(
-                'Cannot render a <script> outside the main document without `async={true}` and a non-empty `src` prop.' +
-                  ' Ensure there is a valid `src` and either make the script async or move it into the root <head> tag or' +
-                  ' somewhere in the <body>.',
+                "Cannot render a <script> outside the main document without `async={true}` and a non-empty `src` prop." +
+                  " Ensure there is a valid `src` and either make the script async or move it into the root <head> tag or" +
+                  " somewhere in the <body>."
               );
             }
           }
@@ -5713,13 +5722,13 @@ export function isHostHoistableType(
       }
       return true;
     }
-    case 'noscript':
-    case 'template': {
-      if (__DEV__) {
+    case "noscript":
+    case "template": {
+      if (false) {
         if (outsideHostContainerContext) {
           console.error(
-            'Cannot render <%s> outside the main document. Try moving it into the root <head> tag.',
-            type,
+            "Cannot render <%s> outside the main document. Try moving it into the root <head> tag.",
+            type
           );
         }
       }
@@ -5736,18 +5745,18 @@ export function maySuspendCommit(type: Type, props: Props): boolean {
   // Suspensey images are the default, unless you opt-out of with either
   // loading="lazy" or onLoad={...} which implies you're ok waiting.
   return (
-    type === 'img' &&
+    type === "img" &&
     props.src != null &&
-    props.src !== '' &&
+    props.src !== "" &&
     props.onLoad == null &&
-    props.loading !== 'lazy'
+    props.loading !== "lazy"
   );
 }
 
 export function maySuspendCommitOnUpdate(
   type: Type,
   oldProps: Props,
-  newProps: Props,
+  newProps: Props
 ): boolean {
   return (
     maySuspendCommit(type, newProps) &&
@@ -5757,7 +5766,7 @@ export function maySuspendCommitOnUpdate(
 
 export function maySuspendCommitInSyncRender(
   type: Type,
-  props: Props,
+  props: Props
 ): boolean {
   // TODO: Allow sync lanes to suspend too with an opt-in.
   return false;
@@ -5765,7 +5774,7 @@ export function maySuspendCommitInSyncRender(
 
 export function mayResourceSuspendCommit(resource: Resource): boolean {
   return (
-    resource.type === 'stylesheet' &&
+    resource.type === "stylesheet" &&
     (resource.state.loading & Inserted) === NotLoaded
   );
 }
@@ -5773,7 +5782,7 @@ export function mayResourceSuspendCommit(resource: Resource): boolean {
 export function preloadInstance(
   instance: Instance,
   type: Type,
-  props: Props,
+  props: Props
 ): boolean {
   // We don't need to preload Suspensey images because the browser will
   // load them early once we set the src.
@@ -5785,7 +5794,7 @@ export function preloadInstance(
 
 export function preloadResource(resource: Resource): boolean {
   if (
-    resource.type === 'stylesheet' &&
+    resource.type === "stylesheet" &&
     (resource.state.loading & Settled) === NotLoaded
   ) {
     // Return false to indicate this resource should suspend
@@ -5820,21 +5829,21 @@ const SUSPENSEY_IMAGE_TIMEOUT = 500;
 export function suspendInstance(
   instance: Instance,
   type: Type,
-  props: Props,
+  props: Props
 ): void {
   if (!enableSuspenseyImages && !enableViewTransition) {
     return;
   }
   if (suspendedState === null) {
     throw new Error(
-      'Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug.',
+      "Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug."
     );
   }
   const state = suspendedState;
   if (
     // $FlowFixMe[prop-missing]
-    typeof instance.decode === 'function' &&
-    typeof setTimeout === 'function'
+    typeof instance.decode === "function" &&
+    typeof setTimeout === "function"
   ) {
     // If this browser supports decode() API, we use it to suspend waiting on the image.
     // The loading should have already started at this point, so it should be enough to
@@ -5844,7 +5853,7 @@ export function suspendInstance(
     Promise.race([
       // $FlowFixMe[prop-missing]
       instance.decode(),
-      new Promise(resolve => setTimeout(resolve, SUSPENSEY_IMAGE_TIMEOUT)),
+      new Promise((resolve) => setTimeout(resolve, SUSPENSEY_IMAGE_TIMEOUT)),
     ]).then(ping, ping);
   }
 }
@@ -5852,16 +5861,16 @@ export function suspendInstance(
 export function suspendResource(
   hoistableRoot: HoistableRoot,
   resource: Resource,
-  props: any,
+  props: any
 ): void {
   if (suspendedState === null) {
     throw new Error(
-      'Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug.',
+      "Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug."
     );
   }
   const state = suspendedState;
-  if (resource.type === 'stylesheet') {
-    if (typeof props.media === 'string') {
+  if (resource.type === "stylesheet") {
+    if (typeof props.media === "string") {
       // If we don't currently match media we avoid suspending on this resource
       // and let it insert on the mutation path
       if (matchMedia(props.media).matches === false) {
@@ -5875,7 +5884,7 @@ export function suspendResource(
 
         // Attempt to hydrate instance from DOM
         let instance: null | Instance = hoistableRoot.querySelector(
-          getStylesheetSelectorFromKey(key),
+          getStylesheetSelectorFromKey(key)
         );
         if (instance) {
           // If this instance has a loading state it came from the Fizz runtime.
@@ -5886,9 +5895,9 @@ export function suspendResource(
           const maybeLoadingState: ?Promise<mixed> = (instance: any)._p;
           if (
             maybeLoadingState !== null &&
-            typeof maybeLoadingState === 'object' &&
+            typeof maybeLoadingState === "object" &&
             // $FlowFixMe[method-unbinding]
-            typeof maybeLoadingState.then === 'function'
+            typeof maybeLoadingState.then === "function"
           ) {
             const loadingState = maybeLoadingState;
             state.count++;
@@ -5910,7 +5919,7 @@ export function suspendResource(
         }
 
         // Construct and insert a new instance
-        instance = ownerDocument.createElement('link');
+        instance = ownerDocument.createElement("link");
         markNodeAsHoistable(instance);
         const linkInstance: HTMLLinkElement = (instance: any);
         // This Promise is a loading state used by the Fizz runtime. We need this incase there is a race
@@ -5919,7 +5928,7 @@ export function suspendResource(
           linkInstance.onload = resolve;
           linkInstance.onerror = reject;
         });
-        setInitialProperties(instance, 'link', stylesheetProps);
+        setInitialProperties(instance, "link", stylesheetProps);
         resource.instance = instance;
       }
 
@@ -5932,8 +5941,8 @@ export function suspendResource(
       if (preloadEl && (resource.state.loading & Settled) === NotLoaded) {
         state.count++;
         const ping = onUnsuspend.bind(state);
-        preloadEl.addEventListener('load', ping);
-        preloadEl.addEventListener('error', ping);
+        preloadEl.addEventListener("load", ping);
+        preloadEl.addEventListener("error", ping);
       }
     }
   }
@@ -5942,7 +5951,7 @@ export function suspendResource(
 export function suspendOnActiveViewTransition(rootContainer: Container): void {
   if (suspendedState === null) {
     throw new Error(
-      'Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug.',
+      "Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug."
     );
   }
   const state = suspendedState;
@@ -5963,7 +5972,7 @@ export function suspendOnActiveViewTransition(rootContainer: Container): void {
 export function waitForCommitToBeReady(): null | ((() => void) => () => void) {
   if (suspendedState === null) {
     throw new Error(
-      'Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug.',
+      "Internal React Error: suspendedState null when it was expected to exists. Please report this as a React bug."
     );
   }
 
@@ -5979,7 +5988,7 @@ export function waitForCommitToBeReady(): null | ((() => void) => () => void) {
   // We need to check the count again because the inserted stylesheets may have led to new
   // tasks to wait on.
   if (state.count > 0) {
-    return commit => {
+    return (commit) => {
       // We almost never want to show content before its styles have loaded. But
       // eventually we will give up and allow unstyled content. So this number is
       // somewhat arbitrary — big enough that you'd only reach it under
@@ -6038,12 +6047,12 @@ const LAST_PRECEDENCE = null;
 // Currentlyt his is only during insertSuspendedStylesheet.
 let precedencesByRoot: Map<
   HoistableRoot,
-  Map<string | typeof LAST_PRECEDENCE, Instance>,
+  Map<string | typeof LAST_PRECEDENCE, Instance>
 > = (null: any);
 
 function insertSuspendedStylesheets(
   state: SuspendedState,
-  resources: Map<StylesheetResource, HoistableRoot>,
+  resources: Map<StylesheetResource, HoistableRoot>
 ): void {
   // We need to clear this out so we don't try to reinsert after the stylesheets have loaded
   state.stylesheets = null;
@@ -6071,7 +6080,7 @@ function insertStylesheetIntoRoot(
   this: SuspendedState,
   root: HoistableRoot,
   resource: StylesheetResource,
-  map: Map<StylesheetResource, HoistableRoot>,
+  map: Map<StylesheetResource, HoistableRoot>
 ) {
   if (resource.state.loading & Inserted) {
     // This resource was inserted by another root committing. we don't need to insert it again
@@ -6084,15 +6093,15 @@ function insertStylesheetIntoRoot(
     precedences = new Map();
     precedencesByRoot.set(root, precedences);
     const nodes = root.querySelectorAll(
-      'link[data-precedence],style[data-precedence]',
+      "link[data-precedence],style[data-precedence]"
     );
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
       if (
-        node.nodeName === 'LINK' ||
+        node.nodeName === "LINK" ||
         // We omit style tags with media="not all" because they are not in the right position
         // and will be hoisted by the Fizz runtime imminently.
-        node.getAttribute('media') !== 'not all'
+        node.getAttribute("media") !== "not all"
       ) {
         precedences.set(node.dataset.precedence, node);
         last = node;
@@ -6108,7 +6117,7 @@ function insertStylesheetIntoRoot(
   // We only call this after we have constructed an instance so we assume it here
   const instance: HTMLLinkElement = (resource.instance: any);
   // We will always have a precedence for stylesheet instances
-  const precedence: string = (instance.getAttribute('data-precedence'): any);
+  const precedence: string = (instance.getAttribute("data-precedence"): any);
 
   const prior = precedences.get(precedence) || last;
   if (prior === last) {
@@ -6118,8 +6127,8 @@ function insertStylesheetIntoRoot(
 
   this.count++;
   const onComplete = onUnsuspend.bind(this);
-  instance.addEventListener('load', onComplete);
-  instance.addEventListener('error', onComplete);
+  instance.addEventListener("load", onComplete);
+  instance.addEventListener("error", onComplete);
 
   if (prior) {
     (prior.parentNode: any).insertBefore(instance, prior.nextSibling);

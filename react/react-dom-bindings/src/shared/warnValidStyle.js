@@ -25,40 +25,40 @@ function camelize(string) {
 }
 
 function warnHyphenatedStyleName(name) {
-  if (__DEV__) {
+  if (false) {
     if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
       return;
     }
 
     warnedStyleNames[name] = true;
     console.error(
-      'Unsupported style property %s. Did you mean %s?',
+      "Unsupported style property %s. Did you mean %s?",
       name,
       // As Andi Smith suggests
       // (http://www.andismith.com/blog/2012/02/modernizr-prefixed/), an `-ms` prefix
       // is converted to lowercase `ms`.
-      camelize(name.replace(msPattern, 'ms-')),
+      camelize(name.replace(msPattern, "ms-"))
     );
   }
 }
 
 function warnBadVendoredStyleName(name) {
-  if (__DEV__) {
+  if (false) {
     if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
       return;
     }
 
     warnedStyleNames[name] = true;
     console.error(
-      'Unsupported vendor-prefixed style property %s. Did you mean %s?',
+      "Unsupported vendor-prefixed style property %s. Did you mean %s?",
       name,
-      name.charAt(0).toUpperCase() + name.slice(1),
+      name.charAt(0).toUpperCase() + name.slice(1)
     );
   }
 }
 
 function warnStyleValueWithSemicolon(name, value) {
-  if (__DEV__) {
+  if (false) {
     if (warnedStyleValues.hasOwnProperty(value) && warnedStyleValues[value]) {
       return;
     }
@@ -68,42 +68,42 @@ function warnStyleValueWithSemicolon(name, value) {
       "Style property values shouldn't contain a semicolon. " +
         'Try "%s: %s" instead.',
       name,
-      value.replace(badStyleValueWithSemicolonPattern, ''),
+      value.replace(badStyleValueWithSemicolonPattern, "")
     );
   }
 }
 
 function warnStyleValueIsNaN(name, value) {
-  if (__DEV__) {
+  if (false) {
     if (warnedForNaNValue) {
       return;
     }
 
     warnedForNaNValue = true;
     console.error(
-      '`NaN` is an invalid value for the `%s` css style property.',
-      name,
+      "`NaN` is an invalid value for the `%s` css style property.",
+      name
     );
   }
 }
 
 function warnStyleValueIsInfinity(name, value) {
-  if (__DEV__) {
+  if (false) {
     if (warnedForInfinityValue) {
       return;
     }
 
     warnedForInfinityValue = true;
     console.error(
-      '`Infinity` is an invalid value for the `%s` css style property.',
-      name,
+      "`Infinity` is an invalid value for the `%s` css style property.",
+      name
     );
   }
 }
 
 function warnValidStyle(name, value) {
-  if (__DEV__) {
-    if (name.indexOf('-') > -1) {
+  if (false) {
+    if (name.indexOf("-") > -1) {
       warnHyphenatedStyleName(name);
     } else if (badVendoredStyleNamePattern.test(name)) {
       warnBadVendoredStyleName(name);
@@ -111,7 +111,7 @@ function warnValidStyle(name, value) {
       warnStyleValueWithSemicolon(name, value);
     }
 
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       if (isNaN(value)) {
         warnStyleValueIsNaN(name, value);
       } else if (!isFinite(value)) {

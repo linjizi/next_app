@@ -7,7 +7,7 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactNoop;
@@ -17,33 +17,33 @@ let waitFor;
 let waitForAll;
 let waitForPaint;
 
-describe('StrictEffectsMode defaults', () => {
+describe("StrictEffectsMode defaults", () => {
   beforeEach(() => {
     jest.resetModules();
 
-    React = require('react');
-    ReactNoop = require('react-noop-renderer');
-    Scheduler = require('scheduler');
-    act = require('internal-test-utils').act;
+    React = require("react");
+    ReactNoop = require("react-noop-renderer");
+    Scheduler = require("scheduler");
+    act = require("internal-test-utils").act;
 
-    const InternalTestUtils = require('internal-test-utils');
+    const InternalTestUtils = require("internal-test-utils");
     waitFor = InternalTestUtils.waitFor;
     waitForAll = InternalTestUtils.waitForAll;
     waitForPaint = InternalTestUtils.waitForPaint;
   });
 
   // @gate !disableLegacyMode
-  it('should not double invoke effects in legacy mode', async () => {
+  it("should not double invoke effects in legacy mode", async () => {
     const log = [];
-    function App({text}) {
+    function App({ text }) {
       React.useEffect(() => {
-        log.push('useEffect mount');
-        return () => log.push('useEffect unmount');
+        log.push("useEffect mount");
+        return () => log.push("useEffect unmount");
       });
 
       React.useLayoutEffect(() => {
-        log.push('useLayoutEffect mount');
-        return () => log.push('useLayoutEffect unmount');
+        log.push("useLayoutEffect mount");
+        return () => log.push("useLayoutEffect unmount");
       });
 
       return text;
@@ -52,28 +52,28 @@ describe('StrictEffectsMode defaults', () => {
     await act(() => {
       ReactNoop.renderLegacySyncRoot(
         <React.StrictMode>
-          <App text={'mount'} />
-        </React.StrictMode>,
+          <App text={"mount"} />
+        </React.StrictMode>
       );
     });
 
-    expect(log).toEqual(['useLayoutEffect mount', 'useEffect mount']);
+    expect(log).toEqual(["useLayoutEffect mount", "useEffect mount"]);
   });
 
   // @gate !disableLegacyMode
-  it('should not double invoke class lifecycles in legacy mode', async () => {
+  it("should not double invoke class lifecycles in legacy mode", async () => {
     const log = [];
     class App extends React.PureComponent {
       componentDidMount() {
-        log.push('componentDidMount');
+        log.push("componentDidMount");
       }
 
       componentDidUpdate() {
-        log.push('componentDidUpdate');
+        log.push("componentDidUpdate");
       }
 
       componentWillUnmount() {
-        log.push('componentWillUnmount');
+        log.push("componentWillUnmount");
       }
 
       render() {
@@ -84,18 +84,18 @@ describe('StrictEffectsMode defaults', () => {
     await act(() => {
       ReactNoop.renderLegacySyncRoot(
         <React.StrictMode>
-          <App text={'mount'} />
-        </React.StrictMode>,
+          <App text={"mount"} />
+        </React.StrictMode>
       );
     });
 
-    expect(log).toEqual(['componentDidMount']);
+    expect(log).toEqual(["componentDidMount"]);
   });
 
-  if (__DEV__) {
-    it('should flush double-invoked effects within the same frame as layout effects if there are no passive effects', async () => {
+  if (false) {
+    it("should flush double-invoked effects within the same frame as layout effects if there are no passive effects", async () => {
       const log = [];
-      function ComponentWithEffects({label}) {
+      function ComponentWithEffects({ label }) {
         React.useLayoutEffect(() => {
           Scheduler.log(`useLayoutEffect mount "${label}"`);
           log.push(`useLayoutEffect mount "${label}"`);
@@ -111,8 +111,8 @@ describe('StrictEffectsMode defaults', () => {
       await act(async () => {
         ReactNoop.render(
           <React.StrictMode>
-            <ComponentWithEffects label={'one'} />
-          </React.StrictMode>,
+            <ComponentWithEffects label={"one"} />
+          </React.StrictMode>
         );
 
         await waitForPaint(['useLayoutEffect mount "one"']);
@@ -127,9 +127,9 @@ describe('StrictEffectsMode defaults', () => {
       await act(async () => {
         ReactNoop.render(
           <React.StrictMode>
-            <ComponentWithEffects label={'one'} />
-            <ComponentWithEffects label={'two'} />
-          </React.StrictMode>,
+            <ComponentWithEffects label={"one"} />
+            <ComponentWithEffects label={"two"} />
+          </React.StrictMode>
         );
 
         expect(log).toEqual([]);
@@ -154,9 +154,9 @@ describe('StrictEffectsMode defaults', () => {
 
     // This test also verifies that double-invoked effects flush synchronously
     // within the same frame as passive effects.
-    it('should double invoke effects only for newly mounted components', async () => {
+    it("should double invoke effects only for newly mounted components", async () => {
       const log = [];
-      function ComponentWithEffects({label}) {
+      function ComponentWithEffects({ label }) {
         React.useEffect(() => {
           log.push(`useEffect mount "${label}"`);
           Scheduler.log(`useEffect mount "${label}"`);
@@ -181,8 +181,8 @@ describe('StrictEffectsMode defaults', () => {
       await act(async () => {
         ReactNoop.render(
           <React.StrictMode>
-            <ComponentWithEffects label={'one'} />
-          </React.StrictMode>,
+            <ComponentWithEffects label={"one"} />
+          </React.StrictMode>
         );
 
         await waitForAll([
@@ -203,9 +203,9 @@ describe('StrictEffectsMode defaults', () => {
       await act(async () => {
         ReactNoop.render(
           <React.StrictMode>
-            <ComponentWithEffects label={'one'} />
-            <ComponentWithEffects label={'two'} />
-          </React.StrictMode>,
+            <ComponentWithEffects label={"one"} />
+            <ComponentWithEffects label={"two"} />
+          </React.StrictMode>
         );
 
         await waitFor([
@@ -240,17 +240,17 @@ describe('StrictEffectsMode defaults', () => {
       });
     });
 
-    it('double invoking for effects for modern roots', async () => {
+    it("double invoking for effects for modern roots", async () => {
       const log = [];
-      function App({text}) {
+      function App({ text }) {
         React.useEffect(() => {
-          log.push('useEffect mount');
-          return () => log.push('useEffect unmount');
+          log.push("useEffect mount");
+          return () => log.push("useEffect unmount");
         });
 
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect mount');
-          return () => log.push('useLayoutEffect unmount');
+          log.push("useLayoutEffect mount");
+          return () => log.push("useLayoutEffect unmount");
         });
 
         return text;
@@ -258,34 +258,34 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect mount',
-        'useEffect mount',
-        'useLayoutEffect unmount',
-        'useEffect unmount',
-        'useLayoutEffect mount',
-        'useEffect mount',
+        "useLayoutEffect mount",
+        "useEffect mount",
+        "useLayoutEffect unmount",
+        "useEffect unmount",
+        "useLayoutEffect mount",
+        "useEffect mount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'update'} />
-          </React.StrictMode>,
+            <App text={"update"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect unmount',
-        'useLayoutEffect mount',
-        'useEffect unmount',
-        'useEffect mount',
+        "useLayoutEffect unmount",
+        "useLayoutEffect mount",
+        "useEffect unmount",
+        "useEffect mount",
       ]);
 
       log.length = 0;
@@ -293,20 +293,20 @@ describe('StrictEffectsMode defaults', () => {
         ReactNoop.render(null);
       });
 
-      expect(log).toEqual(['useLayoutEffect unmount', 'useEffect unmount']);
+      expect(log).toEqual(["useLayoutEffect unmount", "useEffect unmount"]);
     });
 
-    it('multiple effects are double invoked in the right order (all mounted, all unmounted, all remounted)', async () => {
+    it("multiple effects are double invoked in the right order (all mounted, all unmounted, all remounted)", async () => {
       const log = [];
-      function App({text}) {
+      function App({ text }) {
         React.useEffect(() => {
-          log.push('useEffect One mount');
-          return () => log.push('useEffect One unmount');
+          log.push("useEffect One mount");
+          return () => log.push("useEffect One unmount");
         });
 
         React.useEffect(() => {
-          log.push('useEffect Two mount');
-          return () => log.push('useEffect Two unmount');
+          log.push("useEffect Two mount");
+          return () => log.push("useEffect Two unmount");
         });
 
         return text;
@@ -315,34 +315,34 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useEffect One mount',
-        'useEffect Two mount',
-        'useEffect One unmount',
-        'useEffect Two unmount',
-        'useEffect One mount',
-        'useEffect Two mount',
+        "useEffect One mount",
+        "useEffect Two mount",
+        "useEffect One unmount",
+        "useEffect Two unmount",
+        "useEffect One mount",
+        "useEffect Two mount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'update'} />
-          </React.StrictMode>,
+            <App text={"update"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useEffect One unmount',
-        'useEffect Two unmount',
-        'useEffect One mount',
-        'useEffect Two mount',
+        "useEffect One unmount",
+        "useEffect Two unmount",
+        "useEffect One mount",
+        "useEffect Two mount",
       ]);
 
       log.length = 0;
@@ -350,20 +350,20 @@ describe('StrictEffectsMode defaults', () => {
         ReactNoop.render(null);
       });
 
-      expect(log).toEqual(['useEffect One unmount', 'useEffect Two unmount']);
+      expect(log).toEqual(["useEffect One unmount", "useEffect Two unmount"]);
     });
 
-    it('multiple layout effects are double invoked in the right order (all mounted, all unmounted, all remounted)', async () => {
+    it("multiple layout effects are double invoked in the right order (all mounted, all unmounted, all remounted)", async () => {
       const log = [];
-      function App({text}) {
+      function App({ text }) {
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect One mount');
-          return () => log.push('useLayoutEffect One unmount');
+          log.push("useLayoutEffect One mount");
+          return () => log.push("useLayoutEffect One unmount");
         });
 
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect Two mount');
-          return () => log.push('useLayoutEffect Two unmount');
+          log.push("useLayoutEffect Two mount");
+          return () => log.push("useLayoutEffect Two unmount");
         });
 
         return text;
@@ -372,34 +372,34 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect One mount',
-        'useLayoutEffect Two mount',
-        'useLayoutEffect One unmount',
-        'useLayoutEffect Two unmount',
-        'useLayoutEffect One mount',
-        'useLayoutEffect Two mount',
+        "useLayoutEffect One mount",
+        "useLayoutEffect Two mount",
+        "useLayoutEffect One unmount",
+        "useLayoutEffect Two unmount",
+        "useLayoutEffect One mount",
+        "useLayoutEffect Two mount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'update'} />
-          </React.StrictMode>,
+            <App text={"update"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect One unmount',
-        'useLayoutEffect Two unmount',
-        'useLayoutEffect One mount',
-        'useLayoutEffect Two mount',
+        "useLayoutEffect One unmount",
+        "useLayoutEffect Two unmount",
+        "useLayoutEffect One mount",
+        "useLayoutEffect Two mount",
       ]);
 
       log.length = 0;
@@ -408,20 +408,20 @@ describe('StrictEffectsMode defaults', () => {
       });
 
       expect(log).toEqual([
-        'useLayoutEffect One unmount',
-        'useLayoutEffect Two unmount',
+        "useLayoutEffect One unmount",
+        "useLayoutEffect Two unmount",
       ]);
     });
 
-    it('useEffect and useLayoutEffect is called twice when there is no unmount', async () => {
+    it("useEffect and useLayoutEffect is called twice when there is no unmount", async () => {
       const log = [];
-      function App({text}) {
+      function App({ text }) {
         React.useEffect(() => {
-          log.push('useEffect mount');
+          log.push("useEffect mount");
         });
 
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect mount');
+          log.push("useLayoutEffect mount");
         });
 
         return text;
@@ -430,28 +430,28 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect mount',
-        'useEffect mount',
-        'useLayoutEffect mount',
-        'useEffect mount',
+        "useLayoutEffect mount",
+        "useEffect mount",
+        "useLayoutEffect mount",
+        "useEffect mount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'update'} />
-          </React.StrictMode>,
+            <App text={"update"} />
+          </React.StrictMode>
         );
       });
 
-      expect(log).toEqual(['useLayoutEffect mount', 'useEffect mount']);
+      expect(log).toEqual(["useLayoutEffect mount", "useEffect mount"]);
 
       log.length = 0;
       await act(() => {
@@ -461,14 +461,15 @@ describe('StrictEffectsMode defaults', () => {
       expect(log).toEqual([]);
     });
 
-    it('disconnects refs during double invoking', async () => {
+    it("disconnects refs during double invoking", async () => {
       const onRefMock = jest.fn();
-      function App({text}) {
+      function App({ text }) {
         return (
           <span
-            ref={ref => {
+            ref={(ref) => {
               onRefMock(ref);
-            }}>
+            }}
+          >
             text
           </span>
         );
@@ -477,8 +478,8 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
@@ -488,24 +489,24 @@ describe('StrictEffectsMode defaults', () => {
       expect(onRefMock.mock.calls[2][0]).not.toBeNull();
     });
 
-    it('passes the right context to class component lifecycles', async () => {
+    it("passes the right context to class component lifecycles", async () => {
       const log = [];
       class App extends React.PureComponent {
         test() {}
 
         componentDidMount() {
           this.test();
-          log.push('componentDidMount');
+          log.push("componentDidMount");
         }
 
         componentDidUpdate() {
           this.test();
-          log.push('componentDidUpdate');
+          log.push("componentDidUpdate");
         }
 
         componentWillUnmount() {
           this.test();
-          log.push('componentWillUnmount');
+          log.push("componentWillUnmount");
         }
 
         render() {
@@ -517,30 +518,30 @@ describe('StrictEffectsMode defaults', () => {
         ReactNoop.render(
           <React.StrictMode>
             <App />
-          </React.StrictMode>,
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'componentDidMount',
-        'componentWillUnmount',
-        'componentDidMount',
+        "componentDidMount",
+        "componentWillUnmount",
+        "componentDidMount",
       ]);
     });
 
-    it('double invoking works for class components', async () => {
+    it("double invoking works for class components", async () => {
       const log = [];
       class App extends React.PureComponent {
         componentDidMount() {
-          log.push('componentDidMount');
+          log.push("componentDidMount");
         }
 
         componentDidUpdate() {
-          log.push('componentDidUpdate');
+          log.push("componentDidUpdate");
         }
 
         componentWillUnmount() {
-          log.push('componentWillUnmount');
+          log.push("componentWillUnmount");
         }
 
         render() {
@@ -551,51 +552,51 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'componentDidMount',
-        'componentWillUnmount',
-        'componentDidMount',
+        "componentDidMount",
+        "componentWillUnmount",
+        "componentDidMount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'update'} />
-          </React.StrictMode>,
+            <App text={"update"} />
+          </React.StrictMode>
         );
       });
 
-      expect(log).toEqual(['componentDidUpdate']);
+      expect(log).toEqual(["componentDidUpdate"]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(null);
       });
 
-      expect(log).toEqual(['componentWillUnmount']);
+      expect(log).toEqual(["componentWillUnmount"]);
     });
 
-    it('double flushing passive effects only results in one double invoke', async () => {
+    it("double flushing passive effects only results in one double invoke", async () => {
       const log = [];
-      function App({text}) {
+      function App({ text }) {
         const [state, setState] = React.useState(0);
         React.useEffect(() => {
           if (state !== 1) {
             setState(1);
           }
-          log.push('useEffect mount');
-          return () => log.push('useEffect unmount');
+          log.push("useEffect mount");
+          return () => log.push("useEffect unmount");
         });
 
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect mount');
-          return () => log.push('useLayoutEffect unmount');
+          log.push("useLayoutEffect mount");
+          return () => log.push("useLayoutEffect unmount");
         });
 
         log.push(text);
@@ -606,40 +607,40 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'mount',
-        'mount',
-        'useLayoutEffect mount',
-        'useEffect mount',
-        'useLayoutEffect unmount',
-        'useEffect unmount',
-        'useLayoutEffect mount',
-        'useEffect mount',
-        'mount',
-        'mount',
-        'useLayoutEffect unmount',
-        'useLayoutEffect mount',
-        'useEffect unmount',
-        'useEffect mount',
+        "mount",
+        "mount",
+        "useLayoutEffect mount",
+        "useEffect mount",
+        "useLayoutEffect unmount",
+        "useEffect unmount",
+        "useLayoutEffect mount",
+        "useEffect mount",
+        "mount",
+        "mount",
+        "useLayoutEffect unmount",
+        "useLayoutEffect mount",
+        "useEffect unmount",
+        "useEffect mount",
       ]);
     });
 
-    it('newly mounted components after initial mount get double invoked', async () => {
+    it("newly mounted components after initial mount get double invoked", async () => {
       let _setShowChild;
       const log = [];
       function Child() {
         React.useEffect(() => {
-          log.push('Child useEffect mount');
-          return () => log.push('Child useEffect unmount');
+          log.push("Child useEffect mount");
+          return () => log.push("Child useEffect unmount");
         });
         React.useLayoutEffect(() => {
-          log.push('Child useLayoutEffect mount');
-          return () => log.push('Child useLayoutEffect unmount');
+          log.push("Child useLayoutEffect mount");
+          return () => log.push("Child useLayoutEffect unmount");
         });
 
         return null;
@@ -649,12 +650,12 @@ describe('StrictEffectsMode defaults', () => {
         const [showChild, setShowChild] = React.useState(false);
         _setShowChild = setShowChild;
         React.useEffect(() => {
-          log.push('App useEffect mount');
-          return () => log.push('App useEffect unmount');
+          log.push("App useEffect mount");
+          return () => log.push("App useEffect unmount");
         });
         React.useLayoutEffect(() => {
-          log.push('App useLayoutEffect mount');
-          return () => log.push('App useLayoutEffect unmount');
+          log.push("App useLayoutEffect mount");
+          return () => log.push("App useLayoutEffect unmount");
         });
 
         return showChild && <Child />;
@@ -664,17 +665,17 @@ describe('StrictEffectsMode defaults', () => {
         ReactNoop.render(
           <React.StrictMode>
             <App />
-          </React.StrictMode>,
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'App useLayoutEffect mount',
-        'App useEffect mount',
-        'App useLayoutEffect unmount',
-        'App useEffect unmount',
-        'App useLayoutEffect mount',
-        'App useEffect mount',
+        "App useLayoutEffect mount",
+        "App useEffect mount",
+        "App useLayoutEffect unmount",
+        "App useEffect unmount",
+        "App useLayoutEffect mount",
+        "App useEffect mount",
       ]);
 
       log.length = 0;
@@ -683,28 +684,28 @@ describe('StrictEffectsMode defaults', () => {
       });
 
       expect(log).toEqual([
-        'App useLayoutEffect unmount',
-        'Child useLayoutEffect mount',
-        'App useLayoutEffect mount',
-        'App useEffect unmount',
-        'Child useEffect mount',
-        'App useEffect mount',
-        'Child useLayoutEffect unmount',
-        'Child useEffect unmount',
-        'Child useLayoutEffect mount',
-        'Child useEffect mount',
+        "App useLayoutEffect unmount",
+        "Child useLayoutEffect mount",
+        "App useLayoutEffect mount",
+        "App useEffect unmount",
+        "Child useEffect mount",
+        "App useEffect mount",
+        "Child useLayoutEffect unmount",
+        "Child useEffect unmount",
+        "Child useLayoutEffect mount",
+        "Child useEffect mount",
       ]);
     });
 
-    it('classes and functions are double invoked together correctly', async () => {
+    it("classes and functions are double invoked together correctly", async () => {
       const log = [];
       class ClassChild extends React.PureComponent {
         componentDidMount() {
-          log.push('componentDidMount');
+          log.push("componentDidMount");
         }
 
         componentWillUnmount() {
-          log.push('componentWillUnmount');
+          log.push("componentWillUnmount");
         }
 
         render() {
@@ -712,19 +713,19 @@ describe('StrictEffectsMode defaults', () => {
         }
       }
 
-      function FunctionChild({text}) {
+      function FunctionChild({ text }) {
         React.useEffect(() => {
-          log.push('useEffect mount');
-          return () => log.push('useEffect unmount');
+          log.push("useEffect mount");
+          return () => log.push("useEffect unmount");
         });
         React.useLayoutEffect(() => {
-          log.push('useLayoutEffect mount');
-          return () => log.push('useLayoutEffect unmount');
+          log.push("useLayoutEffect mount");
+          return () => log.push("useLayoutEffect unmount");
         });
         return text;
       }
 
-      function App({text}) {
+      function App({ text }) {
         return (
           <React.StrictMode>
             <ClassChild text={text} />
@@ -736,37 +737,37 @@ describe('StrictEffectsMode defaults', () => {
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'componentDidMount',
-        'useLayoutEffect mount',
-        'useEffect mount',
-        'componentWillUnmount',
-        'useLayoutEffect unmount',
-        'useEffect unmount',
-        'componentDidMount',
-        'useLayoutEffect mount',
-        'useEffect mount',
+        "componentDidMount",
+        "useLayoutEffect mount",
+        "useEffect mount",
+        "componentWillUnmount",
+        "useLayoutEffect unmount",
+        "useEffect unmount",
+        "componentDidMount",
+        "useLayoutEffect mount",
+        "useEffect mount",
       ]);
 
       log.length = 0;
       await act(() => {
         ReactNoop.render(
           <React.StrictMode>
-            <App text={'mount'} />
-          </React.StrictMode>,
+            <App text={"mount"} />
+          </React.StrictMode>
         );
       });
 
       expect(log).toEqual([
-        'useLayoutEffect unmount',
-        'useLayoutEffect mount',
-        'useEffect unmount',
-        'useEffect mount',
+        "useLayoutEffect unmount",
+        "useLayoutEffect mount",
+        "useEffect unmount",
+        "useEffect mount",
       ]);
 
       log.length = 0;
@@ -775,9 +776,9 @@ describe('StrictEffectsMode defaults', () => {
       });
 
       expect(log).toEqual([
-        'componentWillUnmount',
-        'useLayoutEffect unmount',
-        'useEffect unmount',
+        "componentWillUnmount",
+        "useLayoutEffect unmount",
+        "useEffect unmount",
       ]);
     });
   }

@@ -99,16 +99,11 @@ import {
   markRootEntangled,
 } from './ReactFiberLane';
 import {
-  enterDisallowedContextReadInDEV,
-  exitDisallowedContextReadInDEV,
-} from './ReactFiberNewContext';
-import {
   Callback,
   Visibility,
   ShouldCapture,
   DidCapture,
 } from './ReactFiberFlags';
-import getComponentNameFromFiber from './getComponentNameFromFiber';
 
 import {StrictLegacyMode} from './ReactTypeOfMode';
 import {
@@ -120,7 +115,6 @@ import {
   enqueueConcurrentClassUpdate,
   unsafe_markUpdateLaneFromFiberToRoot,
 } from './ReactFiberConcurrentUpdates';
-import {setIsStrictModeForDevtools} from './ReactFiberDevToolsHook';
 
 import assign from 'shared/assign';
 import {
@@ -165,13 +159,6 @@ let hasForceUpdate = false;
 let didWarnUpdateInsideUpdate;
 let currentlyProcessingQueue: ?SharedQueue<$FlowFixMe>;
 export let resetCurrentlyProcessingQueue: () => void;
-if (__DEV__) {
-  didWarnUpdateInsideUpdate = false;
-  currentlyProcessingQueue = null;
-  resetCurrentlyProcessingQueue = () => {
-    currentlyProcessingQueue = null;
-  };
-}
 
 export function initializeUpdateQueue<State>(fiber: Fiber): void {
   const queue: UpdateQueue<State> = {
@@ -232,23 +219,6 @@ export function enqueueUpdate<State>(
   }
 
   const sharedQueue: SharedQueue<State> = (updateQueue: any).shared;
-
-  if (__DEV__) {
-    if (
-      currentlyProcessingQueue === sharedQueue &&
-      !didWarnUpdateInsideUpdate
-    ) {
-      const componentName = getComponentNameFromFiber(fiber);
-      console.error(
-        'An update (setState, replaceState, or forceUpdate) was scheduled ' +
-          'from inside an update function. Update functions should be pure, ' +
-          'with zero side-effects. Consider using componentDidUpdate or a ' +
-          'callback.\n\nPlease update the following component: %s',
-        componentName,
-      );
-      didWarnUpdateInsideUpdate = true;
-    }
-  }
 
   if (isUnsafeClassRenderPhaseUpdate(fiber)) {
     // This is an unsafe render phase update. Add directly to the update
@@ -395,21 +365,7 @@ function getStateFromUpdate<State>(
       const payload = update.payload;
       if (typeof payload === 'function') {
         // Updater function
-        if (__DEV__) {
-          enterDisallowedContextReadInDEV();
-        }
         const nextState = payload.call(instance, prevState, nextProps);
-        if (__DEV__) {
-          if (workInProgress.mode & StrictLegacyMode) {
-            setIsStrictModeForDevtools(true);
-            try {
-              payload.call(instance, prevState, nextProps);
-            } finally {
-              setIsStrictModeForDevtools(false);
-            }
-          }
-          exitDisallowedContextReadInDEV();
-        }
         return nextState;
       }
       // State object
@@ -425,21 +381,7 @@ function getStateFromUpdate<State>(
       let partialState;
       if (typeof payload === 'function') {
         // Updater function
-        if (__DEV__) {
-          enterDisallowedContextReadInDEV();
-        }
         partialState = payload.call(instance, prevState, nextProps);
-        if (__DEV__) {
-          if (workInProgress.mode & StrictLegacyMode) {
-            setIsStrictModeForDevtools(true);
-            try {
-              payload.call(instance, prevState, nextProps);
-            } finally {
-              setIsStrictModeForDevtools(false);
-            }
-          }
-          exitDisallowedContextReadInDEV();
-        }
       } else {
         // Partial state object
         partialState = payload;
@@ -495,10 +437,6 @@ export function processUpdateQueue<State>(
   const queue: UpdateQueue<State> = (workInProgress.updateQueue: any);
 
   hasForceUpdate = false;
-
-  if (__DEV__) {
-    currentlyProcessingQueue = queue.shared;
-  }
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -688,10 +626,6 @@ export function processUpdateQueue<State>(
     markSkippedUpdateLanes(newLanes);
     workInProgress.lanes = newLanes;
     workInProgress.memoizedState = newState;
-  }
-
-  if (__DEV__) {
-    currentlyProcessingQueue = null;
   }
 }
 

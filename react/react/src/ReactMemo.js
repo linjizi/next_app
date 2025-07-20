@@ -7,18 +7,18 @@
  * @noflow
  */
 
-import {REACT_MEMO_TYPE} from 'shared/ReactSymbols';
+import { REACT_MEMO_TYPE } from "shared/ReactSymbols";
 
 export function memo<Props>(
   type: React$ElementType,
-  compare?: (oldProps: Props, newProps: Props) => boolean,
+  compare?: (oldProps: Props, newProps: Props) => boolean
 ) {
-  if (__DEV__) {
+  if (false) {
     if (type == null) {
       console.error(
-        'memo: The first argument must be a component. Instead ' +
-          'received: %s',
-        type === null ? 'null' : typeof type,
+        "memo: The first argument must be a component. Instead " +
+          "received: %s",
+        type === null ? "null" : typeof type
       );
     }
   }
@@ -27,9 +27,9 @@ export function memo<Props>(
     type,
     compare: compare === undefined ? null : compare,
   };
-  if (__DEV__) {
+  if (false) {
     let ownName;
-    Object.defineProperty(elementType, 'displayName', {
+    Object.defineProperty(elementType, "displayName", {
       enumerable: false,
       configurable: true,
       get: function () {
@@ -46,7 +46,7 @@ export function memo<Props>(
         //   React.memo((props) => {...});
         // This kind of inner function is not used elsewhere so the side effect is okay.
         if (!type.name && !type.displayName) {
-          Object.defineProperty(type, 'name', {
+          Object.defineProperty(type, "name", {
             value: name,
           });
           type.displayName = name;

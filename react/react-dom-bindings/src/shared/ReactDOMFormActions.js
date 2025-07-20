@@ -7,11 +7,11 @@
  * @flow
  */
 
-import type {Dispatcher} from 'react-reconciler/src/ReactInternalTypes';
-import type {Awaited} from 'shared/ReactTypes';
+import type { Dispatcher } from "react-reconciler/src/ReactInternalTypes";
+import type { Awaited } from "shared/ReactTypes";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
-import ReactDOMSharedInternals from 'shared/ReactDOMSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
+import ReactDOMSharedInternals from "shared/ReactDOMSharedInternals";
 
 type FormStatusNotPending = {|
   pending: false,
@@ -24,7 +24,7 @@ type FormStatusPending = {|
   pending: true,
   data: FormData,
   method: string,
-  action: string | (FormData => void | Promise<void>) | null,
+  action: string | ((FormData) => void | Promise<void>) | null,
 |};
 
 export type FormStatus = FormStatusPending | FormStatusNotPending;
@@ -38,7 +38,7 @@ const sharedNotPendingObject = {
   action: null,
 };
 
-export const NotPending: FormStatus = __DEV__
+export const NotPending: FormStatus = false
   ? Object.freeze(sharedNotPendingObject)
   : sharedNotPendingObject;
 
@@ -46,15 +46,15 @@ function resolveDispatcher() {
   // Copied from react/src/ReactHooks.js. It's the same thing but in a
   // different package.
   const dispatcher = ReactSharedInternals.H;
-  if (__DEV__) {
+  if (false) {
     if (dispatcher === null) {
       console.error(
-        'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
-          ' one of the following reasons:\n' +
-          '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
-          '2. You might be breaking the Rules of Hooks\n' +
-          '3. You might have more than one copy of React in the same app\n' +
-          'See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.',
+        "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for" +
+          " one of the following reasons:\n" +
+          "1. You might have mismatching versions of React and the renderer (such as React DOM)\n" +
+          "2. You might be breaking the Rules of Hooks\n" +
+          "3. You might have more than one copy of React in the same app\n" +
+          "See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
       );
     }
   }
@@ -72,7 +72,7 @@ export function useFormStatus(): FormStatus {
 export function useFormState<S, P>(
   action: (Awaited<S>, P) => S,
   initialState: Awaited<S>,
-  permalink?: string,
+  permalink?: string
 ): [Awaited<S>, (P) => void, boolean] {
   const dispatcher = resolveDispatcher();
   return dispatcher.useFormState(action, initialState, permalink);

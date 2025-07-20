@@ -47,13 +47,6 @@ function getTaskName(type) {
 }
 
 function getOwner() {
-  if (__DEV__) {
-    const dispatcher = ReactSharedInternals.A;
-    if (dispatcher === null) {
-      return null;
-    }
-    return dispatcher.getOwner();
-  }
   return null;
 }
 

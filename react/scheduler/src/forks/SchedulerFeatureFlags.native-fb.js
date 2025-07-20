@@ -7,7 +7,7 @@
  * @flow
  */
 
-export const enableProfiling = __DEV__;
+export const enableProfiling = false;
 export const frameYieldMs = 5;
 
 export const userBlockingPriorityTimeout = 250;

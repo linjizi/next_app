@@ -7,13 +7,13 @@
  * @flow
  */
 
-import type {AsyncDispatcher, Fiber} from './ReactInternalTypes';
-import type {Cache} from './ReactFiberCacheComponent';
+import type { AsyncDispatcher, Fiber } from "./ReactInternalTypes";
+import type { Cache } from "./ReactFiberCacheComponent";
 
-import {readContext} from './ReactFiberNewContext';
-import {CacheContext} from './ReactFiberCacheComponent';
+import { readContext } from "./ReactFiberNewContext";
+import { CacheContext } from "./ReactFiberCacheComponent";
 
-import {current as currentOwner} from './ReactCurrentFiber';
+import { current as currentOwner } from "./ReactCurrentFiber";
 
 function getCacheForType<T>(resourceType: () => T): T {
   const cache: Cache = readContext(CacheContext);
@@ -35,7 +35,7 @@ export const DefaultAsyncDispatcher: AsyncDispatcher = ({
   cacheSignal,
 }: any);
 
-if (__DEV__) {
+if (false) {
   DefaultAsyncDispatcher.getOwner = (): null | Fiber => {
     return currentOwner;
   };

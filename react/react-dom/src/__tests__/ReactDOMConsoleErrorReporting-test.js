@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-'use strict';
+"use strict";
 
-describe('ReactDOMConsoleErrorReporting', () => {
+describe("ReactDOMConsoleErrorReporting", () => {
   let act;
   let React;
   let ReactDOMClient;
@@ -20,15 +20,15 @@ describe('ReactDOMConsoleErrorReporting', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    act = require('internal-test-utils').act;
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
-    Scheduler = require('scheduler');
+    act = require("internal-test-utils").act;
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
+    Scheduler = require("scheduler");
 
     ErrorBoundary = class extends React.Component {
-      state = {error: null};
+      state = { error: null };
       static getDerivedStateFromError(error) {
-        return {error};
+        return { error };
       }
       render() {
         if (this.state.error) {
@@ -40,17 +40,17 @@ describe('ReactDOMConsoleErrorReporting', () => {
     NoError = function () {
       return <h1>OK</h1>;
     };
-    container = document.createElement('div');
+    container = document.createElement("div");
     document.body.appendChild(container);
     windowOnError = jest.fn();
-    window.addEventListener('error', windowOnError);
-    spyOnDevAndProd(console, 'error').mockImplementation(() => {});
-    spyOnDevAndProd(console, 'warn').mockImplementation(() => {});
+    window.addEventListener("error", windowOnError);
+    spyOnDevAndProd(console, "error").mockImplementation(() => {});
+    spyOnDevAndProd(console, "warn").mockImplementation(() => {});
   });
 
   afterEach(() => {
     document.body.removeChild(container);
-    window.removeEventListener('error', windowOnError);
+    window.removeEventListener("error", windowOnError);
     jest.restoreAllMocks();
   });
 
@@ -60,14 +60,15 @@ describe('ReactDOMConsoleErrorReporting', () => {
     Scheduler.unstable_flushAll();
   }
 
-  describe('ReactDOMClient.createRoot', () => {
-    it('logs errors during event handlers', async () => {
+  describe("ReactDOMClient.createRoot", () => {
+    it("logs errors during event handlers", async () => {
       function Foo() {
         return (
           <button
             onClick={() => {
-              throw Error('Boom');
-            }}>
+              throw Error("Boom");
+            }}
+          >
             click me
           </button>
         );
@@ -79,16 +80,16 @@ describe('ReactDOMConsoleErrorReporting', () => {
       });
 
       container.firstChild.dispatchEvent(
-        new MouseEvent('click', {
+        new MouseEvent("click", {
           bubbles: true,
-        }),
+        })
       );
 
       expect(windowOnError.mock.calls).toEqual([
         [
           // Reported because we're in a browser click event:
           expect.objectContaining({
-            message: 'Boom',
+            message: "Boom",
           }),
         ],
       ]);
@@ -96,7 +97,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
         [
           // Reported because we're in a browser click event:
           expect.objectContaining({
-            message: 'Boom',
+            message: "Boom",
           }),
         ],
       ]);
@@ -107,14 +108,14 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
       expect(console.error.mock.calls).toEqual([]);
     });
 
-    it('logs render errors without an error boundary', async () => {
+    it("logs render errors without an error boundary", async () => {
       function Foo() {
-        throw Error('Boom');
+        throw Error("Boom");
       }
 
       const root = ReactDOMClient.createRoot(container);
@@ -122,27 +123,27 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(<Foo />);
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.error.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.warn.mock.calls).toEqual([
           [
             // Addendum by React:
-            expect.stringContaining('%s'),
-            expect.stringContaining('An error occurred in the <Foo> component'),
-            expect.stringContaining('Consider adding an error boundary'),
+            expect.stringContaining("%s"),
+            expect.stringContaining("An error occurred in the <Foo> component"),
+            expect.stringContaining("Consider adding an error boundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -151,7 +152,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -159,7 +160,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -172,18 +173,18 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });
 
-    it('logs render errors with an error boundary', async () => {
-      spyOnDevAndProd(console, 'error');
+    it("logs render errors with an error boundary", async () => {
+      spyOnDevAndProd(console, "error");
 
       function Foo() {
-        throw Error('Boom');
+        throw Error("Boom");
       }
 
       const root = ReactDOMClient.createRoot(container);
@@ -191,24 +192,24 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(
           <ErrorBoundary>
             <Foo />
-          </ErrorBoundary>,
+          </ErrorBoundary>
         );
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([]);
         expect(console.error.mock.calls).toEqual([
           [
             // Formatting
-            expect.stringContaining('%o'),
+            expect.stringContaining("%o"),
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
             // Addendum by React:
             expect.stringContaining(
-              'The above error occurred in the <Foo> component',
+              "The above error occurred in the <Foo> component"
             ),
-            expect.stringContaining('ErrorBoundary'),
+            expect.stringContaining("ErrorBoundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -221,7 +222,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -233,19 +234,19 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });
 
-    it('logs layout effect errors without an error boundary', async () => {
-      spyOnDevAndProd(console, 'error');
+    it("logs layout effect errors without an error boundary", async () => {
+      spyOnDevAndProd(console, "error");
 
       function Foo() {
         React.useLayoutEffect(() => {
-          throw Error('Boom');
+          throw Error("Boom");
         }, []);
         return null;
       }
@@ -255,27 +256,27 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(<Foo />);
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.error.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.warn.mock.calls).toEqual([
           [
             // Addendum by React:
-            expect.stringContaining('%s'),
-            expect.stringContaining('An error occurred in the <Foo> component'),
-            expect.stringContaining('Consider adding an error boundary'),
+            expect.stringContaining("%s"),
+            expect.stringContaining("An error occurred in the <Foo> component"),
+            expect.stringContaining("Consider adding an error boundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -286,7 +287,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -294,7 +295,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -307,19 +308,19 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });
 
-    it('logs layout effect errors with an error boundary', async () => {
-      spyOnDevAndProd(console, 'error');
+    it("logs layout effect errors with an error boundary", async () => {
+      spyOnDevAndProd(console, "error");
 
       function Foo() {
         React.useLayoutEffect(() => {
-          throw Error('Boom');
+          throw Error("Boom");
         }, []);
         return null;
       }
@@ -329,24 +330,24 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(
           <ErrorBoundary>
             <Foo />
-          </ErrorBoundary>,
+          </ErrorBoundary>
         );
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([]);
         expect(console.error.mock.calls).toEqual([
           [
             // Formatting
-            expect.stringContaining('%o'),
+            expect.stringContaining("%o"),
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
             // Addendum by React:
             expect.stringContaining(
-              'The above error occurred in the <Foo> component',
+              "The above error occurred in the <Foo> component"
             ),
-            expect.stringContaining('ErrorBoundary'),
+            expect.stringContaining("ErrorBoundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -359,7 +360,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -371,19 +372,19 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });
 
-    it('logs passive effect errors without an error boundary', async () => {
-      spyOnDevAndProd(console, 'error');
+    it("logs passive effect errors without an error boundary", async () => {
+      spyOnDevAndProd(console, "error");
 
       function Foo() {
         React.useEffect(() => {
-          throw Error('Boom');
+          throw Error("Boom");
         }, []);
         return null;
       }
@@ -393,27 +394,27 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(<Foo />);
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.error.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
         expect(console.warn.mock.calls).toEqual([
           [
             // Addendum by React:
-            expect.stringContaining('%s'),
-            expect.stringContaining('An error occurred in the <Foo> component'),
-            expect.stringContaining('Consider adding an error boundary'),
+            expect.stringContaining("%s"),
+            expect.stringContaining("An error occurred in the <Foo> component"),
+            expect.stringContaining("Consider adding an error boundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -422,7 +423,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
         expect(windowOnError.mock.calls).toEqual([
           [
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -430,7 +431,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -443,19 +444,19 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });
 
-    it('logs passive effect errors with an error boundary', async () => {
-      spyOnDevAndProd(console, 'error');
+    it("logs passive effect errors with an error boundary", async () => {
+      spyOnDevAndProd(console, "error");
 
       function Foo() {
         React.useEffect(() => {
-          throw Error('Boom');
+          throw Error("Boom");
         }, []);
         return null;
       }
@@ -465,24 +466,24 @@ describe('ReactDOMConsoleErrorReporting', () => {
         root.render(
           <ErrorBoundary>
             <Foo />
-          </ErrorBoundary>,
+          </ErrorBoundary>
         );
       });
 
-      if (__DEV__) {
+      if (false) {
         expect(windowOnError.mock.calls).toEqual([]);
         expect(console.error.mock.calls).toEqual([
           [
             // Formatting
-            expect.stringContaining('%o'),
+            expect.stringContaining("%o"),
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
             // Addendum by React:
             expect.stringContaining(
-              'The above error occurred in the <Foo> component',
+              "The above error occurred in the <Foo> component"
             ),
-            expect.stringContaining('ErrorBoundary'),
+            expect.stringContaining("ErrorBoundary"),
             // The component stack is not added without the polyfill/devtools.
             // expect.stringContaining('Foo'),
           ],
@@ -495,7 +496,7 @@ describe('ReactDOMConsoleErrorReporting', () => {
           [
             // Reported by React with no extra message:
             expect.objectContaining({
-              message: 'Boom',
+              message: "Boom",
             }),
           ],
         ]);
@@ -507,9 +508,9 @@ describe('ReactDOMConsoleErrorReporting', () => {
       await act(() => {
         root.render(<NoError />);
       });
-      expect(container.textContent).toBe('OK');
+      expect(container.textContent).toBe("OK");
       expect(windowOnError.mock.calls).toEqual([]);
-      if (__DEV__) {
+      if (false) {
         expect(console.error.mock.calls).toEqual([]);
       }
     });

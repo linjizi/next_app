@@ -7,7 +7,7 @@
  * @flow
  */
 
-import {Children} from 'react';
+import { Children } from "react";
 
 let didWarnSelectedSetOnOption = false;
 let didWarnInvalidChild = false;
@@ -18,26 +18,26 @@ let didWarnInvalidInnerHTML = false;
  */
 
 export function validateOptionProps(element: Element, props: Object) {
-  if (__DEV__) {
+  if (false) {
     // If a value is not provided, then the children must be simple.
     if (props.value == null) {
-      if (typeof props.children === 'object' && props.children !== null) {
+      if (typeof props.children === "object" && props.children !== null) {
         Children.forEach(props.children, function (child) {
           if (child == null) {
             return;
           }
           if (
-            typeof child === 'string' ||
-            typeof child === 'number' ||
-            typeof child === 'bigint'
+            typeof child === "string" ||
+            typeof child === "number" ||
+            typeof child === "bigint"
           ) {
             return;
           }
           if (!didWarnInvalidChild) {
             didWarnInvalidChild = true;
             console.error(
-              'Cannot infer the option value of complex children. ' +
-                'Pass a `value` prop or use a plain string as children to <option>.',
+              "Cannot infer the option value of complex children. " +
+                "Pass a `value` prop or use a plain string as children to <option>."
             );
           }
         });
@@ -45,8 +45,8 @@ export function validateOptionProps(element: Element, props: Object) {
         if (!didWarnInvalidInnerHTML) {
           didWarnInvalidInnerHTML = true;
           console.error(
-            'Pass a `value` prop if you set dangerouslyInnerHTML so React knows ' +
-              'which value should be selected.',
+            "Pass a `value` prop if you set dangerouslyInnerHTML so React knows " +
+              "which value should be selected."
           );
         }
       }
@@ -55,8 +55,8 @@ export function validateOptionProps(element: Element, props: Object) {
     // TODO: Remove support for `selected` in <option>.
     if (props.selected != null && !didWarnSelectedSetOnOption) {
       console.error(
-        'Use the `defaultValue` or `value` props on <select> instead of ' +
-          'setting `selected` on <option>.',
+        "Use the `defaultValue` or `value` props on <select> instead of " +
+          "setting `selected` on <option>."
       );
       didWarnSelectedSetOnOption = true;
     }

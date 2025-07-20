@@ -38,10 +38,7 @@ import {
   SuspenseComponent,
   ActivityComponent,
 } from './ReactWorkTags';
-import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
-import isArray from 'shared/isArray';
 import {
-  enableSchedulingProfiler,
   enableHydrationLaneScheduling,
   disableLegacyMode,
 } from 'shared/ReactFeatureFlags';
@@ -347,11 +344,6 @@ function updateContainerImpl(
   callback: ?Function,
 ): void {
 
-  // enableSchedulingProfiler：false
-  if (enableSchedulingProfiler) {
-    markRenderScheduled(lane);
-  }
-
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
@@ -371,7 +363,6 @@ function updateContainerImpl(
 
   const root = enqueueUpdate(rootFiber, update, lane);
   if (root !== null) {
-    startUpdateTimerByLane(lane, 'root.render()');
     // root.pendingLanes = 32 && firstScheduledRoot = lastScheduledRoot = root;
     scheduleUpdateOnFiber(root, rootFiber, lane);
     entangleTransitions(root, rootFiber, lane);
@@ -526,20 +517,7 @@ function getCurrentFiberForDevTools() {
 }
 
 function getLaneLabelMap(): Map<Lane, string> | null {
-  if (enableSchedulingProfiler) {
-    const map: Map<Lane, string> = new Map();
-
-    let lane = 1;
-    for (let index = 0; index < TotalLanes; index++) {
-      const label = ((getLabelForLane(lane): any): string);
-      map.set(lane, label);
-      lane *= 2;
-    }
-
-    return map;
-  } else {
-    return null;
-  }
+  return null;
 }
 
 export function injectIntoDevTools(): boolean {
@@ -554,13 +532,6 @@ export function injectIntoDevTools(): boolean {
   };
   if (extraDevToolsConfig !== null) {
     internals.rendererConfig = (extraDevToolsConfig: RendererInspectionConfig);
-  }
-  if (enableSchedulingProfiler) {
-    // Conditionally inject these hooks only if Timeline profiler is supported by this build.
-    // This gives DevTools a way to feature detect that isn't tied to version number
-    // (since profiling and timeline are controlled by different feature flags).
-    internals.getLaneLabelMap = getLaneLabelMap;
-    internals.injectProfilingHooks = injectProfilingHooks;
   }
   return injectInternals(internals);
 }

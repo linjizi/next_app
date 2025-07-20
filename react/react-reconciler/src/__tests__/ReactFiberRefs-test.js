@@ -7,7 +7,7 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
 let React;
 let Scheduler;
@@ -15,17 +15,17 @@ let ReactNoop;
 let act;
 let assertLog;
 
-describe('ReactFiberRefs', () => {
+describe("ReactFiberRefs", () => {
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    Scheduler = require('scheduler');
-    ReactNoop = require('react-noop-renderer');
-    act = require('internal-test-utils').act;
-    assertLog = require('internal-test-utils').assertLog;
+    React = require("react");
+    Scheduler = require("scheduler");
+    ReactNoop = require("react-noop-renderer");
+    act = require("internal-test-utils").act;
+    assertLog = require("internal-test-utils").assertLog;
   });
 
-  it('ref is attached even if there are no other updates (class)', async () => {
+  it("ref is attached even if there are no other updates (class)", async () => {
     let component;
     class Component extends React.Component {
       shouldComponentUpdate() {
@@ -33,9 +33,9 @@ describe('ReactFiberRefs', () => {
         return false;
       }
       render() {
-        Scheduler.log('Render');
+        Scheduler.log("Render");
         component = this;
-        return 'Hi';
+        return "Hi";
       }
     }
 
@@ -45,8 +45,8 @@ describe('ReactFiberRefs', () => {
 
     // Mount with ref1 attached
     await act(() => root.render(<Component ref={ref1} />));
-    assertLog(['Render']);
-    expect(root).toMatchRenderedOutput('Hi');
+    assertLog(["Render"]);
+    expect(root).toMatchRenderedOutput("Hi");
     expect(ref1.current).toBe(component);
     // ref2 has no value
     expect(ref2.current).toBe(null);
@@ -55,13 +55,13 @@ describe('ReactFiberRefs', () => {
     await act(() => root.render(<Component ref={ref2} />));
     // The component did not re-render because no props changed.
     assertLog([]);
-    expect(root).toMatchRenderedOutput('Hi');
+    expect(root).toMatchRenderedOutput("Hi");
     // But the refs still should have been swapped.
     expect(ref1.current).toBe(null);
     expect(ref2.current).toBe(component);
   });
 
-  it('ref is attached even if there are no other updates (host component)', async () => {
+  it("ref is attached even if there are no other updates (host component)", async () => {
     // This is kind of ailly test because host components never bail out if they
     // receive a new element, and there's no way to update a ref without also
     // updating the props, but adding it here anyway for symmetry with the
@@ -85,9 +85,9 @@ describe('ReactFiberRefs', () => {
     expect(ref2.current).not.toBe(null);
   });
 
-  it('throw if a string ref is passed to a ref-receiving component', async () => {
+  it("throw if a string ref is passed to a ref-receiving component", async () => {
     let refProp;
-    function Child({ref}) {
+    function Child({ ref }) {
       // This component renders successfully because the ref type check does not
       // occur until you pass it to a component that accepts refs.
       //
@@ -104,12 +104,12 @@ describe('ReactFiberRefs', () => {
 
     const root = ReactNoop.createRoot();
     await expect(act(() => root.render(<Owner />))).rejects.toThrow(
-      'Expected ref to be a function',
+      "Expected ref to be a function"
     );
-    expect(refProp).toBe('child');
+    expect(refProp).toBe("child");
   });
 
-  it('strings refs can be codemodded to callback refs', async () => {
+  it("strings refs can be codemodded to callback refs", async () => {
     let app;
     class App extends React.Component {
       render() {
@@ -117,7 +117,7 @@ describe('ReactFiberRefs', () => {
         return (
           <div
             prop="Hello!"
-            ref={el => {
+            ref={(el) => {
               // `refs` used to be a shared frozen object unless/until a string
               // ref attached by the reconciler, but it's not anymore so that we
               // can codemod string refs to userspace callback refs.
@@ -130,10 +130,10 @@ describe('ReactFiberRefs', () => {
 
     const root = ReactNoop.createRoot();
     await act(() => root.render(<App />));
-    expect(app.refs.div.prop).toBe('Hello!');
+    expect(app.refs.div.prop).toBe("Hello!");
   });
 
-  it('class refs are initialized to a frozen shared object', async () => {
+  it("class refs are initialized to a frozen shared object", async () => {
     const refsCollection = new Set();
     class Component extends React.Component {
       constructor(props) {
@@ -151,12 +151,12 @@ describe('ReactFiberRefs', () => {
         <>
           <Component />
           <Component />
-        </>,
-      ),
+        </>
+      )
     );
 
     expect(refsCollection.size).toBe(1);
     const refsInstance = Array.from(refsCollection)[0];
-    expect(Object.isFrozen(refsInstance)).toBe(__DEV__);
+    expect(Object.isFrozen(refsInstance)).toBe(false);
   });
 });

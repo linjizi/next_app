@@ -1,12 +1,12 @@
-let ReactDOM = require('react-dom');
+let ReactDOM = require("react-dom");
 
-describe('ReactDOMRoot', () => {
+describe("ReactDOMRoot", () => {
   let container;
 
   beforeEach(() => {
     jest.resetModules();
-    container = document.createElement('div');
-    ReactDOM = require('react-dom');
+    container = document.createElement("div");
+    ReactDOM = require("react-dom");
   });
 
   afterEach(() => {
@@ -14,15 +14,15 @@ describe('ReactDOMRoot', () => {
   });
 
   // @gate !disableLegacyMode
-  it('deprecation warning for ReactDOM.render', () => {
-    spyOnDev(console, 'error');
+  it("deprecation warning for ReactDOM.render", () => {
+    spyOnDev(console, "error");
 
-    ReactDOM.render('Hi', container);
-    expect(container.textContent).toEqual('Hi');
-    if (__DEV__) {
+    ReactDOM.render("Hi", container);
+    expect(container.textContent).toEqual("Hi");
+    if (false) {
       expect(console.error).toHaveBeenCalledTimes(1);
       expect(console.error.mock.calls[0][0]).toContain(
-        'ReactDOM.render has not been supported since React 18',
+        "ReactDOM.render has not been supported since React 18"
       );
     }
   });

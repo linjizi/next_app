@@ -7,9 +7,9 @@
  * @flow
  */
 
-import type {Wakeable, Thenable, ReactDebugInfo} from 'shared/ReactTypes';
+import type { Wakeable, Thenable, ReactDebugInfo } from "shared/ReactTypes";
 
-import {REACT_LAZY_TYPE} from 'shared/ReactSymbols';
+import { REACT_LAZY_TYPE } from "shared/ReactSymbols";
 
 const Uninitialized = -1;
 const Pending = 0;
@@ -18,7 +18,7 @@ const Rejected = 2;
 
 type UninitializedPayload<T> = {
   _status: -1,
-  _result: () => Thenable<{default: T, ...}>,
+  _result: () => Thenable<{ default: T, ... }>,
 };
 
 type PendingPayload = {
@@ -28,7 +28,7 @@ type PendingPayload = {
 
 type ResolvedPayload<T> = {
   _status: 1,
-  _result: {default: T, ...},
+  _result: { default: T, ... },
 };
 
 type RejectedPayload = {
@@ -59,7 +59,7 @@ function lazyInitializer<T>(payload: Payload<T>): T {
     // happens if the ctor or any wrappers processing the ctor throws. This might
     // end up fixing it if the resolution was a concurrency bug.
     thenable.then(
-      moduleObject => {
+      (moduleObject) => {
         if (
           (payload: Payload<T>)._status === Pending ||
           payload._status === Uninitialized
@@ -70,7 +70,7 @@ function lazyInitializer<T>(payload: Payload<T>): T {
           resolved._result = moduleObject;
         }
       },
-      error => {
+      (error) => {
         if (
           (payload: Payload<T>)._status === Pending ||
           payload._status === Uninitialized
@@ -80,7 +80,7 @@ function lazyInitializer<T>(payload: Payload<T>): T {
           rejected._status = Rejected;
           rejected._result = error;
         }
-      },
+      }
     );
     if (payload._status === Uninitialized) {
       // In case, we're still uninitialized, then we're waiting for the thenable
@@ -92,30 +92,30 @@ function lazyInitializer<T>(payload: Payload<T>): T {
   }
   if (payload._status === Resolved) {
     const moduleObject = payload._result;
-    if (__DEV__) {
+    if (false) {
       if (moduleObject === undefined) {
         console.error(
-          'lazy: Expected the result of a dynamic imp' +
-            'ort() call. ' +
-            'Instead received: %s\n\nYour code should look like: \n  ' +
+          "lazy: Expected the result of a dynamic imp" +
+            "ort() call. " +
+            "Instead received: %s\n\nYour code should look like: \n  " +
             // Break up imports to avoid accidentally parsing them as dependencies.
-            'const MyComponent = lazy(() => imp' +
+            "const MyComponent = lazy(() => imp" +
             "ort('./MyComponent'))\n\n" +
-            'Did you accidentally put curly braces around the import?',
-          moduleObject,
+            "Did you accidentally put curly braces around the import?",
+          moduleObject
         );
       }
     }
-    if (__DEV__) {
-      if (!('default' in moduleObject)) {
+    if (false) {
+      if (!("default" in moduleObject)) {
         console.error(
-          'lazy: Expected the result of a dynamic imp' +
-            'ort() call. ' +
-            'Instead received: %s\n\nYour code should look like: \n  ' +
+          "lazy: Expected the result of a dynamic imp" +
+            "ort() call. " +
+            "Instead received: %s\n\nYour code should look like: \n  " +
             // Break up imports to avoid accidentally parsing them as dependencies.
-            'const MyComponent = lazy(() => imp' +
+            "const MyComponent = lazy(() => imp" +
             "ort('./MyComponent'))",
-          moduleObject,
+          moduleObject
         );
       }
     }
@@ -126,7 +126,7 @@ function lazyInitializer<T>(payload: Payload<T>): T {
 }
 
 export function lazy<T>(
-  ctor: () => Thenable<{default: T, ...}>,
+  ctor: () => Thenable<{ default: T, ... }>
 ): LazyComponent<T, Payload<T>> {
   const payload: Payload<T> = {
     // We use these fields to store the result.

@@ -60,11 +60,11 @@
 // log2(32) = 5 bits. That means we can lop bits off the end 5 at a time without
 // affecting the final result.
 
-import type {Fiber} from 'react-reconciler/src/ReactInternalTypes';
+import type { Fiber } from "react-reconciler/src/ReactInternalTypes";
 
-import {getIsHydrating} from './ReactFiberHydrationContext';
-import {clz32} from './clz32';
-import {Forked, NoFlags} from './ReactFiberFlags';
+import { getIsHydrating } from "./ReactFiberHydrationContext";
+import { clz32 } from "./clz32";
+import { Forked, NoFlags } from "./ReactFiberFlags";
 
 export type TreeContext = {
   id: number,
@@ -84,7 +84,7 @@ const idStack: Array<any> = [];
 let idStackIndex: number = 0;
 let treeContextProvider: Fiber | null = null;
 let treeContextId: number = 1;
-let treeContextOverflow: string = '';
+let treeContextOverflow: string = "";
 
 export function isForkedChild(workInProgress: Fiber): boolean {
   warnIfNotHydrating();
@@ -105,7 +105,7 @@ export function getTreeId(): string {
 
 export function pushTreeFork(
   workInProgress: Fiber,
-  totalChildren: number,
+  totalChildren: number
 ): void {
   // This is called right after we reconcile an array (or iterator) of child
   // fibers, because that's the only place where we know how many children in
@@ -134,7 +134,7 @@ export function pushTreeFork(
 export function pushTreeId(
   workInProgress: Fiber,
   totalChildren: number,
-  index: number,
+  index: number
 ) {
   warnIfNotHydrating();
 
@@ -264,7 +264,7 @@ export function getSuspendedTreeContext(): TreeContext | null {
 
 export function restoreSuspendedTreeContext(
   workInProgress: Fiber,
-  suspendedContext: TreeContext,
+  suspendedContext: TreeContext
 ) {
   warnIfNotHydrating();
 
@@ -278,11 +278,11 @@ export function restoreSuspendedTreeContext(
 }
 
 function warnIfNotHydrating() {
-  if (__DEV__) {
+  if (false) {
     if (!getIsHydrating()) {
       console.error(
-        'Expected to be hydrating. This is a bug in React. Please file ' +
-          'an issue.',
+        "Expected to be hydrating. This is a bug in React. Please file " +
+          "an issue."
       );
     }
   }

@@ -7,7 +7,7 @@
  * @flow
  */
 
-import {checkFormFieldValueStringCoercion} from 'shared/CheckStringCoercion';
+import { checkFormFieldValueStringCoercion } from "shared/CheckStringCoercion";
 
 export opaque type ToStringValue =
   | boolean
@@ -24,24 +24,24 @@ export opaque type ToStringValue =
 export function toString(value: ToStringValue): string {
   // The coercion safety check is performed in getToStringValue().
   // eslint-disable-next-line react-internal/safe-string-coercion
-  return '' + (value: any);
+  return "" + (value: any);
 }
 
 export function getToStringValue(value: mixed): ToStringValue {
   switch (typeof value) {
-    case 'bigint':
-    case 'boolean':
-    case 'number':
-    case 'string':
-    case 'undefined':
+    case "bigint":
+    case "boolean":
+    case "number":
+    case "string":
+    case "undefined":
       return value;
-    case 'object':
-      if (__DEV__) {
+    case "object":
+      if (false) {
         checkFormFieldValueStringCoercion(value);
       }
       return value;
     default:
       // function, symbol are assigned as empty strings
-      return '';
+      return "";
   }
 }

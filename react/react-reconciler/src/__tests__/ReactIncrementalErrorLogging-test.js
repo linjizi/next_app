@@ -8,7 +8,7 @@
  * @jest-environment node
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactNoop;
@@ -22,14 +22,14 @@ async function fakeAct(cb) {
   Scheduler.unstable_flushAll();
 }
 
-describe('ReactIncrementalErrorLogging', () => {
+describe("ReactIncrementalErrorLogging", () => {
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    ReactNoop = require('react-noop-renderer');
-    Scheduler = require('scheduler');
+    React = require("react");
+    ReactNoop = require("react-noop-renderer");
+    Scheduler = require("scheduler");
 
-    const InternalTestUtils = require('internal-test-utils');
+    const InternalTestUtils = require("internal-test-utils");
     waitForAll = InternalTestUtils.waitForAll;
   });
 
@@ -43,23 +43,23 @@ describe('ReactIncrementalErrorLogging', () => {
     console.warn = jest.fn();
     console.error = jest.fn();
     uncaughtExceptionMock = jest.fn();
-    process.on('uncaughtException', uncaughtExceptionMock);
+    process.on("uncaughtException", uncaughtExceptionMock);
   });
 
   afterEach(() => {
     console.warn = oldConsoleWarn;
     console.error = oldConsoleError;
-    process.off('uncaughtException', uncaughtExceptionMock);
+    process.off("uncaughtException", uncaughtExceptionMock);
     oldConsoleWarn = null;
     oldConsoleError = null;
     uncaughtExceptionMock = null;
   });
 
-  it('should log errors that occur during the begin phase', async () => {
+  it("should log errors that occur during the begin phase", async () => {
     class ErrorThrowingComponent extends React.Component {
       constructor(props) {
         super(props);
-        throw new Error('constructor error');
+        throw new Error("constructor error");
       }
       render() {
         return <div />;
@@ -71,26 +71,26 @@ describe('ReactIncrementalErrorLogging', () => {
           <span>
             <ErrorThrowingComponent />
           </span>
-        </div>,
+        </div>
       );
     });
     expect(uncaughtExceptionMock).toHaveBeenCalledTimes(1);
     expect(uncaughtExceptionMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'constructor error',
-      }),
+        message: "constructor error",
+      })
     );
-    if (__DEV__) {
+    if (false) {
       expect(console.warn).toHaveBeenCalledTimes(1);
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('%s'),
+        expect.stringContaining("%s"),
         expect.stringContaining(
-          'An error occurred in the <ErrorThrowingComponent> component.',
+          "An error occurred in the <ErrorThrowingComponent> component."
         ),
         expect.stringContaining(
-          'Consider adding an error boundary to your tree ' +
-            'to customize error handling behavior.',
-        ),
+          "Consider adding an error boundary to your tree " +
+            "to customize error handling behavior."
+        )
         // The component stack is not added without the polyfill/devtools.
         // expect.stringMatching(
         //  new RegExp(
@@ -101,10 +101,10 @@ describe('ReactIncrementalErrorLogging', () => {
     }
   });
 
-  it('should log errors that occur during the commit phase', async () => {
+  it("should log errors that occur during the commit phase", async () => {
     class ErrorThrowingComponent extends React.Component {
       componentDidMount() {
-        throw new Error('componentDidMount error');
+        throw new Error("componentDidMount error");
       }
       render() {
         return <div />;
@@ -116,26 +116,26 @@ describe('ReactIncrementalErrorLogging', () => {
           <span>
             <ErrorThrowingComponent />
           </span>
-        </div>,
+        </div>
       );
     });
     expect(uncaughtExceptionMock).toHaveBeenCalledTimes(1);
     expect(uncaughtExceptionMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'componentDidMount error',
-      }),
+        message: "componentDidMount error",
+      })
     );
-    if (__DEV__) {
+    if (false) {
       expect(console.warn).toHaveBeenCalledTimes(1);
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('%s'),
+        expect.stringContaining("%s"),
         expect.stringContaining(
-          'An error occurred in the <ErrorThrowingComponent> component.',
+          "An error occurred in the <ErrorThrowingComponent> component."
         ),
         expect.stringContaining(
-          'Consider adding an error boundary to your tree ' +
-            'to customize error handling behavior.',
-        ),
+          "Consider adding an error boundary to your tree " +
+            "to customize error handling behavior."
+        )
         // The component stack is not added without the polyfill/devtools.
         // expect.stringMatching(
         //   new RegExp(
@@ -146,18 +146,18 @@ describe('ReactIncrementalErrorLogging', () => {
     }
   });
 
-  it('should ignore errors thrown in log method to prevent cycle', async () => {
+  it("should ignore errors thrown in log method to prevent cycle", async () => {
     const logCapturedErrorCalls = [];
-    console.error.mockImplementation(error => {
+    console.error.mockImplementation((error) => {
       // Test what happens when logging itself is buggy.
       logCapturedErrorCalls.push(error);
-      throw new Error('logCapturedError error');
+      throw new Error("logCapturedError error");
     });
 
     class ErrorBoundary extends React.Component {
-      state = {error: null};
+      state = { error: null };
       componentDidCatch(error) {
-        this.setState({error});
+        this.setState({ error });
       }
       render() {
         return this.state.error ? null : this.props.children;
@@ -165,7 +165,7 @@ describe('ReactIncrementalErrorLogging', () => {
     }
     class ErrorThrowingComponent extends React.Component {
       render() {
-        throw new Error('render error');
+        throw new Error("render error");
       }
     }
     await fakeAct(() => {
@@ -176,23 +176,23 @@ describe('ReactIncrementalErrorLogging', () => {
               <ErrorThrowingComponent />
             </span>
           </ErrorBoundary>
-        </div>,
+        </div>
       );
     });
     expect(logCapturedErrorCalls.length).toBe(1);
-    if (__DEV__) {
+    if (false) {
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('%o'),
+        expect.stringContaining("%o"),
         expect.objectContaining({
-          message: 'render error',
+          message: "render error",
         }),
         expect.stringContaining(
-          'The above error occurred in the <ErrorThrowingComponent> component.',
+          "The above error occurred in the <ErrorThrowingComponent> component."
         ),
         expect.stringContaining(
-          'React will try to recreate this component tree from scratch ' +
-            'using the error boundary you provided, ErrorBoundary.',
-        ),
+          "React will try to recreate this component tree from scratch " +
+            "using the error boundary you provided, ErrorBoundary."
+        )
         // The component stack is not added without the polyfill/devtools.
         // expect.stringMatching(
         //   new RegExp(
@@ -203,38 +203,38 @@ describe('ReactIncrementalErrorLogging', () => {
     } else {
       expect(logCapturedErrorCalls[0]).toEqual(
         expect.objectContaining({
-          message: 'render error',
-        }),
+          message: "render error",
+        })
       );
     }
     // The error thrown in logCapturedError should be rethrown with a clean stack
     expect(() => {
       jest.runAllTimers();
-    }).toThrow('logCapturedError error');
+    }).toThrow("logCapturedError error");
   });
 
-  it('resets instance variables before unmounting failed node', async () => {
+  it("resets instance variables before unmounting failed node", async () => {
     class ErrorBoundary extends React.Component {
-      state = {error: null};
+      state = { error: null };
       componentDidCatch(error) {
-        this.setState({error});
+        this.setState({ error });
       }
       render() {
         return this.state.error ? null : this.props.children;
       }
     }
     class Foo extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       componentDidMount() {
-        this.setState({step: 1});
+        this.setState({ step: 1 });
       }
       componentWillUnmount() {
-        Scheduler.log('componentWillUnmount: ' + this.state.step);
+        Scheduler.log("componentWillUnmount: " + this.state.step);
       }
       render() {
-        Scheduler.log('render: ' + this.state.step);
+        Scheduler.log("render: " + this.state.step);
         if (this.state.step > 0) {
-          throw new Error('oops');
+          throw new Error("oops");
         }
         return null;
       }
@@ -243,35 +243,35 @@ describe('ReactIncrementalErrorLogging', () => {
     ReactNoop.render(
       <ErrorBoundary>
         <Foo />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     await waitForAll(
       [
-        'render: 0',
+        "render: 0",
 
-        'render: 1',
+        "render: 1",
 
         // Retry one more time before handling error
-        'render: 1',
+        "render: 1",
 
-        'componentWillUnmount: 0',
-      ].filter(Boolean),
+        "componentWillUnmount: 0",
+      ].filter(Boolean)
     );
 
     expect(console.error).toHaveBeenCalledTimes(1);
-    if (__DEV__) {
+    if (false) {
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('%o'),
+        expect.stringContaining("%o"),
         expect.objectContaining({
-          message: 'oops',
+          message: "oops",
         }),
         expect.stringContaining(
-          'The above error occurred in the <Foo> component.',
+          "The above error occurred in the <Foo> component."
         ),
         expect.stringContaining(
-          'React will try to recreate this component tree from scratch ' +
-            'using the error boundary you provided, ErrorBoundary.',
-        ),
+          "React will try to recreate this component tree from scratch " +
+            "using the error boundary you provided, ErrorBoundary."
+        )
         // The component stack is not added without the polyfill/devtools.
         // expect.stringMatching(
         //   new RegExp('\\s+(in|at) Foo')
@@ -280,8 +280,8 @@ describe('ReactIncrementalErrorLogging', () => {
     } else {
       expect(console.error).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'oops',
-        }),
+          message: "oops",
+        })
       );
     }
   });

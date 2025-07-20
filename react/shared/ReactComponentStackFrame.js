@@ -7,13 +7,13 @@
  * @flow
  */
 
-import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
+import { disableLogs, reenableLogs } from "shared/ConsolePatchingDev";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
-import DefaultPrepareStackTrace from 'shared/DefaultPrepareStackTrace';
+import DefaultPrepareStackTrace from "shared/DefaultPrepareStackTrace";
 
-import {formatOwnerStack} from './ReactOwnerStackFrames';
+import { formatOwnerStack } from "./ReactOwnerStackFrames";
 
 let prefix;
 let suffix;
@@ -24,47 +24,47 @@ export function describeBuiltInComponentFrame(name: string): string {
       throw Error();
     } catch (x) {
       const match = x.stack.trim().match(/\n( *(at )?)/);
-      prefix = (match && match[1]) || '';
+      prefix = (match && match[1]) || "";
       suffix =
-        x.stack.indexOf('\n    at') > -1
+        x.stack.indexOf("\n    at") > -1
           ? // V8
-            ' (<anonymous>)'
+            " (<anonymous>)"
           : // JSC/Spidermonkey
-            x.stack.indexOf('@') > -1
-            ? '@unknown:0:0'
-            : // Other
-              '';
+          x.stack.indexOf("@") > -1
+          ? "@unknown:0:0"
+          : // Other
+            "";
     }
   }
   // We use the prefix to ensure our stacks line up with native stack frames.
-  return '\n' + prefix + name + suffix;
+  return "\n" + prefix + name + suffix;
 }
 
 export function describeDebugInfoFrame(
   name: string,
   env: ?string,
-  location: ?Error,
+  location: ?Error
 ): string {
   if (location != null) {
     // If we have a location, it's the child's owner stack. Treat the bottom most frame as
     // the location of this function.
     const childStack = formatOwnerStack(location);
-    const idx = childStack.lastIndexOf('\n');
+    const idx = childStack.lastIndexOf("\n");
     const lastLine = idx === -1 ? childStack : childStack.slice(idx + 1);
     if (lastLine.indexOf(name) !== -1) {
       // For async stacks it's possible we don't have the owner on it. As a precaution only
       // use this frame if it has the name of the function in it.
-      return '\n' + lastLine;
+      return "\n" + lastLine;
     }
   }
 
-  return describeBuiltInComponentFrame(name + (env ? ' [' + env + ']' : ''));
+  return describeBuiltInComponentFrame(name + (env ? " [" + env + "]" : ""));
 }
 
 let reentry = false;
 let componentFrameCache;
-if (__DEV__) {
-  const PossiblyWeakMap = typeof WeakMap === 'function' ? WeakMap : Map;
+if (false) {
+  const PossiblyWeakMap = typeof WeakMap === "function" ? WeakMap : Map;
   componentFrameCache = new PossiblyWeakMap<Function, string>();
 }
 
@@ -81,14 +81,14 @@ if (__DEV__) {
  */
 export function describeNativeComponentFrame(
   fn: Function,
-  construct: boolean,
+  construct: boolean
 ): string {
   // If something asked for a stack inside a fake render, it should get ignored.
   if (!fn || reentry) {
-    return '';
+    return "";
   }
 
-  if (__DEV__) {
+  if (false) {
     const frame = componentFrameCache.get(fn);
     if (frame !== undefined) {
       return frame;
@@ -100,7 +100,7 @@ export function describeNativeComponentFrame(
   Error.prepareStackTrace = DefaultPrepareStackTrace;
   let previousDispatcher = null;
 
-  if (__DEV__) {
+  if (false) {
     previousDispatcher = ReactSharedInternals.H;
     // Set the dispatcher in DEV because this might be call in the render function
     // for warnings.
@@ -130,14 +130,14 @@ export function describeNativeComponentFrame(
               throw Error();
             };
             // $FlowFixMe[prop-missing]
-            Object.defineProperty(Fake.prototype, 'props', {
+            Object.defineProperty(Fake.prototype, "props", {
               set: function () {
                 // We use a throwing setter instead of frozen or non-writable props
                 // because that won't throw in a non-strict mode function.
                 throw Error();
               },
             });
-            if (typeof Reflect === 'object' && Reflect.construct) {
+            if (typeof Reflect === "object" && Reflect.construct) {
               // We construct a different control for this case to include any extra
               // frames added by the construct call.
               try {
@@ -170,13 +170,13 @@ export function describeNativeComponentFrame(
             // component, which we don't yet support. Attach a noop catch handler to
             // silence the error.
             // TODO: Implement component stacks for async client components?
-            if (maybePromise && typeof maybePromise.catch === 'function') {
+            if (maybePromise && typeof maybePromise.catch === "function") {
               maybePromise.catch(() => {});
             }
           }
         } catch (sample) {
           // This is inlined manually because closure doesn't do it for us.
-          if (sample && control && typeof sample.stack === 'string') {
+          if (sample && control && typeof sample.stack === "string") {
             return [sample.stack, control.stack];
           }
         }
@@ -185,10 +185,10 @@ export function describeNativeComponentFrame(
     };
     // $FlowFixMe[prop-missing]
     RunInRootFrame.DetermineComponentFrameRoot.displayName =
-      'DetermineComponentFrameRoot';
+      "DetermineComponentFrameRoot";
     const namePropDescriptor = Object.getOwnPropertyDescriptor(
       RunInRootFrame.DetermineComponentFrameRoot,
-      'name',
+      "name"
     );
     // Before ES6, the `name` property was not configurable.
     if (namePropDescriptor && namePropDescriptor.configurable) {
@@ -198,8 +198,8 @@ export function describeNativeComponentFrame(
         // Configurable properties can be updated even if its writable descriptor
         // is set to `false`.
         // $FlowFixMe[cannot-write]
-        'name',
-        {value: 'DetermineComponentFrameRoot'},
+        "name",
+        { value: "DetermineComponentFrameRoot" }
       );
     }
 
@@ -208,19 +208,19 @@ export function describeNativeComponentFrame(
     if (sampleStack && controlStack) {
       // This extracts the first frame from the sample that isn't also in the control.
       // Skipping one frame that we assume is the frame that calls the two.
-      const sampleLines = sampleStack.split('\n');
-      const controlLines = controlStack.split('\n');
+      const sampleLines = sampleStack.split("\n");
+      const controlLines = controlStack.split("\n");
       let s = 0;
       let c = 0;
       while (
         s < sampleLines.length &&
-        !sampleLines[s].includes('DetermineComponentFrameRoot')
+        !sampleLines[s].includes("DetermineComponentFrameRoot")
       ) {
         s++;
       }
       while (
         c < controlLines.length &&
-        !controlLines[c].includes('DetermineComponentFrameRoot')
+        !controlLines[c].includes("DetermineComponentFrameRoot")
       ) {
         c++;
       }
@@ -257,17 +257,17 @@ export function describeNativeComponentFrame(
               // The next one that isn't the same should be our match though.
               if (c < 0 || sampleLines[s] !== controlLines[c]) {
                 // V8 adds a "new" prefix for native classes. Let's remove it to make it prettier.
-                let frame = '\n' + sampleLines[s].replace(' at new ', ' at ');
+                let frame = "\n" + sampleLines[s].replace(" at new ", " at ");
 
                 // If our component frame is labeled "<anonymous>"
                 // but we have a user-provided "displayName"
                 // splice it in to make the stack more readable.
-                if (fn.displayName && frame.includes('<anonymous>')) {
-                  frame = frame.replace('<anonymous>', fn.displayName);
+                if (fn.displayName && frame.includes("<anonymous>")) {
+                  frame = frame.replace("<anonymous>", fn.displayName);
                 }
 
-                if (__DEV__) {
-                  if (typeof fn === 'function') {
+                if (false) {
+                  if (typeof fn === "function") {
                     componentFrameCache.set(fn, frame);
                   }
                 }
@@ -282,17 +282,17 @@ export function describeNativeComponentFrame(
     }
   } finally {
     reentry = false;
-    if (__DEV__) {
+    if (false) {
       ReactSharedInternals.H = previousDispatcher;
       reenableLogs();
     }
     Error.prepareStackTrace = previousPrepareStackTrace;
   }
   // Fallback to just using the name if we couldn't make it throw.
-  const name = fn ? fn.displayName || fn.name : '';
-  const syntheticFrame = name ? describeBuiltInComponentFrame(name) : '';
-  if (__DEV__) {
-    if (typeof fn === 'function') {
+  const name = fn ? fn.displayName || fn.name : "";
+  const syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
+  if (false) {
+    if (typeof fn === "function") {
       componentFrameCache.set(fn, syntheticFrame);
     }
   }

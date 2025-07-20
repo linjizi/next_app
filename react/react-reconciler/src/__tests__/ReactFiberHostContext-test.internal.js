@@ -8,7 +8,7 @@
  * @jest-environment node
  */
 
-'use strict';
+"use strict";
 
 let React;
 let act;
@@ -17,24 +17,24 @@ let ConcurrentRoot;
 let DefaultEventPriority;
 let NoEventPriority;
 
-describe('ReactFiberHostContext', () => {
+describe("ReactFiberHostContext", () => {
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
+    React = require("react");
     act = React.act;
-    ReactFiberReconciler = require('react-reconciler');
+    ReactFiberReconciler = require("react-reconciler");
     ConcurrentRoot =
-      require('react-reconciler/src/ReactRootTags').ConcurrentRoot;
+      require("react-reconciler/src/ReactRootTags").ConcurrentRoot;
     DefaultEventPriority =
-      require('react-reconciler/src/ReactEventPriorities').DefaultEventPriority;
+      require("react-reconciler/src/ReactEventPriorities").DefaultEventPriority;
     NoEventPriority =
-      require('react-reconciler/src/ReactEventPriorities').NoEventPriority;
+      require("react-reconciler/src/ReactEventPriorities").NoEventPriority;
   });
 
   global.IS_REACT_ACT_ENVIRONMENT = true;
 
   // @gate __DEV__
-  it('should send the context to prepareForCommit and resetAfterCommit', () => {
+  it("should send the context to prepareForCommit and resetAfterCommit", () => {
     const rootContext = {};
     const childContext = {};
     let updatePriority: typeof DefaultEventPriority = NoEventPriority;
@@ -121,11 +121,11 @@ describe('ReactFiberHostContext', () => {
       null,
       false,
       null,
-      '',
+      "",
       () => {},
       () => {},
       () => {},
-      null,
+      null
     );
     act(() => {
       Renderer.updateContainer(
@@ -134,7 +134,7 @@ describe('ReactFiberHostContext', () => {
         </a>,
         container,
         /* parentComponent: */ null,
-        /* callback: */ null,
+        /* callback: */ null
       );
     });
   });

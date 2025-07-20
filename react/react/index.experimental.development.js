@@ -66,11 +66,5 @@ export function experimental_useOptimistic<S, A>(
   passthrough: S,
   reducer: ?(S, A) => S,
 ): [S, (A) => void] {
-  if (__DEV__) {
-    console.error(
-      'useOptimistic is now in canary. Remove the experimental_ prefix. ' +
-        'The prefixed alias will be removed in an upcoming release.',
-    );
-  }
   return useOptimistic(passthrough, reducer);
 }

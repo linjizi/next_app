@@ -71,11 +71,6 @@ export const CacheContext: ReactContext<Cache> = {
   _threadCount: 0,
 };
 
-if (__DEV__) {
-  CacheContext._currentRenderer = null;
-  CacheContext._currentRenderer2 = null;
-}
-
 // Creates a new empty Cache instance with a ref-count of 0. The caller is responsible
 // for retaining the cache once it is in use (retainCache), and releasing the cache
 // once it is no longer needed (releaseCache).
@@ -88,28 +83,12 @@ export function createCache(): Cache {
 }
 
 export function retainCache(cache: Cache) {
-  if (__DEV__) {
-    if (cache.controller.signal.aborted) {
-      console.warn(
-        'A cache instance was retained after it was already freed. ' +
-          'This likely indicates a bug in React.',
-      );
-    }
-  }
   cache.refCount++;
 }
 
 // Cleanup a cache instance, potentially freeing it if there are no more references
 export function releaseCache(cache: Cache) {
   cache.refCount--;
-  if (__DEV__) {
-    if (cache.refCount < 0) {
-      console.warn(
-        'A cache instance was released after it was already freed. ' +
-          'This likely indicates a bug in React.',
-      );
-    }
-  }
   if (cache.refCount === 0) {
     scheduleCallback(NormalPriority, () => {
       cache.controller.abort();

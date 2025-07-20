@@ -7,7 +7,7 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
+import type { Fiber } from "./ReactInternalTypes";
 
 import {
   HostComponent,
@@ -22,23 +22,26 @@ import {
   SimpleMemoComponent,
   ClassComponent,
   HostText,
-} from './ReactWorkTags';
+} from "./ReactWorkTags";
 
-import {enableSrcObject} from 'shared/ReactFeatureFlags';
+import { enableSrcObject } from "shared/ReactFeatureFlags";
 
-import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
-import assign from 'shared/assign';
-import getComponentNameFromType from 'shared/getComponentNameFromType';
+import { REACT_ELEMENT_TYPE } from "shared/ReactSymbols";
+import assign from "shared/assign";
+import getComponentNameFromType from "shared/getComponentNameFromType";
 
-import isArray from 'shared/isArray';
+import isArray from "shared/isArray";
 
 export type HydrationDiffNode = {
   fiber: Fiber,
   children: Array<HydrationDiffNode>,
-  serverProps: void | null | $ReadOnly<{[propName: string]: mixed}> | string, // null means no matching server node
+  serverProps: void | null | $ReadOnly<{ [propName: string]: mixed }> | string, // null means no matching server node
   serverTail: Array<
-    | $ReadOnly<{type: string, props: $ReadOnly<{[propName: string]: mixed}>}>
-    | string,
+    | $ReadOnly<{
+        type: string,
+        props: $ReadOnly<{ [propName: string]: mixed }>,
+      }>
+    | string
   >,
   distanceFromLeaf: number,
 };
@@ -48,7 +51,7 @@ const idealDepth = 15;
 
 function findNotableNode(
   node: HydrationDiffNode,
-  indent: number,
+  indent: number
 ): HydrationDiffNode {
   if (
     node.serverProps === undefined &&
@@ -65,15 +68,15 @@ function findNotableNode(
 }
 
 function indentation(indent: number): string {
-  return '  ' + '  '.repeat(indent);
+  return "  " + "  ".repeat(indent);
 }
 
 function added(indent: number): string {
-  return '+ ' + '  '.repeat(indent);
+  return "+ " + "  ".repeat(indent);
 }
 
 function removed(indent: number): string {
-  return '- ' + '  '.repeat(indent);
+  return "- " + "  ".repeat(indent);
 }
 
 function describeFiberType(fiber: Fiber): null | string {
@@ -83,13 +86,13 @@ function describeFiberType(fiber: Fiber): null | string {
     case HostComponent:
       return fiber.type;
     case LazyComponent:
-      return 'Lazy';
+      return "Lazy";
     case ActivityComponent:
-      return 'Activity';
+      return "Activity";
     case SuspenseComponent:
-      return 'Suspense';
+      return "Suspense";
     case SuspenseListComponent:
-      return 'SuspenseList';
+      return "SuspenseList";
     case FunctionComponent:
     case SimpleMemoComponent:
       const fn = fiber.type;
@@ -115,15 +118,15 @@ function describeTextNode(content: string, maxLength: number): string {
       if (maxLength < 8) {
         return '{"..."}';
       }
-      return '{' + encoded.slice(0, maxLength - 7) + '..."}';
+      return "{" + encoded.slice(0, maxLength - 7) + '..."}';
     }
-    return '{' + encoded + '}';
+    return "{" + encoded + "}";
   } else {
     if (content.length > maxLength) {
       if (maxLength < 5) {
         return '{"..."}';
       }
-      return content.slice(0, maxLength - 3) + '...';
+      return content.slice(0, maxLength - 3) + "...";
     }
     return content;
   }
@@ -132,12 +135,12 @@ function describeTextNode(content: string, maxLength: number): string {
 function describeTextDiff(
   clientText: string,
   serverProps: mixed,
-  indent: number,
+  indent: number
 ): string {
   const maxLength = maxRowLength - indent * 2;
   if (serverProps === null) {
-    return added(indent) + describeTextNode(clientText, maxLength) + '\n';
-  } else if (typeof serverProps === 'string') {
+    return added(indent) + describeTextNode(clientText, maxLength) + "\n";
+  } else if (typeof serverProps === "string") {
     let serverText: string = serverProps;
     let firstDiff = 0;
     for (
@@ -154,19 +157,19 @@ function describeTextDiff(
     if (firstDiff > maxLength - 8 && firstDiff > 10) {
       // The first difference between the two strings would be cut off, so cut off in
       // the beginning instead.
-      clientText = '...' + clientText.slice(firstDiff - 8);
-      serverText = '...' + serverText.slice(firstDiff - 8);
+      clientText = "..." + clientText.slice(firstDiff - 8);
+      serverText = "..." + serverText.slice(firstDiff - 8);
     }
     return (
       added(indent) +
       describeTextNode(clientText, maxLength) +
-      '\n' +
+      "\n" +
       removed(indent) +
       describeTextNode(serverText, maxLength) +
-      '\n'
+      "\n"
     );
   } else {
-    return indentation(indent) + describeTextNode(clientText, maxLength) + '\n';
+    return indentation(indent) + describeTextNode(clientText, maxLength) + "\n";
   }
 }
 
@@ -180,7 +183,7 @@ function objectName(object: mixed): string {
 
 function describeValue(value: mixed, maxLength: number): string {
   switch (typeof value) {
-    case 'string': {
+    case "string": {
       const encoded = JSON.stringify(value);
       if (encoded.length > maxLength) {
         if (maxLength < 5) {
@@ -190,20 +193,20 @@ function describeValue(value: mixed, maxLength: number): string {
       }
       return encoded;
     }
-    case 'object': {
+    case "object": {
       if (value === null) {
-        return 'null';
+        return "null";
       }
       if (isArray(value)) {
-        return '[...]';
+        return "[...]";
       }
       if ((value: any).$$typeof === REACT_ELEMENT_TYPE) {
         const type = getComponentNameFromType((value: any).type);
-        return type ? '<' + type + '>' : '<...>';
+        return type ? "<" + type + ">" : "<...>";
       }
       const name = objectName(value);
-      if (name === 'Object') {
-        let properties = '';
+      if (name === "Object") {
+        let properties = "";
         maxLength -= 2;
         for (let propName in value) {
           if (!value.hasOwnProperty(propName)) {
@@ -216,25 +219,25 @@ function describeValue(value: mixed, maxLength: number): string {
           maxLength -= propName.length - 2;
           const propValue = describeValue(
             value[propName],
-            maxLength < 15 ? maxLength : 15,
+            maxLength < 15 ? maxLength : 15
           );
           maxLength -= propValue.length;
           if (maxLength < 0) {
-            properties += properties === '' ? '...' : ', ...';
+            properties += properties === "" ? "..." : ", ...";
             break;
           }
           properties +=
-            (properties === '' ? '' : ',') + propName + ':' + propValue;
+            (properties === "" ? "" : ",") + propName + ":" + propValue;
         }
-        return '{' + properties + '}';
-      } else if (enableSrcObject && (name === 'Blob' || name === 'File')) {
-        return name + ':' + (value: any).type;
+        return "{" + properties + "}";
+      } else if (enableSrcObject && (name === "Blob" || name === "File")) {
+        return name + ":" + (value: any).type;
       }
       return name;
     }
-    case 'function': {
+    case "function": {
       const name = (value: any).displayName || value.name;
-      return name ? 'function ' + name : 'function';
+      return name ? "function " + name : "function";
     }
     default:
       // eslint-disable-next-line react-internal/safe-string-coercion
@@ -243,7 +246,7 @@ function describeValue(value: mixed, maxLength: number): string {
 }
 
 function describePropValue(value: mixed, maxLength: number): string {
-  if (typeof value === 'string' && !needsEscaping.test(value)) {
+  if (typeof value === "string" && !needsEscaping.test(value)) {
     if (value.length > maxLength - 2) {
       if (maxLength < 5) {
         return '"..."';
@@ -252,45 +255,45 @@ function describePropValue(value: mixed, maxLength: number): string {
     }
     return '"' + value + '"';
   }
-  return '{' + describeValue(value, maxLength - 2) + '}';
+  return "{" + describeValue(value, maxLength - 2) + "}";
 }
 
 function describeCollapsedElement(
   type: string,
-  props: {[propName: string]: mixed},
-  indent: number,
+  props: { [propName: string]: mixed },
+  indent: number
 ): string {
   // This function tries to fit the props into a single line for non-essential elements.
   // We also ignore children because we're not going deeper.
 
   let maxLength = maxRowLength - indent * 2 - type.length - 2;
 
-  let content = '';
+  let content = "";
 
   for (const propName in props) {
     if (!props.hasOwnProperty(propName)) {
       continue;
     }
-    if (propName === 'children') {
+    if (propName === "children") {
       // Ignored.
       continue;
     }
     const propValue = describePropValue(props[propName], 15);
     maxLength -= propName.length + propValue.length + 2;
     if (maxLength < 0) {
-      content += ' ...';
+      content += " ...";
       break;
     }
-    content += ' ' + propName + '=' + propValue;
+    content += " " + propName + "=" + propValue;
   }
 
-  return indentation(indent) + '<' + type + content + '>\n';
+  return indentation(indent) + "<" + type + content + ">\n";
 }
 
 function describeExpandedElement(
   type: string,
-  props: {+[propName: string]: mixed},
-  rowPrefix: string,
+  props: { +[propName: string]: mixed },
+  rowPrefix: string
 ): string {
   // This function tries to fit the props into a single line for non-essential elements.
   // We also ignore children because we're not going deeper.
@@ -306,44 +309,44 @@ function describeExpandedElement(
     if (!props.hasOwnProperty(propName)) {
       continue;
     }
-    if (propName === 'children') {
+    if (propName === "children") {
       // Ignored.
       continue;
     }
     const maxLength = maxRowLength - rowPrefix.length - propName.length - 1;
     const propValue = describePropValue(props[propName], maxLength);
     remainingRowLength -= propName.length + propValue.length + 2;
-    properties.push(propName + '=' + propValue);
+    properties.push(propName + "=" + propValue);
   }
 
   if (properties.length === 0) {
-    return rowPrefix + '<' + type + '>\n';
+    return rowPrefix + "<" + type + ">\n";
   } else if (remainingRowLength > 0) {
     // We can fit all on one row.
-    return rowPrefix + '<' + type + ' ' + properties.join(' ') + '>\n';
+    return rowPrefix + "<" + type + " " + properties.join(" ") + ">\n";
   } else {
     // Split into one row per property:
     return (
       rowPrefix +
-      '<' +
+      "<" +
       type +
-      '\n' +
+      "\n" +
       rowPrefix +
-      '  ' +
-      properties.join('\n' + rowPrefix + '  ') +
-      '\n' +
+      "  " +
+      properties.join("\n" + rowPrefix + "  ") +
+      "\n" +
       rowPrefix +
-      '>\n'
+      ">\n"
     );
   }
 }
 
 function describePropertiesDiff(
-  clientObject: {+[propName: string]: mixed},
-  serverObject: {+[propName: string]: mixed},
-  indent: number,
+  clientObject: { +[propName: string]: mixed },
+  serverObject: { +[propName: string]: mixed },
+  indent: number
 ): string {
-  let properties = '';
+  let properties = "";
   const remainingServerProperties = assign({}, serverObject);
   for (const propName in clientObject) {
     if (!clientObject.hasOwnProperty(propName)) {
@@ -356,10 +359,10 @@ function describePropertiesDiff(
     if (serverObject.hasOwnProperty(propName)) {
       const serverValue = serverObject[propName];
       const serverPropValue = describeValue(serverValue, maxLength);
-      properties += added(indent) + propName + ': ' + clientPropValue + '\n';
-      properties += removed(indent) + propName + ': ' + serverPropValue + '\n';
+      properties += added(indent) + propName + ": " + clientPropValue + "\n";
+      properties += removed(indent) + propName + ": " + serverPropValue + "\n";
     } else {
-      properties += added(indent) + propName + ': ' + clientPropValue + '\n';
+      properties += added(indent) + propName + ": " + clientPropValue + "\n";
     }
   }
   for (const propName in remainingServerProperties) {
@@ -369,18 +372,18 @@ function describePropertiesDiff(
     const maxLength = maxRowLength - indent * 2 - propName.length - 2;
     const serverValue = remainingServerProperties[propName];
     const serverPropValue = describeValue(serverValue, maxLength);
-    properties += removed(indent) + propName + ': ' + serverPropValue + '\n';
+    properties += removed(indent) + propName + ": " + serverPropValue + "\n";
   }
   return properties;
 }
 
 function describeElementDiff(
   type: string,
-  clientProps: {+[propName: string]: mixed},
-  serverProps: {+[propName: string]: mixed},
-  indent: number,
+  clientProps: { +[propName: string]: mixed },
+  serverProps: { +[propName: string]: mixed },
+  indent: number
 ): string {
-  let content = '';
+  let content = "";
 
   // Maps any previously unmatched lower case server prop name to its full prop name
   const serverPropNames: Map<string, string> = new Map();
@@ -392,14 +395,14 @@ function describeElementDiff(
     serverPropNames.set(propName.toLowerCase(), propName);
   }
 
-  if (serverPropNames.size === 1 && serverPropNames.has('children')) {
+  if (serverPropNames.size === 1 && serverPropNames.has("children")) {
     content += describeExpandedElement(type, clientProps, indentation(indent));
   } else {
     for (const propName in clientProps) {
       if (!clientProps.hasOwnProperty(propName)) {
         continue;
       }
-      if (propName === 'children') {
+      if (propName === "children") {
         // Handled below.
         continue;
       }
@@ -413,45 +416,45 @@ function describeElementDiff(
         const clientPropValue = describePropValue(clientValue, maxLength);
         const serverPropValue = describePropValue(serverValue, maxLength);
         if (
-          typeof clientValue === 'object' &&
+          typeof clientValue === "object" &&
           clientValue !== null &&
-          typeof serverValue === 'object' &&
+          typeof serverValue === "object" &&
           serverValue !== null &&
-          objectName(clientValue) === 'Object' &&
-          objectName(serverValue) === 'Object' &&
+          objectName(clientValue) === "Object" &&
+          objectName(serverValue) === "Object" &&
           // Only do the diff if the object has a lot of keys or was shortened.
           (Object.keys(clientValue).length > 2 ||
             Object.keys(serverValue).length > 2 ||
-            clientPropValue.indexOf('...') > -1 ||
-            serverPropValue.indexOf('...') > -1)
+            clientPropValue.indexOf("...") > -1 ||
+            serverPropValue.indexOf("...") > -1)
         ) {
           // We're comparing two plain objects. We can diff the nested objects instead.
           content +=
             indentation(indent + 1) +
             propName +
-            '={{\n' +
+            "={{\n" +
             describePropertiesDiff(clientValue, serverValue, indent + 2) +
             indentation(indent + 1) +
-            '}}\n';
+            "}}\n";
         } else {
           content +=
-            added(indent + 1) + propName + '=' + clientPropValue + '\n';
+            added(indent + 1) + propName + "=" + clientPropValue + "\n";
           content +=
-            removed(indent + 1) + propName + '=' + serverPropValue + '\n';
+            removed(indent + 1) + propName + "=" + serverPropValue + "\n";
         }
       } else {
         // Considered equal.
         content +=
           indentation(indent + 1) +
           propName +
-          '=' +
+          "=" +
           describePropValue(clientProps[propName], maxLength) +
-          '\n';
+          "\n";
       }
     }
 
-    serverPropNames.forEach(propName => {
-      if (propName === 'children') {
+    serverPropNames.forEach((propName) => {
+      if (propName === "children") {
         // Handled below.
         return;
       }
@@ -459,60 +462,60 @@ function describeElementDiff(
       content +=
         removed(indent + 1) +
         propName +
-        '=' +
+        "=" +
         describePropValue(serverProps[propName], maxLength) +
-        '\n';
+        "\n";
     });
 
-    if (content === '') {
+    if (content === "") {
       // No properties
-      content = indentation(indent) + '<' + type + '>\n';
+      content = indentation(indent) + "<" + type + ">\n";
     } else {
       // Had properties
       content =
         indentation(indent) +
-        '<' +
+        "<" +
         type +
-        '\n' +
+        "\n" +
         content +
         indentation(indent) +
-        '>\n';
+        ">\n";
     }
   }
 
   const serverChildren = serverProps.children;
   const clientChildren = clientProps.children;
   if (
-    typeof serverChildren === 'string' ||
-    typeof serverChildren === 'number' ||
-    typeof serverChildren === 'bigint'
+    typeof serverChildren === "string" ||
+    typeof serverChildren === "number" ||
+    typeof serverChildren === "bigint"
   ) {
     // There's a diff of the children.
     // $FlowFixMe[unsafe-addition]
-    const serverText = '' + serverChildren;
-    let clientText = '';
+    const serverText = "" + serverChildren;
+    let clientText = "";
     if (
-      typeof clientChildren === 'string' ||
-      typeof clientChildren === 'number' ||
-      typeof clientChildren === 'bigint'
+      typeof clientChildren === "string" ||
+      typeof clientChildren === "number" ||
+      typeof clientChildren === "bigint"
     ) {
       // $FlowFixMe[unsafe-addition]
-      clientText = '' + clientChildren;
+      clientText = "" + clientChildren;
     }
     content += describeTextDiff(clientText, serverText, indent + 1);
   } else if (
-    typeof clientChildren === 'string' ||
-    typeof clientChildren === 'number' ||
-    typeof clientChildren === 'bigint'
+    typeof clientChildren === "string" ||
+    typeof clientChildren === "number" ||
+    typeof clientChildren === "bigint"
   ) {
     if (serverChildren == null) {
       // This is a new string child.
       // $FlowFixMe[unsafe-addition]
-      content += describeTextDiff('' + clientChildren, null, indent + 1);
+      content += describeTextDiff("" + clientChildren, null, indent + 1);
     } else {
       // The client has children but it's not considered a difference from the server.
       // $FlowFixMe[unsafe-addition]
-      content += describeTextDiff('' + clientChildren, undefined, indent + 1);
+      content += describeTextDiff("" + clientChildren, undefined, indent + 1);
     }
   }
   return content;
@@ -523,7 +526,7 @@ function describeSiblingFiber(fiber: Fiber, indent: number): string {
   if (type === null) {
     // Skip this type of fiber. We currently treat this as a fragment
     // so it's just part of the parent's children.
-    let flatContent = '';
+    let flatContent = "";
     let childFiber = fiber.child;
     while (childFiber) {
       flatContent += describeSiblingFiber(childFiber, indent);
@@ -531,7 +534,7 @@ function describeSiblingFiber(fiber: Fiber, indent: number): string {
     }
     return flatContent;
   }
-  return indentation(indent) + '<' + type + '>' + '\n';
+  return indentation(indent) + "<" + type + ">" + "\n";
 }
 
 function describeNode(node: HydrationDiffNode, indent: number): string {
@@ -540,25 +543,25 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
     skipToNode !== node &&
     (node.children.length !== 1 || node.children[0] !== skipToNode)
   ) {
-    return indentation(indent) + '...\n' + describeNode(skipToNode, indent + 1);
+    return indentation(indent) + "...\n" + describeNode(skipToNode, indent + 1);
   }
 
   // Prefix with any server components for context
-  let parentContent = '';
+  let parentContent = "";
   const debugInfo = node.fiber._debugInfo;
   if (debugInfo) {
     for (let i = 0; i < debugInfo.length; i++) {
       const serverComponentName = debugInfo[i].name;
-      if (typeof serverComponentName === 'string') {
+      if (typeof serverComponentName === "string") {
         parentContent +=
-          indentation(indent) + '<' + serverComponentName + '>' + '\n';
+          indentation(indent) + "<" + serverComponentName + ">" + "\n";
         indent++;
       }
     }
   }
 
   // Self
-  let selfContent = '';
+  let selfContent = "";
 
   // We use the pending props since we might be generating a diff before the complete phase
   // when something throws.
@@ -579,10 +582,10 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
       } else if (node.serverProps === null) {
         selfContent = describeExpandedElement(type, clientProps, added(indent));
         indent++;
-      } else if (typeof node.serverProps === 'string') {
-        if (__DEV__) {
+      } else if (typeof node.serverProps === "string") {
+        if (false) {
           console.error(
-            'Should not have matched a non HostText fiber to a Text node. This is a bug in React.',
+            "Should not have matched a non HostText fiber to a Text node. This is a bug in React."
           );
         }
       } else {
@@ -590,7 +593,7 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
           type,
           clientProps,
           node.serverProps,
-          indent,
+          indent
         );
         indent++;
       }
@@ -598,7 +601,7 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
   }
 
   // Compute children
-  let childContent = '';
+  let childContent = "";
   let childFiber = node.fiber.child;
   let diffIdx = 0;
   while (childFiber && diffIdx < node.children.length) {
@@ -618,7 +621,7 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
     // If we had any further siblings after the last mismatch, we can't be sure if it's
     // actually a valid match since it might not have found a match. So we exclude next
     // siblings to avoid confusion.
-    childContent += indentation(indent) + '...' + '\n';
+    childContent += indentation(indent) + "..." + "\n";
   }
 
   // Deleted tail nodes
@@ -628,18 +631,18 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
   }
   for (let i = 0; i < serverTail.length; i++) {
     const tailNode = serverTail[i];
-    if (typeof tailNode === 'string') {
+    if (typeof tailNode === "string") {
       // Removed text node
       childContent +=
         removed(indent) +
         describeTextNode(tailNode, maxRowLength - indent * 2) +
-        '\n';
+        "\n";
     } else {
       // Removed element
       childContent += describeExpandedElement(
         tailNode.type,
         tailNode.props,
-        removed(indent),
+        removed(indent)
       );
     }
   }
@@ -649,8 +652,8 @@ function describeNode(node: HydrationDiffNode, indent: number): string {
 
 export function describeDiff(rootNode: HydrationDiffNode): string {
   try {
-    return '\n\n' + describeNode(rootNode, 0);
+    return "\n\n" + describeNode(rootNode, 0);
   } catch (x) {
-    return '';
+    return "";
   }
 }

@@ -8,21 +8,25 @@
  */
 
 // TODO: direct imports like some-package/src/* are bad. Fix me.
-import {getCurrentFiberOwnerNameInDevOrNull} from 'react-reconciler/src/ReactCurrentFiber';
+import { getCurrentFiberOwnerNameInDevOrNull } from "react-reconciler/src/ReactCurrentFiber";
 
-import {getFiberCurrentPropsFromNode} from './ReactDOMComponentTree';
-import {getToStringValue, toString} from './ToStringValue';
-import {track, trackHydrated, updateValueIfChanged} from './inputValueTracking';
-import getActiveElement from './getActiveElement';
+import { getFiberCurrentPropsFromNode } from "./ReactDOMComponentTree";
+import { getToStringValue, toString } from "./ToStringValue";
+import {
+  track,
+  trackHydrated,
+  updateValueIfChanged,
+} from "./inputValueTracking";
+import getActiveElement from "./getActiveElement";
 import {
   disableInputAttributeSyncing,
   enableHydrationChangeEvent,
-} from 'shared/ReactFeatureFlags';
-import {checkAttributeStringCoercion} from 'shared/CheckStringCoercion';
+} from "shared/ReactFeatureFlags";
+import { checkAttributeStringCoercion } from "shared/CheckStringCoercion";
 
-import type {ToStringValue} from './ToStringValue';
-import escapeSelectorAttributeValueInsideDoubleQuotes from './escapeSelectorAttributeValueInsideDoubleQuotes';
-import {queueChangeEvent} from '../events/ReactDOMEventReplaying';
+import type { ToStringValue } from "./ToStringValue";
+import escapeSelectorAttributeValueInsideDoubleQuotes from "./escapeSelectorAttributeValueInsideDoubleQuotes";
+import { queueChangeEvent } from "../events/ReactDOMEventReplaying";
 
 let didWarnValueDefaultValue = false;
 let didWarnCheckedDefaultChecked = false;
@@ -45,7 +49,7 @@ let didWarnCheckedDefaultChecked = false;
  */
 
 export function validateInputProps(element: Element, props: Object) {
-  if (__DEV__) {
+  if (false) {
     // Normally we check for undefined and null the same, but explicitly specifying both
     // properties, at all is probably worth warning for. We could move this either direction
     // and just make it ok to pass null or just check hasOwnProperty.
@@ -55,14 +59,14 @@ export function validateInputProps(element: Element, props: Object) {
       !didWarnCheckedDefaultChecked
     ) {
       console.error(
-        '%s contains an input of type %s with both checked and defaultChecked props. ' +
-          'Input elements must be either controlled or uncontrolled ' +
-          '(specify either the checked prop, or the defaultChecked prop, but not ' +
-          'both). Decide between using a controlled or uncontrolled input ' +
-          'element and remove one of these props. More info: ' +
-          'https://react.dev/link/controlled-components',
-        getCurrentFiberOwnerNameInDevOrNull() || 'A component',
-        props.type,
+        "%s contains an input of type %s with both checked and defaultChecked props. " +
+          "Input elements must be either controlled or uncontrolled " +
+          "(specify either the checked prop, or the defaultChecked prop, but not " +
+          "both). Decide between using a controlled or uncontrolled input " +
+          "element and remove one of these props. More info: " +
+          "https://react.dev/link/controlled-components",
+        getCurrentFiberOwnerNameInDevOrNull() || "A component",
+        props.type
       );
       didWarnCheckedDefaultChecked = true;
     }
@@ -72,14 +76,14 @@ export function validateInputProps(element: Element, props: Object) {
       !didWarnValueDefaultValue
     ) {
       console.error(
-        '%s contains an input of type %s with both value and defaultValue props. ' +
-          'Input elements must be either controlled or uncontrolled ' +
-          '(specify either the value prop, or the defaultValue prop, but not ' +
-          'both). Decide between using a controlled or uncontrolled input ' +
-          'element and remove one of these props. More info: ' +
-          'https://react.dev/link/controlled-components',
-        getCurrentFiberOwnerNameInDevOrNull() || 'A component',
-        props.type,
+        "%s contains an input of type %s with both value and defaultValue props. " +
+          "Input elements must be either controlled or uncontrolled " +
+          "(specify either the value prop, or the defaultValue prop, but not " +
+          "both). Decide between using a controlled or uncontrolled input " +
+          "element and remove one of these props. More info: " +
+          "https://react.dev/link/controlled-components",
+        getCurrentFiberOwnerNameInDevOrNull() || "A component",
+        props.type
       );
       didWarnValueDefaultValue = true;
     }
@@ -94,7 +98,7 @@ export function updateInput(
   checked: ?boolean,
   defaultChecked: ?boolean,
   type: ?string,
-  name: ?string,
+  name: ?string
 ) {
   const node: HTMLInputElement = (element: any);
 
@@ -102,27 +106,27 @@ export function updateInput(
   // Changing the type or name as the same time as changing the checked value
   // needs to be atomically applied. We can only ensure that by disconnecting
   // the name while do the mutations and then reapply the name after that's done.
-  node.name = '';
+  node.name = "";
 
   if (
     type != null &&
-    typeof type !== 'function' &&
-    typeof type !== 'symbol' &&
-    typeof type !== 'boolean'
+    typeof type !== "function" &&
+    typeof type !== "symbol" &&
+    typeof type !== "boolean"
   ) {
-    if (__DEV__) {
-      checkAttributeStringCoercion(type, 'type');
+    if (false) {
+      checkAttributeStringCoercion(type, "type");
     }
     node.type = type;
   } else {
-    node.removeAttribute('type');
+    node.removeAttribute("type");
   }
 
   if (value != null) {
-    if (type === 'number') {
+    if (type === "number") {
       if (
         // $FlowFixMe[incompatible-type]
-        (value === 0 && node.value === '') ||
+        (value === 0 && node.value === "") ||
         // We explicitly want to coerce to number here if possible.
         // eslint-disable-next-line
         node.value != (value: any)
@@ -132,10 +136,10 @@ export function updateInput(
     } else if (node.value !== toString(getToStringValue(value))) {
       node.value = toString(getToStringValue(value));
     }
-  } else if (type === 'submit' || type === 'reset') {
+  } else if (type === "submit" || type === "reset") {
     // Submit/reset inputs need the attribute removed completely to avoid
     // blank-text buttons.
-    node.removeAttribute('value');
+    node.removeAttribute("value");
   }
 
   if (disableInputAttributeSyncing) {
@@ -145,7 +149,7 @@ export function updateInput(
     if (defaultValue != null) {
       setDefaultValue(node, type, getToStringValue(defaultValue));
     } else if (lastDefaultValue != null) {
-      node.removeAttribute('value');
+      node.removeAttribute("value");
     }
   } else {
     // When syncing the value attribute, the value comes from a cascade of
@@ -158,7 +162,7 @@ export function updateInput(
     } else if (defaultValue != null) {
       setDefaultValue(node, type, getToStringValue(defaultValue));
     } else if (lastDefaultValue != null) {
-      node.removeAttribute('value');
+      node.removeAttribute("value");
     }
   }
 
@@ -167,7 +171,7 @@ export function updateInput(
     // controllable from the defaultValue React property. It needs to be
     // updated as new props come in.
     if (defaultChecked == null) {
-      node.removeAttribute('checked');
+      node.removeAttribute("checked");
     } else {
       node.defaultChecked = !!defaultChecked;
     }
@@ -185,21 +189,21 @@ export function updateInput(
     // TODO: Should really update input value tracking for the whole radio
     // button group in an effect or something (similar to #27024)
     node.checked =
-      checked && typeof checked !== 'function' && typeof checked !== 'symbol';
+      checked && typeof checked !== "function" && typeof checked !== "symbol";
   }
 
   if (
     name != null &&
-    typeof name !== 'function' &&
-    typeof name !== 'symbol' &&
-    typeof name !== 'boolean'
+    typeof name !== "function" &&
+    typeof name !== "symbol" &&
+    typeof name !== "boolean"
   ) {
-    if (__DEV__) {
-      checkAttributeStringCoercion(name, 'name');
+    if (false) {
+      checkAttributeStringCoercion(name, "name");
     }
     node.name = toString(getToStringValue(name));
   } else {
-    node.removeAttribute('name');
+    node.removeAttribute("name");
   }
 }
 
@@ -211,24 +215,24 @@ export function initInput(
   defaultChecked: ?boolean,
   type: ?string,
   name: ?string,
-  isHydrating: boolean,
+  isHydrating: boolean
 ) {
   const node: HTMLInputElement = (element: any);
 
   if (
     type != null &&
-    typeof type !== 'function' &&
-    typeof type !== 'symbol' &&
-    typeof type !== 'boolean'
+    typeof type !== "function" &&
+    typeof type !== "symbol" &&
+    typeof type !== "boolean"
   ) {
-    if (__DEV__) {
-      checkAttributeStringCoercion(type, 'type');
+    if (false) {
+      checkAttributeStringCoercion(type, "type");
     }
     node.type = type;
   }
 
   if (value != null || defaultValue != null) {
-    const isButton = type === 'submit' || type === 'reset';
+    const isButton = type === "submit" || type === "reset";
 
     // Avoid setting value attribute on submit/reset inputs as it overrides the
     // default value provided by the browser. See: #12872
@@ -239,7 +243,7 @@ export function initInput(
     }
 
     const defaultValueStr =
-      defaultValue != null ? toString(getToStringValue(defaultValue)) : '';
+      defaultValue != null ? toString(getToStringValue(defaultValue)) : "";
     const initialValue =
       value != null ? toString(getToStringValue(value)) : defaultValueStr;
 
@@ -299,8 +303,8 @@ export function initInput(
   // TODO: This 'function' or 'symbol' check isn't replicated in other places
   // so this semantic is inconsistent.
   const initialChecked =
-    typeof checkedOrDefault !== 'function' &&
-    typeof checkedOrDefault !== 'symbol' &&
+    typeof checkedOrDefault !== "function" &&
+    typeof checkedOrDefault !== "symbol" &&
     !!checkedOrDefault;
 
   if (isHydrating && !enableHydrationChangeEvent) {
@@ -332,12 +336,12 @@ export function initInput(
   // Name needs to be set at the end so that it applies atomically to connected radio buttons.
   if (
     name != null &&
-    typeof name !== 'function' &&
-    typeof name !== 'symbol' &&
-    typeof name !== 'boolean'
+    typeof name !== "function" &&
+    typeof name !== "symbol" &&
+    typeof name !== "boolean"
   ) {
-    if (__DEV__) {
-      checkAttributeStringCoercion(name, 'name');
+    if (false) {
+      checkAttributeStringCoercion(name, "name");
     }
     node.name = name;
   }
@@ -349,12 +353,12 @@ export function hydrateInput(
   value: ?string,
   defaultValue: ?string,
   checked: ?boolean,
-  defaultChecked: ?boolean,
+  defaultChecked: ?boolean
 ): void {
   const node: HTMLInputElement = (element: any);
 
   const defaultValueStr =
-    defaultValue != null ? toString(getToStringValue(defaultValue)) : '';
+    defaultValue != null ? toString(getToStringValue(defaultValue)) : "";
   const initialValue =
     value != null ? toString(getToStringValue(value)) : defaultValueStr;
 
@@ -362,8 +366,8 @@ export function hydrateInput(
   // TODO: This 'function' or 'symbol' check isn't replicated in other places
   // so this semantic is inconsistent.
   const initialChecked =
-    typeof checkedOrDefault !== 'function' &&
-    typeof checkedOrDefault !== 'symbol' &&
+    typeof checkedOrDefault !== "function" &&
+    typeof checkedOrDefault !== "symbol" &&
     !!checkedOrDefault;
 
   // Detach .checked from .defaultChecked but leave user input alone
@@ -374,7 +378,7 @@ export function hydrateInput(
     // If the current value is different, that suggests that the user
     // changed it before hydration. Queue a replay of the change event.
     // For radio buttons the change event only fires on the selected one.
-    if (node.type !== 'radio' || node.checked) {
+    if (node.type !== "radio" || node.checked) {
       queueChangeEvent(node);
     }
   }
@@ -390,10 +394,10 @@ export function restoreControlledInputState(element: Element, props: Object) {
     props.checked,
     props.defaultChecked,
     props.type,
-    props.name,
+    props.name
   );
   const name = props.name;
-  if (props.type === 'radio' && name != null) {
+  if (props.type === "radio" && name != null) {
     let queryRoot: Element = rootNode;
 
     while (queryRoot.parentNode) {
@@ -407,13 +411,13 @@ export function restoreControlledInputState(element: Element, props: Object) {
     // the input might not even be in a form. It might not even be in the
     // document. Let's just use the local `querySelectorAll` to ensure we don't
     // miss anything.
-    if (__DEV__) {
-      checkAttributeStringCoercion(name, 'name');
+    if (false) {
+      checkAttributeStringCoercion(name, "name");
     }
     const group = queryRoot.querySelectorAll(
       'input[name="' +
-        escapeSelectorAttributeValueInsideDoubleQuotes('' + name) +
-        '"][type="radio"]',
+        escapeSelectorAttributeValueInsideDoubleQuotes("" + name) +
+        '"][type="radio"]'
     );
 
     for (let i = 0; i < group.length; i++) {
@@ -429,8 +433,8 @@ export function restoreControlledInputState(element: Element, props: Object) {
 
       if (!otherProps) {
         throw new Error(
-          'ReactDOMInput: Mixing React and non-React radio inputs with the ' +
-            'same `name` is not supported.',
+          "ReactDOMInput: Mixing React and non-React radio inputs with the " +
+            "same `name` is not supported."
         );
       }
 
@@ -445,7 +449,7 @@ export function restoreControlledInputState(element: Element, props: Object) {
         otherProps.checked,
         otherProps.defaultChecked,
         otherProps.type,
-        otherProps.name,
+        otherProps.name
       );
     }
 
@@ -472,11 +476,11 @@ export function restoreControlledInputState(element: Element, props: Object) {
 export function setDefaultValue(
   node: HTMLInputElement,
   type: ?string,
-  value: ToStringValue,
+  value: ToStringValue
 ) {
   if (
     // Focused number inputs synchronize on blur. See ChangeEventPlugin.js
-    type !== 'number' ||
+    type !== "number" ||
     getActiveElement(node.ownerDocument) !== node
   ) {
     if (node.defaultValue !== toString(value)) {

@@ -7,7 +7,7 @@
  * @flow
  */
 
-import type {ReactDebugInfo} from './ReactTypes';
+import type { ReactDebugInfo } from "./ReactTypes";
 
 export type ReactElement = {
   $$typeof: any,
@@ -15,11 +15,11 @@ export type ReactElement = {
   key: any,
   ref: any,
   props: any,
-  // __DEV__ or for string refs
+  // false or for string refs
   _owner: any,
 
-  // __DEV__
-  _store: {validated: 0 | 1 | 2, ...}, // 0: not validated, 1: validated, 2: force fail
+  // false
+  _store: { validated: 0 | 1 | 2, ... }, // 0: not validated, 1: validated, 2: force fail
   _debugInfo: null | ReactDebugInfo,
   _debugStack: Error,
   _debugTask: null | ConsoleTask,

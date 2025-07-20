@@ -8,33 +8,33 @@
  */
 
 // TODO: direct imports like some-package/src/* are bad. Fix me.
-import {getCurrentFiberOwnerNameInDevOrNull} from 'react-reconciler/src/ReactCurrentFiber';
+import { getCurrentFiberOwnerNameInDevOrNull } from "react-reconciler/src/ReactCurrentFiber";
 
-import {getToStringValue, toString} from './ToStringValue';
-import isArray from 'shared/isArray';
-import {queueChangeEvent} from '../events/ReactDOMEventReplaying';
+import { getToStringValue, toString } from "./ToStringValue";
+import isArray from "shared/isArray";
+import { queueChangeEvent } from "../events/ReactDOMEventReplaying";
 
 let didWarnValueDefaultValue;
 
-if (__DEV__) {
+if (false) {
   didWarnValueDefaultValue = false;
 }
 
 function getDeclarationErrorAddendum() {
   const ownerName = getCurrentFiberOwnerNameInDevOrNull();
   if (ownerName) {
-    return '\n\nCheck the render method of `' + ownerName + '`.';
+    return "\n\nCheck the render method of `" + ownerName + "`.";
   }
-  return '';
+  return "";
 }
 
-const valuePropNames = ['value', 'defaultValue'];
+const valuePropNames = ["value", "defaultValue"];
 
 /**
  * Validation function for `value` and `defaultValue`.
  */
 function checkSelectPropTypes(props: any) {
-  if (__DEV__) {
+  if (false) {
     for (let i = 0; i < valuePropNames.length; i++) {
       const propName = valuePropNames[i];
       if (props[propName] == null) {
@@ -43,17 +43,17 @@ function checkSelectPropTypes(props: any) {
       const propNameIsArray = isArray(props[propName]);
       if (props.multiple && !propNameIsArray) {
         console.error(
-          'The `%s` prop supplied to <select> must be an array if ' +
-            '`multiple` is true.%s',
+          "The `%s` prop supplied to <select> must be an array if " +
+            "`multiple` is true.%s",
           propName,
-          getDeclarationErrorAddendum(),
+          getDeclarationErrorAddendum()
         );
       } else if (!props.multiple && propNameIsArray) {
         console.error(
-          'The `%s` prop supplied to <select> must be a scalar ' +
-            'value if `multiple` is false.%s',
+          "The `%s` prop supplied to <select> must be a scalar " +
+            "value if `multiple` is false.%s",
           propName,
-          getDeclarationErrorAddendum(),
+          getDeclarationErrorAddendum()
         );
       }
     }
@@ -64,19 +64,19 @@ function updateOptions(
   node: HTMLSelectElement,
   multiple: boolean,
   propValue: any,
-  setDefaultSelected: boolean,
+  setDefaultSelected: boolean
 ) {
   const options: HTMLOptionsCollection = node.options;
 
   if (multiple) {
     const selectedValues = (propValue: Array<string>);
-    const selectedValue: {[string]: boolean} = {};
+    const selectedValue: { [string]: boolean } = {};
     for (let i = 0; i < selectedValues.length; i++) {
       // Prefix to avoid chaos with special keys.
-      selectedValue['$' + selectedValues[i]] = true;
+      selectedValue["$" + selectedValues[i]] = true;
     }
     for (let i = 0; i < options.length; i++) {
-      const selected = selectedValue.hasOwnProperty('$' + options[i].value);
+      const selected = selectedValue.hasOwnProperty("$" + options[i].value);
       if (options[i].selected !== selected) {
         options[i].selected = selected;
       }
@@ -124,7 +124,7 @@ function updateOptions(
  */
 
 export function validateSelectProps(element: Element, props: Object) {
-  if (__DEV__) {
+  if (false) {
     checkSelectPropTypes(props);
     if (
       props.value !== undefined &&
@@ -132,11 +132,11 @@ export function validateSelectProps(element: Element, props: Object) {
       !didWarnValueDefaultValue
     ) {
       console.error(
-        'Select elements must be either controlled or uncontrolled ' +
-          '(specify either the value prop, or the defaultValue prop, but not ' +
-          'both). Decide between using a controlled or uncontrolled select ' +
-          'element and remove one of these props. More info: ' +
-          'https://react.dev/link/controlled-components',
+        "Select elements must be either controlled or uncontrolled " +
+          "(specify either the value prop, or the defaultValue prop, but not " +
+          "both). Decide between using a controlled or uncontrolled select " +
+          "element and remove one of these props. More info: " +
+          "https://react.dev/link/controlled-components"
       );
       didWarnValueDefaultValue = true;
     }
@@ -147,7 +147,7 @@ export function initSelect(
   element: Element,
   value: ?string,
   defaultValue: ?string,
-  multiple: ?boolean,
+  multiple: ?boolean
 ) {
   const node: HTMLSelectElement = (element: any);
   node.multiple = !!multiple;
@@ -162,7 +162,7 @@ export function hydrateSelect(
   element: Element,
   value: ?string,
   defaultValue: ?string,
-  multiple: ?boolean,
+  multiple: ?boolean
 ): void {
   const node: HTMLSelectElement = (element: any);
   const options: HTMLOptionsCollection = node.options;
@@ -173,16 +173,16 @@ export function hydrateSelect(
 
   if (multiple) {
     const selectedValues = (propValue: ?Array<string>);
-    const selectedValue: {[string]: boolean} = {};
+    const selectedValue: { [string]: boolean } = {};
     if (selectedValues != null) {
       for (let i = 0; i < selectedValues.length; i++) {
         // Prefix to avoid chaos with special keys.
-        selectedValue['$' + selectedValues[i]] = true;
+        selectedValue["$" + selectedValues[i]] = true;
       }
     }
     for (let i = 0; i < options.length; i++) {
       const expectedSelected = selectedValue.hasOwnProperty(
-        '$' + options[i].value,
+        "$" + options[i].value
       );
       if (options[i].selected !== expectedSelected) {
         changed = true;
@@ -216,7 +216,7 @@ export function updateSelect(
   value: ?string,
   defaultValue: ?string,
   multiple: ?boolean,
-  wasMultiple: ?boolean,
+  wasMultiple: ?boolean
 ) {
   const node: HTMLSelectElement = (element: any);
 
@@ -228,7 +228,7 @@ export function updateSelect(
       updateOptions(node, !!multiple, defaultValue, true);
     } else {
       // Revert the select back to its default unselected state.
-      updateOptions(node, !!multiple, multiple ? [] : '', false);
+      updateOptions(node, !!multiple, multiple ? [] : "", false);
     }
   }
 }

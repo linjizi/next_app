@@ -73,8 +73,5 @@ export {useMemoCache as c} from './src/ReactHooks';
 
 // Only export captureOwnerStack in development.
 let captureOwnerStack: ?() => null | string;
-if (__DEV__) {
-  captureOwnerStack = captureOwnerStackImpl;
-}
 
 export {captureOwnerStack};

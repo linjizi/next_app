@@ -7,10 +7,10 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
-import type {StackCursor} from './ReactFiberStack';
-import type {Container, HostContext} from './ReactFiberConfig';
-import type {Hook} from './ReactFiberHooks';
+import type { Fiber } from "./ReactInternalTypes";
+import type { StackCursor } from "./ReactFiberStack";
+import type { Container, HostContext } from "./ReactFiberConfig";
+import type { Hook } from "./ReactFiberHooks";
 
 import {
   getChildHostContext,
@@ -18,8 +18,8 @@ import {
   HostTransitionContext,
   NotPendingTransition,
   isPrimaryRenderer,
-} from './ReactFiberConfig';
-import {createCursor, push, pop} from './ReactFiberStack';
+} from "./ReactFiberConfig";
+import { createCursor, push, pop } from "./ReactFiberStack";
 
 const contextStackCursor: StackCursor<HostContext | null> = createCursor(null);
 const contextFiberStackCursor: StackCursor<Fiber | null> = createCursor(null);
@@ -34,11 +34,11 @@ const hostTransitionProviderCursor: StackCursor<Fiber | null> =
   createCursor(null);
 
 function requiredContext<Value>(c: Value | null): Value {
-  if (__DEV__) {
+  if (false) {
     if (c === null) {
       console.error(
-        'Expected host context to exist. This error is likely caused by a bug ' +
-          'in React. Please file an issue.',
+        "Expected host context to exist. This error is likely caused by a bug " +
+          "in React. Please file an issue."
       );
     }
   }

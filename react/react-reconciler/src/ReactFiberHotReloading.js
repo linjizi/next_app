@@ -9,31 +9,31 @@
 
 /* eslint-disable react-internal/prod-error-codes */
 
-import type {ReactElement} from 'shared/ReactElementType';
-import type {Fiber, FiberRoot} from './ReactInternalTypes';
-import type {ReactNodeList} from 'shared/ReactTypes';
+import type { ReactElement } from "shared/ReactElementType";
+import type { Fiber, FiberRoot } from "./ReactInternalTypes";
+import type { ReactNodeList } from "shared/ReactTypes";
 
 import {
   flushSyncWork,
   scheduleUpdateOnFiber,
   flushPendingEffects,
-} from './ReactFiberWorkLoop';
-import {enqueueConcurrentRenderForLane} from './ReactFiberConcurrentUpdates';
-import {updateContainerSync} from './ReactFiberReconciler';
-import {emptyContextObject} from './ReactFiberLegacyContext';
-import {SyncLane} from './ReactFiberLane';
+} from "./ReactFiberWorkLoop";
+import { enqueueConcurrentRenderForLane } from "./ReactFiberConcurrentUpdates";
+import { updateContainerSync } from "./ReactFiberReconciler";
+import { emptyContextObject } from "./ReactFiberLegacyContext";
+import { SyncLane } from "./ReactFiberLane";
 import {
   ClassComponent,
   FunctionComponent,
   ForwardRef,
   MemoComponent,
   SimpleMemoComponent,
-} from './ReactWorkTags';
+} from "./ReactWorkTags";
 import {
   REACT_FORWARD_REF_TYPE,
   REACT_MEMO_TYPE,
   REACT_LAZY_TYPE,
-} from 'shared/ReactSymbols';
+} from "shared/ReactSymbols";
 
 export type Family = {
   current: any,
@@ -45,7 +45,7 @@ export type RefreshUpdate = {
 };
 
 // Resolves type to a family.
-type RefreshHandler = any => Family | void;
+type RefreshHandler = (any) => Family | void;
 
 // Used by React Refresh runtime through DevTools Global Hook.
 export type SetRefreshHandler = (handler: RefreshHandler | null) => void;
@@ -56,13 +56,13 @@ let resolveFamily: RefreshHandler | null = null;
 let failedBoundaries: WeakSet<Fiber> | null = null;
 
 export const setRefreshHandler = (handler: RefreshHandler | null): void => {
-  if (__DEV__) {
+  if (false) {
     resolveFamily = handler;
   }
 };
 
 export function resolveFunctionForHotReloading(type: any): any {
-  if (__DEV__) {
+  if (false) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
       return type;
@@ -84,7 +84,7 @@ export function resolveClassForHotReloading(type: any): any {
 }
 
 export function resolveForwardRefForHotReloading(type: any): any {
-  if (__DEV__) {
+  if (false) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
       return type;
@@ -95,7 +95,7 @@ export function resolveForwardRefForHotReloading(type: any): any {
       if (
         type !== null &&
         type !== undefined &&
-        typeof type.render === 'function'
+        typeof type.render === "function"
       ) {
         // ForwardRef is special because its resolved .type is an object,
         // but it's possible that we only have its inner render function in the map.
@@ -123,9 +123,9 @@ export function resolveForwardRefForHotReloading(type: any): any {
 
 export function isCompatibleFamilyForHotReloading(
   fiber: Fiber,
-  element: ReactElement,
+  element: ReactElement
 ): boolean {
-  if (__DEV__) {
+  if (false) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
       return false;
@@ -138,19 +138,19 @@ export function isCompatibleFamilyForHotReloading(
     let needsCompareFamilies = false;
 
     const $$typeofNextType =
-      typeof nextType === 'object' && nextType !== null
+      typeof nextType === "object" && nextType !== null
         ? nextType.$$typeof
         : null;
 
     switch (fiber.tag) {
       case ClassComponent: {
-        if (typeof nextType === 'function') {
+        if (typeof nextType === "function") {
           needsCompareFamilies = true;
         }
         break;
       }
       case FunctionComponent: {
-        if (typeof nextType === 'function') {
+        if (typeof nextType === "function") {
           needsCompareFamilies = true;
         } else if ($$typeofNextType === REACT_LAZY_TYPE) {
           // We don't know the inner type yet.
@@ -204,12 +204,12 @@ export function isCompatibleFamilyForHotReloading(
 }
 
 export function markFailedErrorBoundaryForHotReloading(fiber: Fiber) {
-  if (__DEV__) {
+  if (false) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
       return;
     }
-    if (typeof WeakSet !== 'function') {
+    if (typeof WeakSet !== "function") {
       return;
     }
     if (failedBoundaries === null) {
@@ -221,19 +221,19 @@ export function markFailedErrorBoundaryForHotReloading(fiber: Fiber) {
 
 export const scheduleRefresh: ScheduleRefresh = (
   root: FiberRoot,
-  update: RefreshUpdate,
+  update: RefreshUpdate
 ): void => {
-  if (__DEV__) {
+  if (false) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
       return;
     }
-    const {staleFamilies, updatedFamilies} = update;
+    const { staleFamilies, updatedFamilies } = update;
     flushPendingEffects();
     scheduleFibersWithFamiliesRecursively(
       root.current,
       updatedFamilies,
-      staleFamilies,
+      staleFamilies
     );
     flushSyncWork();
   }
@@ -241,9 +241,9 @@ export const scheduleRefresh: ScheduleRefresh = (
 
 export const scheduleRoot: ScheduleRoot = (
   root: FiberRoot,
-  element: ReactNodeList,
+  element: ReactNodeList
 ): void => {
-  if (__DEV__) {
+  if (false) {
     if (root.context !== emptyContextObject) {
       // Super edge case: root has a legacy _renderSubtree context
       // but we don't know the parentComponent so we can't pass it.
@@ -258,10 +258,10 @@ export const scheduleRoot: ScheduleRoot = (
 function scheduleFibersWithFamiliesRecursively(
   fiber: Fiber,
   updatedFamilies: Set<Family>,
-  staleFamilies: Set<Family>,
+  staleFamilies: Set<Family>
 ): void {
-  if (__DEV__) {
-    const {alternate, child, sibling, tag, type} = fiber;
+  if (false) {
+    const { alternate, child, sibling, tag, type } = fiber;
 
     let candidateType = null;
     switch (tag) {
@@ -278,7 +278,7 @@ function scheduleFibersWithFamiliesRecursively(
     }
 
     if (resolveFamily === null) {
-      throw new Error('Expected resolveFamily to be set during hot reload.');
+      throw new Error("Expected resolveFamily to be set during hot reload.");
     }
 
     let needsRender = false;
@@ -320,14 +320,14 @@ function scheduleFibersWithFamiliesRecursively(
       scheduleFibersWithFamiliesRecursively(
         child,
         updatedFamilies,
-        staleFamilies,
+        staleFamilies
       );
     }
     if (sibling !== null) {
       scheduleFibersWithFamiliesRecursively(
         sibling,
         updatedFamilies,
-        staleFamilies,
+        staleFamilies
       );
     }
   }

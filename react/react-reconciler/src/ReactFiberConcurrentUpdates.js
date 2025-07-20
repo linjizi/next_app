@@ -263,25 +263,12 @@ function getRootForUpdatedFiber(sourceFiber: Fiber): FiberRoot | null {
   // the `childLanes`, anyway, but now those two traversals happen at
   // different times.
   // TODO: Consider adding a `root` backpointer on the update queue.
-  detectUpdateOnUnmountedFiber(sourceFiber, sourceFiber);
   let node = sourceFiber;
   let parent = node.return;
   while (parent !== null) {
-    detectUpdateOnUnmountedFiber(sourceFiber, node);
     node = parent;
     parent = node.return;
   }
   return node.tag === HostRoot ? (node.stateNode: FiberRoot) : null;
 }
 
-function detectUpdateOnUnmountedFiber(sourceFiber: Fiber, parent: Fiber) {
-  if (__DEV__) {
-    const alternate = parent.alternate;
-    if (
-      alternate === null &&
-      (parent.flags & (Placement | Hydrating)) !== NoFlags
-    ) {
-      warnAboutUpdateOnNotYetMountedFiberInDEV(sourceFiber);
-    }
-  }
-}

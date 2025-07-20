@@ -7,23 +7,23 @@
  * @flow
  */
 
-import type {Dispatcher} from 'react-reconciler/src/ReactInternalTypes';
-import type {AsyncDispatcher} from 'react-reconciler/src/ReactInternalTypes';
+import type { Dispatcher } from "react-reconciler/src/ReactInternalTypes";
+import type { AsyncDispatcher } from "react-reconciler/src/ReactInternalTypes";
 
 import type {
   Reference,
   TaintEntry,
   RequestCleanupQueue,
-} from './ReactTaintRegistry';
+} from "./ReactTaintRegistry";
 
 import {
   TaintRegistryObjects,
   TaintRegistryValues,
   TaintRegistryByteLengths,
   TaintRegistryPendingRequests,
-} from './ReactTaintRegistry';
+} from "./ReactTaintRegistry";
 
-import {enableTaint} from 'shared/ReactFeatureFlags';
+import { enableTaint } from "shared/ReactFeatureFlags";
 
 export type SharedStateServer = {
   H: null | Dispatcher, // ReactCurrentDispatcher for Hooks
@@ -44,7 +44,7 @@ export type SharedStateServer = {
   recentlyCreatedOwnerStacks: 0,
 };
 
-export type RendererTask = boolean => RendererTask | null;
+export type RendererTask = (boolean) => RendererTask | null;
 
 const ReactSharedInternals: SharedStateServer = ({
   H: null,
@@ -59,7 +59,7 @@ if (enableTaint) {
     TaintRegistryPendingRequests;
 }
 
-if (__DEV__) {
+if (false) {
   // Stack implementation injected by the current renderer.
   ReactSharedInternals.getCurrentStack = (null: null | (() => string));
   ReactSharedInternals.recentlyCreatedOwnerStacks = 0;

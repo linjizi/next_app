@@ -7,14 +7,14 @@
  * @flow
  */
 
-import type {ReactContext, ReactConsumerType} from 'shared/ReactTypes';
-import type {Fiber} from './ReactInternalTypes';
+import type { ReactContext, ReactConsumerType } from "shared/ReactTypes";
+import type { Fiber } from "./ReactInternalTypes";
 
 import {
   disableLegacyMode,
   enableLegacyHidden,
   enableViewTransition,
-} from 'shared/ReactFeatureFlags';
+} from "shared/ReactFeatureFlags";
 
 import {
   FunctionComponent,
@@ -47,95 +47,95 @@ import {
   Throw,
   ViewTransitionComponent,
   ActivityComponent,
-} from 'react-reconciler/src/ReactWorkTags';
-import getComponentNameFromType from 'shared/getComponentNameFromType';
-import {REACT_STRICT_MODE_TYPE} from 'shared/ReactSymbols';
-import type {ReactComponentInfo} from '../../shared/ReactTypes';
+} from "react-reconciler/src/ReactWorkTags";
+import getComponentNameFromType from "shared/getComponentNameFromType";
+import { REACT_STRICT_MODE_TYPE } from "shared/ReactSymbols";
+import type { ReactComponentInfo } from "../../shared/ReactTypes";
 
 // Keep in sync with shared/getComponentNameFromType
 function getWrappedName(
   outerType: mixed,
   innerType: any,
-  wrapperName: string,
+  wrapperName: string
 ): string {
-  const functionName = innerType.displayName || innerType.name || '';
+  const functionName = innerType.displayName || innerType.name || "";
   return (
     (outerType: any).displayName ||
-    (functionName !== '' ? `${wrapperName}(${functionName})` : wrapperName)
+    (functionName !== "" ? `${wrapperName}(${functionName})` : wrapperName)
   );
 }
 
 // Keep in sync with shared/getComponentNameFromType
 function getContextName(type: ReactContext<any>) {
-  return type.displayName || 'Context';
+  return type.displayName || "Context";
 }
 
 export function getComponentNameFromOwner(
-  owner: Fiber | ReactComponentInfo,
+  owner: Fiber | ReactComponentInfo
 ): string | null {
-  if (typeof owner.tag === 'number') {
+  if (typeof owner.tag === "number") {
     return getComponentNameFromFiber((owner: any));
   }
-  if (typeof owner.name === 'string') {
+  if (typeof owner.name === "string") {
     return owner.name;
   }
   return null;
 }
 
 export default function getComponentNameFromFiber(fiber: Fiber): string | null {
-  const {tag, type} = fiber;
+  const { tag, type } = fiber;
   switch (tag) {
     case ActivityComponent:
-      return 'Activity';
+      return "Activity";
     case CacheComponent:
-      return 'Cache';
+      return "Cache";
     case ContextConsumer:
       const consumer: ReactConsumerType<any> = (type: any);
-      return getContextName(consumer._context) + '.Consumer';
+      return getContextName(consumer._context) + ".Consumer";
     case ContextProvider:
       const context: ReactContext<any> = (type: any);
       return getContextName(context);
     case DehydratedFragment:
-      return 'DehydratedFragment';
+      return "DehydratedFragment";
     case ForwardRef:
-      return getWrappedName(type, type.render, 'ForwardRef');
+      return getWrappedName(type, type.render, "ForwardRef");
     case Fragment:
-      return 'Fragment';
+      return "Fragment";
     case HostHoistable:
     case HostSingleton:
     case HostComponent:
       // Host component type is the display name (e.g. "div", "View")
       return type;
     case HostPortal:
-      return 'Portal';
+      return "Portal";
     case HostRoot:
-      return 'Root';
+      return "Root";
     case HostText:
-      return 'Text';
+      return "Text";
     case LazyComponent:
       // Name comes from the type in this case; we don't have a tag.
       return getComponentNameFromType(type);
     case Mode:
       if (type === REACT_STRICT_MODE_TYPE) {
         // Don't be less specific than shared/getComponentNameFromType
-        return 'StrictMode';
+        return "StrictMode";
       }
-      return 'Mode';
+      return "Mode";
     case OffscreenComponent:
-      return 'Offscreen';
+      return "Offscreen";
     case Profiler:
-      return 'Profiler';
+      return "Profiler";
     case ScopeComponent:
-      return 'Scope';
+      return "Scope";
     case SuspenseComponent:
-      return 'Suspense';
+      return "Suspense";
     case SuspenseListComponent:
-      return 'SuspenseList';
+      return "SuspenseList";
     case TracingMarkerComponent:
-      return 'TracingMarker';
+      return "TracingMarker";
     case ViewTransitionComponent:
       if (enableViewTransition) {
-        return 'ViewTransition';
+        return "ViewTransition";
       }
     // The display name for these tags come from the user-provided type:
     // Fallthrough
@@ -149,26 +149,26 @@ export default function getComponentNameFromFiber(fiber: Fiber): string | null {
     case FunctionComponent:
     case MemoComponent:
     case SimpleMemoComponent:
-      if (typeof type === 'function') {
+      if (typeof type === "function") {
         return (type: any).displayName || type.name || null;
       }
-      if (typeof type === 'string') {
+      if (typeof type === "string") {
         return type;
       }
       break;
     case LegacyHiddenComponent:
       if (enableLegacyHidden) {
-        return 'LegacyHidden';
+        return "LegacyHidden";
       }
       break;
     case Throw: {
-      if (__DEV__) {
+      if (false) {
         // For an error in child position we use the name of the inner most parent component.
         // Whether a Server Component or the parent Fiber.
         const debugInfo = fiber._debugInfo;
         if (debugInfo != null) {
           for (let i = debugInfo.length - 1; i >= 0; i--) {
-            if (typeof debugInfo[i].name === 'string') {
+            if (typeof debugInfo[i].name === "string") {
               return debugInfo[i].name;
             }
           }

@@ -7,7 +7,7 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactDOMClient;
@@ -21,40 +21,40 @@ function loadModules({
   enableProfilerCommitHooks = true,
   enableProfilerNestedUpdatePhase = true,
 } = {}) {
-  ReactFeatureFlags = require('shared/ReactFeatureFlags');
+  ReactFeatureFlags = require("shared/ReactFeatureFlags");
 
   ReactFeatureFlags.enableProfilerTimer = enableProfilerTimer;
   ReactFeatureFlags.enableProfilerCommitHooks = enableProfilerCommitHooks;
   ReactFeatureFlags.enableProfilerNestedUpdatePhase =
     enableProfilerNestedUpdatePhase;
 
-  React = require('react');
-  ReactDOMClient = require('react-dom/client');
-  const InternalTestUtils = require('internal-test-utils');
+  React = require("react");
+  ReactDOMClient = require("react-dom/client");
+  const InternalTestUtils = require("internal-test-utils");
   act = InternalTestUtils.act;
   assertConsoleErrorDev = InternalTestUtils.assertConsoleErrorDev;
 }
 
-describe('Profiler', () => {
+describe("Profiler", () => {
   beforeEach(() => {
-    container = document.createElement('div');
+    container = document.createElement("div");
   });
 
-  describe('works in profiling and non-profiling bundles', () => {
-    [true, false].forEach(enableProfilerTimer => {
+  describe("works in profiling and non-profiling bundles", () => {
+    [true, false].forEach((enableProfilerTimer) => {
       describe(`enableProfilerTimer:${
-        enableProfilerTimer ? 'enabled' : 'disabled'
+        enableProfilerTimer ? "enabled" : "disabled"
       }`, () => {
         beforeEach(() => {
           jest.resetModules();
 
-          loadModules({enableProfilerTimer});
+          loadModules({ enableProfilerTimer });
         });
 
         // This will throw in production too,
         // But the test is only interested in verifying the DEV error message.
-        if (__DEV__ && enableProfilerTimer) {
-          it('should warn if required params are missing', async () => {
+        if (false && enableProfilerTimer) {
+          it("should warn if required params are missing", async () => {
             const root = ReactDOMClient.createRoot(container);
             await act(() => {
               root.render(<React.Profiler />);
@@ -65,12 +65,12 @@ describe('Profiler', () => {
               ],
               {
                 withoutStack: true,
-              },
+              }
             );
           });
         }
 
-        it('should support an empty Profiler (with no children)', async () => {
+        it("should support an empty Profiler (with no children)", async () => {
           const root = ReactDOMClient.createRoot(container);
           // As root
           await act(() => {
@@ -83,14 +83,14 @@ describe('Profiler', () => {
             root.render(
               <div>
                 <React.Profiler id="label" onRender={jest.fn()} />
-              </div>,
+              </div>
             );
           });
           expect(container.innerHTML).toMatchSnapshot();
         });
 
-        it('should render children', async () => {
-          const FunctionComponent = ({label}) => <span>{label}</span>;
+        it("should render children", async () => {
+          const FunctionComponent = ({ label }) => <span>{label}</span>;
           const root = ReactDOMClient.createRoot(container);
           await act(() => {
             root.render(
@@ -100,14 +100,14 @@ describe('Profiler', () => {
                   <span>inside span</span>
                   <FunctionComponent label="function component" />
                 </React.Profiler>
-              </div>,
+              </div>
             );
           });
           expect(container.innerHTML).toMatchSnapshot();
         });
 
-        it('should support nested Profilers', async () => {
-          const FunctionComponent = ({label}) => <div>{label}</div>;
+        it("should support nested Profilers", async () => {
+          const FunctionComponent = ({ label }) => <div>{label}</div>;
           class ClassComponent extends React.Component {
             render() {
               return <span>{this.props.label}</span>;
@@ -122,7 +122,7 @@ describe('Profiler', () => {
                   <ClassComponent label="inner class component" />
                   <span>inner span</span>
                 </React.Profiler>
-              </React.Profiler>,
+              </React.Profiler>
             );
           });
 

@@ -7,7 +7,7 @@
  * @emails react-core
  * @jest-environment node
  */
-'use strict';
+"use strict";
 
 let React;
 let ReactNoop;
@@ -19,10 +19,10 @@ let assertLog;
 let serverAct;
 let waitFor;
 
-describe('ReactOwnerStacks', () => {
+describe("ReactOwnerStacks", () => {
   beforeEach(function () {
     let time = 10;
-    advanceTimersByTime = timeMS => {
+    advanceTimersByTime = (timeMS) => {
       jest.advanceTimersByTime(timeMS);
       time += timeMS;
     };
@@ -30,47 +30,47 @@ describe('ReactOwnerStacks', () => {
     const now = jest.fn().mockImplementation(() => {
       return time++;
     });
-    Object.defineProperty(performance, 'timeOrigin', {
+    Object.defineProperty(performance, "timeOrigin", {
       value: time,
       configurable: true,
     });
-    Object.defineProperty(performance, 'now', {
+    Object.defineProperty(performance, "now", {
       value: now,
       configurable: true,
     });
 
     jest.resetModules();
-    React = require('react');
-    ReactNoop = require('react-noop-renderer');
-    ReactNoopServer = require('react-noop-renderer/server');
-    Scheduler = require('scheduler');
-    act = require('internal-test-utils').act;
-    assertLog = require('internal-test-utils').assertLog;
-    serverAct = require('internal-test-utils').serverAct;
-    waitFor = require('internal-test-utils').waitFor;
+    React = require("react");
+    ReactNoop = require("react-noop-renderer");
+    ReactNoopServer = require("react-noop-renderer/server");
+    Scheduler = require("scheduler");
+    act = require("internal-test-utils").act;
+    assertLog = require("internal-test-utils").assertLog;
+    serverAct = require("internal-test-utils").serverAct;
+    waitFor = require("internal-test-utils").waitFor;
   });
 
   function normalizeCodeLocInfo(str) {
     return (
       str &&
       str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function (m, name) {
-        return '\n    in ' + name + ' (at **)';
+        return "\n    in " + name + " (at **)";
       })
     );
   }
 
-  it('behavior in production', () => {
-    if (!__DEV__) {
-      if (gate('fb')) {
-        expect(React).toHaveProperty('captureOwnerStack', undefined);
+  it("behavior in production", () => {
+    if (!false) {
+      if (gate("fb")) {
+        expect(React).toHaveProperty("captureOwnerStack", undefined);
       } else {
-        expect(React).not.toHaveProperty('captureOwnerStack');
+        expect(React).not.toHaveProperty("captureOwnerStack");
       }
     }
   });
 
   // @gate __DEV__
-  it('can get the component owner stacks during rendering in dev', async () => {
+  it("can get the component owner stacks during rendering in dev", async () => {
     let stack;
 
     function Foo() {
@@ -92,18 +92,18 @@ describe('ReactOwnerStacks', () => {
       ReactNoop.render(
         <div>
           <Foo />
-        </div>,
+        </div>
       );
     });
 
     expect(normalizeCodeLocInfo(stack)).toBe(
-      '\n    in Bar (at **)' + '\n    in Foo (at **)',
+      "\n    in Bar (at **)" + "\n    in Foo (at **)"
     );
   });
 
-  it('returns null outside of render', async () => {
+  it("returns null outside of render", async () => {
     // Awkward to gate since some builds will have `captureOwnerStack` return null in prod
-    if (__DEV__) {
+    if (false) {
       expect(React.captureOwnerStack()).toBe(null);
 
       await act(() => {
@@ -115,8 +115,8 @@ describe('ReactOwnerStacks', () => {
   });
 
   // @gate __DEV__
-  it('cuts off at the owner stack limit', async () => {
-    function App({siblingsBeforeStackOne}) {
+  it("cuts off at the owner stack limit", async () => {
+    function App({ siblingsBeforeStackOne }) {
       const children = [];
       for (
         let i = 0;
@@ -156,7 +156,7 @@ describe('ReactOwnerStacks', () => {
           key="one"
           // Should be the value with of `ownerStackLimit` with `__VARIANT__` so that we see the cutoff
           siblingsBeforeStackOne={500}
-        />,
+        />
       );
     });
 
@@ -166,12 +166,12 @@ describe('ReactOwnerStacks', () => {
       stackTwo: normalizeCodeLocInfo(stackTwo),
     }).toEqual({
       pendingTimers: 0,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: __VARIANT__
         ? // captured right after cutoff
-          '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in App (at **)',
+          "\n    in App (at **)",
     });
 
     await act(() => {
@@ -180,7 +180,7 @@ describe('ReactOwnerStacks', () => {
           // TODO: Owner Stacks should update on re-render.
           key="two"
           siblingsBeforeStackOne={0}
-        />,
+        />
       );
     });
 
@@ -192,14 +192,14 @@ describe('ReactOwnerStacks', () => {
       pendingTimers: 0,
       stackOne: __VARIANT__
         ? // We re-rendered immediately so not enough time has ellapsed to reset the limit.
-          '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in App (at **)',
+          "\n    in App (at **)",
       stackTwo: __VARIANT__
         ? // We re-rendered immediately so not enough time has ellapsed to reset the limit.
-          '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in App (at **)',
+          "\n    in App (at **)",
     });
 
     // advance time so that we reset the limit
@@ -213,7 +213,7 @@ describe('ReactOwnerStacks', () => {
           // We reset after <App /> so we need to render one more
           // to have similar cutoff as the initial render (key="one")
           siblingsBeforeStackOne={501}
-        />,
+        />
       );
     });
 
@@ -223,18 +223,18 @@ describe('ReactOwnerStacks', () => {
       stackTwo: normalizeCodeLocInfo(stackTwo),
     }).toEqual({
       pendingTimers: 0,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: __VARIANT__
         ? // captured right after cutoff
-          '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in App (at **)',
+          "\n    in App (at **)",
     });
   });
 
   // @gate __DEV__
-  it('Fiber: resets the owner stack limit periodically', async () => {
-    function App({siblingsBeforeStackOne, timeout}) {
+  it("Fiber: resets the owner stack limit periodically", async () => {
+    function App({ siblingsBeforeStackOne, timeout }) {
       const children = [];
       for (
         let i = 0;
@@ -260,17 +260,17 @@ describe('ReactOwnerStacks', () => {
 
     let stackOne;
     function OwnerStackOne() {
-      Scheduler.log('render OwnerStackOne');
+      Scheduler.log("render OwnerStackOne");
       stackOne = React.captureOwnerStack();
     }
 
     let stackTwo;
     function OwnerStackTwo() {
-      Scheduler.log('render OwnerStackTwo');
+      Scheduler.log("render OwnerStackTwo");
       stackTwo = React.captureOwnerStack();
     }
-    function OwnerStackDelayed({timeout}) {
-      Scheduler.log('render OwnerStackDelayed');
+    function OwnerStackDelayed({ timeout }) {
+      Scheduler.log("render OwnerStackDelayed");
       React.use(timeout);
       return <OwnerStackTwo />;
     }
@@ -282,19 +282,19 @@ describe('ReactOwnerStacks', () => {
           // Should be the value with of `ownerStackLimit` with `__VARIANT__` so that we see the cutoff
           siblingsBeforeStackOne={500}
           timeout={
-            new Promise(resolve =>
+            new Promise((resolve) =>
               setTimeout(
                 resolve,
                 // Must be greater or equal then the reset interval
-                1000,
-              ),
+                1000
+              )
             )
           }
-        />,
+        />
       );
     });
 
-    await waitFor(['render OwnerStackOne', 'render OwnerStackDelayed']);
+    await waitFor(["render OwnerStackOne", "render OwnerStackDelayed"]);
 
     expect({
       pendingTimers: jest.getTimerCount(),
@@ -303,14 +303,14 @@ describe('ReactOwnerStacks', () => {
     }).toEqual({
       // 1 for the timeout
       pendingTimers: 1,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: undefined,
     });
 
     // resolve `timeout` Promise
     advanceTimersByTime(1000);
 
-    await waitFor(['render OwnerStackDelayed', 'render OwnerStackTwo']);
+    await waitFor(["render OwnerStackDelayed", "render OwnerStackTwo"]);
 
     expect({
       pendingTimers: jest.getTimerCount(),
@@ -318,19 +318,19 @@ describe('ReactOwnerStacks', () => {
       stackTwo: normalizeCodeLocInfo(stackTwo),
     }).toEqual({
       pendingTimers: 0,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: __VARIANT__
         ? // We don't reset in Fiber until we start a new render.
           // Here we just continued after a ping.
-          '\n    in UnknownOwner (at **)' + '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)" + "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in OwnerStackDelayed (at **)' + '\n    in App (at **)',
+          "\n    in OwnerStackDelayed (at **)" + "\n    in App (at **)",
     });
   });
 
   // @gate __DEV__
-  it('Fizz: resets the owner stack limit periodically', async () => {
-    function App({siblingsBeforeStackOne, timeout}) {
+  it("Fizz: resets the owner stack limit periodically", async () => {
+    function App({ siblingsBeforeStackOne, timeout }) {
       const children = [];
       for (
         let i = 0;
@@ -356,17 +356,17 @@ describe('ReactOwnerStacks', () => {
 
     let stackOne;
     function OwnerStackOne() {
-      Scheduler.log('render OwnerStackOne');
+      Scheduler.log("render OwnerStackOne");
       stackOne = React.captureOwnerStack();
     }
 
     let stackTwo;
     function OwnerStackTwo() {
-      Scheduler.log('render OwnerStackTwo');
+      Scheduler.log("render OwnerStackTwo");
       stackTwo = React.captureOwnerStack();
     }
-    function OwnerStackDelayed({timeout}) {
-      Scheduler.log('render OwnerStackDelayed');
+    function OwnerStackDelayed({ timeout }) {
+      Scheduler.log("render OwnerStackDelayed");
       React.use(timeout);
       return <OwnerStackTwo />;
     }
@@ -377,18 +377,18 @@ describe('ReactOwnerStacks', () => {
         // Should be the value with of `ownerStackLimit` with `__VARIANT__` so that we see the cutoff
         siblingsBeforeStackOne={500}
         timeout={
-          new Promise(resolve =>
+          new Promise((resolve) =>
             setTimeout(
               resolve,
               // Must be greater or equal then the reset interval
-              1000,
-            ),
+              1000
+            )
           )
         }
-      />,
+      />
     );
 
-    assertLog(['render OwnerStackOne', 'render OwnerStackDelayed']);
+    assertLog(["render OwnerStackOne", "render OwnerStackDelayed"]);
 
     expect({
       pendingTimers: jest.getTimerCount(),
@@ -397,7 +397,7 @@ describe('ReactOwnerStacks', () => {
     }).toEqual({
       // 1 for the timeout
       pendingTimers: 1,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: undefined,
     });
 
@@ -411,13 +411,13 @@ describe('ReactOwnerStacks', () => {
       stackTwo: normalizeCodeLocInfo(stackTwo),
     }).toEqual({
       pendingTimers: 0,
-      stackOne: '\n    in App (at **)',
+      stackOne: "\n    in App (at **)",
       stackTwo: __VARIANT__
         ? // We don't reset in Fiber until we start a new render.
           // Here we just continued after a ping.
-          '\n    in UnknownOwner (at **)' + '\n    in UnknownOwner (at **)'
+          "\n    in UnknownOwner (at **)" + "\n    in UnknownOwner (at **)"
         : // We never hit the limit outside __VARIANT__
-          '\n    in OwnerStackDelayed (at **)' + '\n    in App (at **)',
+          "\n    in OwnerStackDelayed (at **)" + "\n    in App (at **)",
     });
   });
 });

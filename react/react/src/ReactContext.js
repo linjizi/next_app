@@ -7,9 +7,9 @@
  * @flow
  */
 
-import {REACT_CONSUMER_TYPE, REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
+import { REACT_CONSUMER_TYPE, REACT_CONTEXT_TYPE } from "shared/ReactSymbols";
 
-import type {ReactContext} from 'shared/ReactTypes';
+import type { ReactContext } from "shared/ReactTypes";
 
 export function createContext<T>(defaultValue: T): ReactContext<T> {
   // TODO: Second argument used to be an optional `calculateChangedBits`
@@ -37,7 +37,7 @@ export function createContext<T>(defaultValue: T): ReactContext<T> {
     $$typeof: REACT_CONSUMER_TYPE,
     _context: context,
   };
-  if (__DEV__) {
+  if (false) {
     context._currentRenderer = null;
     context._currentRenderer2 = null;
   }

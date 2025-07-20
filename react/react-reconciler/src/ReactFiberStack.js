@@ -7,15 +7,15 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
+import type { Fiber } from "./ReactInternalTypes";
 
-export type StackCursor<T> = {current: T};
+export type StackCursor<T> = { current: T };
 
 const valueStack: Array<any> = [];
 
 let fiberStack: Array<Fiber | null>;
 
-if (__DEV__) {
+if (false) {
   fiberStack = [];
 }
 
@@ -29,15 +29,15 @@ function createCursor<T>(defaultValue: T): StackCursor<T> {
 
 function pop<T>(cursor: StackCursor<T>, fiber: Fiber): void {
   if (index < 0) {
-    if (__DEV__) {
-      console.error('Unexpected pop.');
+    if (false) {
+      console.error("Unexpected pop.");
     }
     return;
   }
 
-  if (__DEV__) {
+  if (false) {
     if (fiber !== fiberStack[index]) {
-      console.error('Unexpected Fiber popped.');
+      console.error("Unexpected Fiber popped.");
     }
   }
 
@@ -45,7 +45,7 @@ function pop<T>(cursor: StackCursor<T>, fiber: Fiber): void {
 
   valueStack[index] = null;
 
-  if (__DEV__) {
+  if (false) {
     fiberStack[index] = null;
   }
 
@@ -57,10 +57,10 @@ function push<T>(cursor: StackCursor<T>, value: T, fiber: Fiber): void {
 
   valueStack[index] = cursor.current;
 
-  if (__DEV__) {
+  if (false) {
     fiberStack[index] = fiber;
   }
 
   cursor.current = value;
 }
-export {createCursor, pop, push};
+export { createCursor, pop, push };

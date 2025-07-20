@@ -15,14 +15,14 @@ import {
   REACT_SUSPENSE_TYPE,
   REACT_SUSPENSE_LIST_TYPE,
   REACT_VIEW_TRANSITION_TYPE,
-} from 'shared/ReactSymbols';
+} from "shared/ReactSymbols";
 
-import type {LazyComponent} from 'react/src/ReactLazy';
+import type { LazyComponent } from "react/src/ReactLazy";
 
-import isArray from 'shared/isArray';
-import getPrototypeOf from 'shared/getPrototypeOf';
+import isArray from "shared/isArray";
+import getPrototypeOf from "shared/getPrototypeOf";
 
-import {enableViewTransition} from 'shared/ReactFeatureFlags';
+import { enableViewTransition } from "shared/ReactFeatureFlags";
 
 // Used for DEV messages to keep track of which parent rendered some props,
 // in case they error.
@@ -60,7 +60,7 @@ export function isGetter(object: any, name: string): boolean {
   if (descriptor === undefined) {
     return isGetter(getPrototypeOf(object), name);
   }
-  return typeof descriptor.get === 'function';
+  return typeof descriptor.get === "function";
 }
 
 export function isSimpleObject(object: any): boolean {
@@ -75,8 +75,8 @@ export function isSimpleObject(object: any): boolean {
     }
     if (!descriptor.enumerable) {
       if (
-        (names[i] === 'key' || names[i] === 'ref') &&
-        typeof descriptor.get === 'function'
+        (names[i] === "key" || names[i] === "ref") &&
+        typeof descriptor.get === "function"
       ) {
         // React adds key and ref getters to props objects to issue warnings.
         // Those getters will not be transferred to the client, but that's ok,
@@ -103,30 +103,30 @@ function describeKeyForErrorMessage(key: string): string {
 
 export function describeValueForErrorMessage(value: mixed): string {
   switch (typeof value) {
-    case 'string': {
+    case "string": {
       return JSON.stringify(
-        value.length <= 10 ? value : value.slice(0, 10) + '...',
+        value.length <= 10 ? value : value.slice(0, 10) + "..."
       );
     }
-    case 'object': {
+    case "object": {
       if (isArray(value)) {
-        return '[...]';
+        return "[...]";
       }
       if (value !== null && value.$$typeof === CLIENT_REFERENCE_TAG) {
         return describeClientReference(value);
       }
       const name = objectName(value);
-      if (name === 'Object') {
-        return '{...}';
+      if (name === "Object") {
+        return "{...}";
       }
       return name;
     }
-    case 'function': {
+    case "function": {
       if ((value: any).$$typeof === CLIENT_REFERENCE_TAG) {
         return describeClientReference(value);
       }
       const name = (value: any).displayName || value.name;
-      return name ? 'function ' + name : 'function';
+      return name ? "function " + name : "function";
     }
     default:
       // eslint-disable-next-line react-internal/safe-string-coercion
@@ -135,20 +135,20 @@ export function describeValueForErrorMessage(value: mixed): string {
 }
 
 function describeElementType(type: any): string {
-  if (typeof type === 'string') {
+  if (typeof type === "string") {
     return type;
   }
   switch (type) {
     case REACT_SUSPENSE_TYPE:
-      return 'Suspense';
+      return "Suspense";
     case REACT_SUSPENSE_LIST_TYPE:
-      return 'SuspenseList';
+      return "SuspenseList";
     case REACT_VIEW_TRANSITION_TYPE:
       if (enableViewTransition) {
-        return 'ViewTransition';
+        return "ViewTransition";
       }
   }
-  if (typeof type === 'object') {
+  if (typeof type === "object") {
     switch (type.$$typeof) {
       case REACT_FORWARD_REF_TYPE:
         return describeElementType(type.render);
@@ -165,108 +165,110 @@ function describeElementType(type: any): string {
       }
     }
   }
-  return '';
+  return "";
 }
 
-const CLIENT_REFERENCE_TAG = Symbol.for('react.client.reference');
+const CLIENT_REFERENCE_TAG = Symbol.for("react.client.reference");
 
 function describeClientReference(ref: any) {
-  return 'client';
+  return "client";
 }
 
 export function describeObjectForErrorMessage(
-  objectOrArray: {+[key: string | number]: mixed, ...} | $ReadOnlyArray<mixed>,
-  expandedName?: string,
+  objectOrArray:
+    | { +[key: string | number]: mixed, ... }
+    | $ReadOnlyArray<mixed>,
+  expandedName?: string
 ): string {
   const objKind = objectName(objectOrArray);
-  if (objKind !== 'Object' && objKind !== 'Array') {
+  if (objKind !== "Object" && objKind !== "Array") {
     return objKind;
   }
-  let str = '';
+  let str = "";
   let start = -1;
   let length = 0;
   if (isArray(objectOrArray)) {
-    if (__DEV__ && jsxChildrenParents.has(objectOrArray)) {
+    if (false && jsxChildrenParents.has(objectOrArray)) {
       // Print JSX Children
       const type = jsxChildrenParents.get(objectOrArray);
-      str = '<' + describeElementType(type) + '>';
+      str = "<" + describeElementType(type) + ">";
       const array: $ReadOnlyArray<mixed> = objectOrArray;
       for (let i = 0; i < array.length; i++) {
         const value = array[i];
         let substr;
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           substr = value;
-        } else if (typeof value === 'object' && value !== null) {
-          substr = '{' + describeObjectForErrorMessage(value) + '}';
+        } else if (typeof value === "object" && value !== null) {
+          substr = "{" + describeObjectForErrorMessage(value) + "}";
         } else {
-          substr = '{' + describeValueForErrorMessage(value) + '}';
+          substr = "{" + describeValueForErrorMessage(value) + "}";
         }
-        if ('' + i === expandedName) {
+        if ("" + i === expandedName) {
           start = str.length;
           length = substr.length;
           str += substr;
         } else if (substr.length < 15 && str.length + substr.length < 40) {
           str += substr;
         } else {
-          str += '{...}';
+          str += "{...}";
         }
       }
-      str += '</' + describeElementType(type) + '>';
+      str += "</" + describeElementType(type) + ">";
     } else {
       // Print Array
-      str = '[';
+      str = "[";
       const array: $ReadOnlyArray<mixed> = objectOrArray;
       for (let i = 0; i < array.length; i++) {
         if (i > 0) {
-          str += ', ';
+          str += ", ";
         }
         const value = array[i];
         let substr;
-        if (typeof value === 'object' && value !== null) {
+        if (typeof value === "object" && value !== null) {
           substr = describeObjectForErrorMessage(value);
         } else {
           substr = describeValueForErrorMessage(value);
         }
-        if ('' + i === expandedName) {
+        if ("" + i === expandedName) {
           start = str.length;
           length = substr.length;
           str += substr;
         } else if (substr.length < 10 && str.length + substr.length < 40) {
           str += substr;
         } else {
-          str += '...';
+          str += "...";
         }
       }
-      str += ']';
+      str += "]";
     }
   } else {
     if (objectOrArray.$$typeof === REACT_ELEMENT_TYPE) {
-      str = '<' + describeElementType(objectOrArray.type) + '/>';
+      str = "<" + describeElementType(objectOrArray.type) + "/>";
     } else if (objectOrArray.$$typeof === CLIENT_REFERENCE_TAG) {
       return describeClientReference(objectOrArray);
-    } else if (__DEV__ && jsxPropsParents.has(objectOrArray)) {
+    } else if (false && jsxPropsParents.has(objectOrArray)) {
       // Print JSX
       const type = jsxPropsParents.get(objectOrArray);
-      str = '<' + (describeElementType(type) || '...');
-      const object: {+[key: string | number]: mixed, ...} = objectOrArray;
+      str = "<" + (describeElementType(type) || "...");
+      const object: { +[key: string | number]: mixed, ... } = objectOrArray;
       const names = Object.keys(object);
       for (let i = 0; i < names.length; i++) {
-        str += ' ';
+        str += " ";
         const name = names[i];
-        str += describeKeyForErrorMessage(name) + '=';
+        str += describeKeyForErrorMessage(name) + "=";
         const value = object[name];
         let substr;
         if (
           name === expandedName &&
-          typeof value === 'object' &&
+          typeof value === "object" &&
           value !== null
         ) {
           substr = describeObjectForErrorMessage(value);
         } else {
           substr = describeValueForErrorMessage(value);
         }
-        if (typeof value !== 'string') {
-          substr = '{' + substr + '}';
+        if (typeof value !== "string") {
+          substr = "{" + substr + "}";
         }
         if (name === expandedName) {
           start = str.length;
@@ -275,24 +277,24 @@ export function describeObjectForErrorMessage(
         } else if (substr.length < 10 && str.length + substr.length < 40) {
           str += substr;
         } else {
-          str += '...';
+          str += "...";
         }
       }
-      str += '>';
+      str += ">";
     } else {
       // Print Object
-      str = '{';
-      const object: {+[key: string | number]: mixed, ...} = objectOrArray;
+      str = "{";
+      const object: { +[key: string | number]: mixed, ... } = objectOrArray;
       const names = Object.keys(object);
       for (let i = 0; i < names.length; i++) {
         if (i > 0) {
-          str += ', ';
+          str += ", ";
         }
         const name = names[i];
-        str += describeKeyForErrorMessage(name) + ': ';
+        str += describeKeyForErrorMessage(name) + ": ";
         const value = object[name];
         let substr;
-        if (typeof value === 'object' && value !== null) {
+        if (typeof value === "object" && value !== null) {
           substr = describeObjectForErrorMessage(value);
         } else {
           substr = describeValueForErrorMessage(value);
@@ -304,18 +306,18 @@ export function describeObjectForErrorMessage(
         } else if (substr.length < 10 && str.length + substr.length < 40) {
           str += substr;
         } else {
-          str += '...';
+          str += "...";
         }
       }
-      str += '}';
+      str += "}";
     }
   }
   if (expandedName === undefined) {
     return str;
   }
   if (start > -1 && length > 0) {
-    const highlight = ' '.repeat(start) + '^'.repeat(length);
-    return '\n  ' + str + '\n  ' + highlight;
+    const highlight = " ".repeat(start) + "^".repeat(length);
+    return "\n  " + str + "\n  " + highlight;
   }
-  return '\n  ' + str;
+  return "\n  " + str;
 }

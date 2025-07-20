@@ -7,10 +7,10 @@
  * @flow
  */
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
 export function captureOwnerStack(): null | string {
-  if (__DEV__) {
+  if (false) {
     const getCurrentStack = ReactSharedInternals.getCurrentStack;
     if (getCurrentStack === null) {
       return null;

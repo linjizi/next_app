@@ -7,7 +7,7 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
 let React;
 let ReactDOM;
@@ -24,30 +24,30 @@ function normalizeCodeLocInfo(str) {
   return (
     str &&
     str.replace(/^ +(?:at|in) ([\S]+)[^\n]*/gm, function (m, name) {
-      const dot = name.lastIndexOf('.');
+      const dot = name.lastIndexOf(".");
       if (dot !== -1) {
         name = name.slice(dot + 1);
       }
-      return '    in ' + name + (/\d/.test(m) ? ' (at **)' : '');
+      return "    in " + name + (/\d/.test(m) ? " (at **)" : "");
     })
   );
 }
 
-describe('ReactUpdates', () => {
+describe("ReactUpdates", () => {
   beforeEach(() => {
     jest.resetModules();
-    React = require('react');
-    ReactDOM = require('react-dom');
-    ReactDOMClient = require('react-dom/client');
+    React = require("react");
+    ReactDOM = require("react-dom");
+    ReactDOMClient = require("react-dom/client");
     findDOMNode =
       ReactDOM.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE
         .findDOMNode;
-    act = require('internal-test-utils').act;
+    act = require("internal-test-utils").act;
     assertConsoleErrorDev =
-      require('internal-test-utils').assertConsoleErrorDev;
-    Scheduler = require('scheduler');
+      require("internal-test-utils").assertConsoleErrorDev;
+    Scheduler = require("scheduler");
 
-    const InternalTestUtils = require('internal-test-utils');
+    const InternalTestUtils = require("internal-test-utils");
     waitForAll = InternalTestUtils.waitForAll;
     waitFor = InternalTestUtils.waitFor;
     assertLog = InternalTestUtils.assertLog;
@@ -55,18 +55,19 @@ describe('ReactUpdates', () => {
 
   // Note: This is based on a similar component we use in www. We can delete
   // once the extra div wrapper is no longer necessary.
-  function LegacyHiddenDiv({children, mode}) {
+  function LegacyHiddenDiv({ children, mode }) {
     return (
-      <div hidden={mode === 'hidden'}>
+      <div hidden={mode === "hidden"}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === "hidden" ? "unstable-defer-without-hiding" : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
     );
   }
 
-  it('should batch state when updating state twice', async () => {
+  it("should batch state when updating state twice", async () => {
     let componentState;
     let setState;
 
@@ -75,35 +76,35 @@ describe('ReactUpdates', () => {
       componentState = state;
       setState = _setState;
       React.useLayoutEffect(() => {
-        Scheduler.log('Commit');
+        Scheduler.log("Commit");
       });
 
       return <div>{state}</div>;
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Component />);
     });
 
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('0');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("0");
 
     await act(() => {
       setState(1);
       setState(2);
       expect(componentState).toBe(0);
-      expect(container.firstChild.textContent).toBe('0');
+      expect(container.firstChild.textContent).toBe("0");
       assertLog([]);
     });
 
     expect(componentState).toBe(2);
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('2');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("2");
   });
 
-  it('should batch state when updating two different states', async () => {
+  it("should batch state when updating two different states", async () => {
     let componentStateA;
     let componentStateB;
     let setStateA;
@@ -118,7 +119,7 @@ describe('ReactUpdates', () => {
       setStateB = _setStateB;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Commit');
+        Scheduler.log("Commit");
       });
 
       return (
@@ -128,43 +129,43 @@ describe('ReactUpdates', () => {
       );
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Component />);
     });
 
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('0 0');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("0 0");
 
     await act(() => {
       setStateA(1);
       setStateB(2);
       expect(componentStateA).toBe(0);
       expect(componentStateB).toBe(0);
-      expect(container.firstChild.textContent).toBe('0 0');
+      expect(container.firstChild.textContent).toBe("0 0");
       assertLog([]);
     });
 
     expect(componentStateA).toBe(1);
     expect(componentStateB).toBe(2);
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('1 2');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("1 2");
   });
 
-  it('should batch state and props together', async () => {
+  it("should batch state and props together", async () => {
     let setState;
     let componentProp;
     let componentState;
 
-    function Component({prop}) {
+    function Component({ prop }) {
       const [state, _setState] = React.useState(0);
       componentProp = prop;
       componentState = state;
       setState = _setState;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Commit');
+        Scheduler.log("Commit");
       });
 
       return (
@@ -174,31 +175,31 @@ describe('ReactUpdates', () => {
       );
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Component prop={0} />);
     });
 
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('0 0');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("0 0");
 
     await act(() => {
       root.render(<Component prop={1} />);
       setState(2);
       expect(componentProp).toBe(0);
       expect(componentState).toBe(0);
-      expect(container.firstChild.textContent).toBe('0 0');
+      expect(container.firstChild.textContent).toBe("0 0");
       assertLog([]);
     });
 
     expect(componentProp).toBe(1);
     expect(componentState).toBe(2);
-    assertLog(['Commit']);
-    expect(container.firstChild.textContent).toBe('1 2');
+    assertLog(["Commit"]);
+    expect(container.firstChild.textContent).toBe("1 2");
   });
 
-  it('should batch parent/child state updates together', async () => {
+  it("should batch parent/child state updates together", async () => {
     let childRef;
     let parentState;
     let childState;
@@ -211,7 +212,7 @@ describe('ReactUpdates', () => {
       setParentState = _setState;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Parent Commit');
+        Scheduler.log("Parent Commit");
       });
 
       return (
@@ -221,33 +222,34 @@ describe('ReactUpdates', () => {
       );
     }
 
-    function Child({prop}) {
+    function Child({ prop }) {
       const [state, _setState] = React.useState(0);
       childState = state;
       setChildState = _setState;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Child Commit');
+        Scheduler.log("Child Commit");
       });
 
       return (
         <div
-          ref={ref => {
+          ref={(ref) => {
             childRef = ref;
-          }}>
+          }}
+        >
           {prop} {state}
         </div>
       );
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Parent />);
     });
 
-    assertLog(['Child Commit', 'Parent Commit']);
-    expect(childRef.textContent).toBe('0 0');
+    assertLog(["Child Commit", "Parent Commit"]);
+    expect(childRef.textContent).toBe("0 0");
 
     await act(() => {
       // Parent update first.
@@ -255,17 +257,17 @@ describe('ReactUpdates', () => {
       setChildState(2);
       expect(parentState).toBe(0);
       expect(childState).toBe(0);
-      expect(childRef.textContent).toBe('0 0');
+      expect(childRef.textContent).toBe("0 0");
       assertLog([]);
     });
 
     expect(parentState).toBe(1);
     expect(childState).toBe(2);
-    expect(childRef.textContent).toBe('1 2');
-    assertLog(['Child Commit', 'Parent Commit']);
+    expect(childRef.textContent).toBe("1 2");
+    assertLog(["Child Commit", "Parent Commit"]);
   });
 
-  it('should batch child/parent state updates together', async () => {
+  it("should batch child/parent state updates together", async () => {
     let childRef;
     let parentState;
     let childState;
@@ -278,7 +280,7 @@ describe('ReactUpdates', () => {
       setParentState = _setState;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Parent Commit');
+        Scheduler.log("Parent Commit");
       });
 
       return (
@@ -288,33 +290,34 @@ describe('ReactUpdates', () => {
       );
     }
 
-    function Child({prop}) {
+    function Child({ prop }) {
       const [state, _setState] = React.useState(0);
       childState = state;
       setChildState = _setState;
 
       React.useLayoutEffect(() => {
-        Scheduler.log('Child Commit');
+        Scheduler.log("Child Commit");
       });
 
       return (
         <div
-          ref={ref => {
+          ref={(ref) => {
             childRef = ref;
-          }}>
+          }}
+        >
           {prop} {state}
         </div>
       );
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Parent />);
     });
 
-    assertLog(['Child Commit', 'Parent Commit']);
-    expect(childRef.textContent).toBe('0 0');
+    assertLog(["Child Commit", "Parent Commit"]);
+    expect(childRef.textContent).toBe("0 0");
 
     await act(() => {
       // Child update first.
@@ -322,27 +325,27 @@ describe('ReactUpdates', () => {
       setParentState(1);
       expect(parentState).toBe(0);
       expect(childState).toBe(0);
-      expect(childRef.textContent).toBe('0 0');
+      expect(childRef.textContent).toBe("0 0");
       assertLog([]);
     });
 
     expect(parentState).toBe(1);
     expect(childState).toBe(2);
-    expect(childRef.textContent).toBe('1 2');
-    assertLog(['Child Commit', 'Parent Commit']);
+    expect(childRef.textContent).toBe("1 2");
+    assertLog(["Child Commit", "Parent Commit"]);
   });
 
-  it('should support chained state updates', async () => {
+  it("should support chained state updates", async () => {
     let instance;
     class Component extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
       constructor(props) {
         super(props);
         instance = this;
       }
 
       componentDidUpdate() {
-        Scheduler.log('Update');
+        Scheduler.log("Update");
       }
 
       render() {
@@ -350,44 +353,44 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Component />);
     });
 
     expect(instance.state.x).toBe(0);
-    expect(container.firstChild.textContent).toBe('0');
+    expect(container.firstChild.textContent).toBe("0");
 
     let innerCallbackRun = false;
     await act(() => {
-      instance.setState({x: 1}, function () {
-        instance.setState({x: 2}, function () {
+      instance.setState({ x: 1 }, function () {
+        instance.setState({ x: 2 }, function () {
           innerCallbackRun = true;
           expect(instance.state.x).toBe(2);
-          expect(container.firstChild.textContent).toBe('2');
-          assertLog(['Update']);
+          expect(container.firstChild.textContent).toBe("2");
+          assertLog(["Update"]);
         });
         expect(instance.state.x).toBe(1);
-        expect(container.firstChild.textContent).toBe('1');
-        assertLog(['Update']);
+        expect(container.firstChild.textContent).toBe("1");
+        assertLog(["Update"]);
       });
       expect(instance.state.x).toBe(0);
-      expect(container.firstChild.textContent).toBe('0');
+      expect(container.firstChild.textContent).toBe("0");
       assertLog([]);
     });
 
     assertLog([]);
     expect(instance.state.x).toBe(2);
     expect(innerCallbackRun).toBeTruthy();
-    expect(container.firstChild.textContent).toBe('2');
+    expect(container.firstChild.textContent).toBe("2");
   });
 
-  it('should batch forceUpdate together', async () => {
+  it("should batch forceUpdate together", async () => {
     let instance;
     let shouldUpdateCount = 0;
     class Component extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
 
       constructor(props) {
         super(props);
@@ -398,7 +401,7 @@ describe('ReactUpdates', () => {
       }
 
       componentDidUpdate() {
-        Scheduler.log('Update');
+        Scheduler.log("Update");
       }
 
       render() {
@@ -406,7 +409,7 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Component />);
@@ -416,25 +419,25 @@ describe('ReactUpdates', () => {
     expect(instance.state.x).toBe(0);
 
     await act(() => {
-      instance.setState({x: 1}, function () {
-        Scheduler.log('callback');
+      instance.setState({ x: 1 }, function () {
+        Scheduler.log("callback");
       });
       instance.forceUpdate(function () {
-        Scheduler.log('forceUpdate');
+        Scheduler.log("forceUpdate");
       });
       assertLog([]);
       expect(instance.state.x).toBe(0);
-      expect(container.firstChild.textContent).toBe('0');
+      expect(container.firstChild.textContent).toBe("0");
     });
 
     // shouldComponentUpdate shouldn't be called since we're forcing
     expect(shouldUpdateCount).toBe(0);
-    assertLog(['Update', 'callback', 'forceUpdate']);
+    assertLog(["Update", "callback", "forceUpdate"]);
     expect(instance.state.x).toBe(1);
-    expect(container.firstChild.textContent).toBe('1');
+    expect(container.firstChild.textContent).toBe("1");
   });
 
-  it('should update children even if parent blocks updates', async () => {
+  it("should update children even if parent blocks updates", async () => {
     let instance;
     class Parent extends React.Component {
       childRef = React.createRef();
@@ -448,40 +451,40 @@ describe('ReactUpdates', () => {
       }
 
       render() {
-        Scheduler.log('Parent render');
+        Scheduler.log("Parent render");
         return <Child ref={this.childRef} />;
       }
     }
 
     class Child extends React.Component {
       render() {
-        Scheduler.log('Child render');
+        Scheduler.log("Child render");
         return <div />;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Parent />);
     });
 
-    assertLog(['Parent render', 'Child render']);
+    assertLog(["Parent render", "Child render"]);
 
     await act(() => {
-      instance.setState({x: 1});
+      instance.setState({ x: 1 });
     });
 
     assertLog([]);
 
     await act(() => {
-      instance.childRef.current.setState({x: 1});
+      instance.childRef.current.setState({ x: 1 });
     });
 
-    assertLog(['Child render']);
+    assertLog(["Child render"]);
   });
 
-  it('should not reconcile children passed via props', async () => {
+  it("should not reconcile children passed via props", async () => {
     class Top extends React.Component {
       render() {
         return (
@@ -498,28 +501,28 @@ describe('ReactUpdates', () => {
       }
 
       render() {
-        Scheduler.log('Middle');
+        Scheduler.log("Middle");
         return React.Children.only(this.props.children);
       }
     }
 
     class Bottom extends React.Component {
       render() {
-        Scheduler.log('Bottom');
+        Scheduler.log("Bottom");
         return null;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Top />);
     });
 
-    assertLog(['Middle', 'Bottom', 'Middle']);
+    assertLog(["Middle", "Bottom", "Middle"]);
   });
 
-  it('should flow updates correctly', async () => {
+  it("should flow updates correctly", async () => {
     let willUpdates = [];
     let didUpdates = [];
     let instance;
@@ -552,7 +555,7 @@ describe('ReactUpdates', () => {
     Object.assign(Child.prototype, UpdateLoggingMixin);
 
     class Switcher extends React.Component {
-      state = {tabKey: 'hello'};
+      state = { tabKey: "hello" };
       boxRef = React.createRef();
       switcherDivRef = React.createRef();
       render() {
@@ -563,8 +566,9 @@ describe('ReactUpdates', () => {
             <div
               ref={this.switcherDivRef}
               style={{
-                display: this.state.tabKey === child.key ? '' : 'none',
-              }}>
+                display: this.state.tabKey === child.key ? "" : "none",
+              }}
+            >
               {child}
             </div>
           </Box>
@@ -590,7 +594,7 @@ describe('ReactUpdates', () => {
     }
     Object.assign(App.prototype, UpdateLoggingMixin);
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     await act(() => {
       ReactDOMClient.createRoot(container).render(<App />);
     });
@@ -608,13 +612,13 @@ describe('ReactUpdates', () => {
     }
 
     function triggerUpdate(c) {
-      c.setState({x: 1});
+      c.setState({ x: 1 });
     }
 
     async function testUpdates(
       components,
       desiredWillUpdates,
-      desiredDidUpdates,
+      desiredDidUpdates
     ) {
       let i;
 
@@ -642,50 +646,50 @@ describe('ReactUpdates', () => {
         instance.switcherRef.current,
       ],
       // Owner-child relationships have inverse will and did
-      ['Switcher', 'Box'],
-      ['Box', 'Switcher'],
+      ["Switcher", "Box"],
+      ["Box", "Switcher"]
     );
 
     await testUpdates(
       [instance.childRef.current, instance.switcherRef.current.boxRef.current],
       // Not owner-child so reconcile independently
-      ['Box', 'Child'],
-      ['Box', 'Child'],
+      ["Box", "Child"],
+      ["Box", "Child"]
     );
 
     await testUpdates(
       [instance.childRef.current, instance.switcherRef.current],
       // Switcher owns Box and Child, Box does not own Child
-      ['Switcher', 'Box', 'Child'],
-      ['Box', 'Switcher', 'Child'],
+      ["Switcher", "Box", "Child"],
+      ["Box", "Switcher", "Child"]
     );
   });
 
-  it('should queue mount-ready handlers across different roots', async () => {
+  it("should queue mount-ready handlers across different roots", async () => {
     // We'll define two components A and B, then update both of them. When A's
     // componentDidUpdate handlers is called, B's DOM should already have been
     // updated.
 
-    const bContainer = document.createElement('div');
+    const bContainer = document.createElement("div");
     let a;
     let b;
 
     let aUpdated = false;
 
     class A extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
       constructor(props) {
         super(props);
         a = this;
       }
       componentDidUpdate() {
-        expect(findDOMNode(b).textContent).toBe('B1');
+        expect(findDOMNode(b).textContent).toBe("B1");
         aUpdated = true;
       }
 
       render() {
         let portal = null;
-        portal = ReactDOM.createPortal(<B ref={n => (b = n)} />, bContainer);
+        portal = ReactDOM.createPortal(<B ref={(n) => (b = n)} />, bContainer);
         return (
           <div>
             A{this.state.x}
@@ -696,39 +700,39 @@ describe('ReactUpdates', () => {
     }
 
     class B extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
 
       render() {
         return <div>B{this.state.x}</div>;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<A />);
     });
 
     await act(() => {
-      a.setState({x: 1});
-      b.setState({x: 1});
+      a.setState({ x: 1 });
+      b.setState({ x: 1 });
     });
 
     expect(aUpdated).toBe(true);
   });
 
-  it('should flush updates in the correct order', async () => {
+  it("should flush updates in the correct order", async () => {
     const updates = [];
     let instance;
     class Outer extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
       innerRef = React.createRef();
       constructor(props) {
         super(props);
         instance = this;
       }
       render() {
-        updates.push('Outer-render-' + this.state.x);
+        updates.push("Outer-render-" + this.state.x);
         return (
           <div>
             <Inner x={this.state.x} ref={this.innerRef} />
@@ -738,75 +742,75 @@ describe('ReactUpdates', () => {
 
       componentDidUpdate() {
         const x = this.state.x;
-        updates.push('Outer-didUpdate-' + x);
-        updates.push('Inner-setState-' + x);
-        this.innerRef.current.setState({x: x}, function () {
-          updates.push('Inner-callback-' + x);
+        updates.push("Outer-didUpdate-" + x);
+        updates.push("Inner-setState-" + x);
+        this.innerRef.current.setState({ x: x }, function () {
+          updates.push("Inner-callback-" + x);
         });
       }
     }
 
     class Inner extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
 
       render() {
-        updates.push('Inner-render-' + this.props.x + '-' + this.state.x);
+        updates.push("Inner-render-" + this.props.x + "-" + this.state.x);
         return <div />;
       }
 
       componentDidUpdate() {
-        updates.push('Inner-didUpdate-' + this.props.x + '-' + this.state.x);
+        updates.push("Inner-didUpdate-" + this.props.x + "-" + this.state.x);
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Outer />);
     });
 
     await act(() => {
-      updates.push('Outer-setState-1');
-      instance.setState({x: 1}, function () {
-        updates.push('Outer-callback-1');
-        updates.push('Outer-setState-2');
-        instance.setState({x: 2}, function () {
-          updates.push('Outer-callback-2');
+      updates.push("Outer-setState-1");
+      instance.setState({ x: 1 }, function () {
+        updates.push("Outer-callback-1");
+        updates.push("Outer-setState-2");
+        instance.setState({ x: 2 }, function () {
+          updates.push("Outer-callback-2");
         });
       });
     });
 
     expect(updates).toEqual([
-      'Outer-render-0',
-      'Inner-render-0-0',
+      "Outer-render-0",
+      "Inner-render-0-0",
 
-      'Outer-setState-1',
-      'Outer-render-1',
-      'Inner-render-1-0',
-      'Inner-didUpdate-1-0',
-      'Outer-didUpdate-1',
+      "Outer-setState-1",
+      "Outer-render-1",
+      "Inner-render-1-0",
+      "Inner-didUpdate-1-0",
+      "Outer-didUpdate-1",
       // Happens in a batch, so don't re-render yet
-      'Inner-setState-1',
-      'Outer-callback-1',
+      "Inner-setState-1",
+      "Outer-callback-1",
 
       // Happens in a batch
-      'Outer-setState-2',
+      "Outer-setState-2",
 
       // Flush batched updates all at once
-      'Outer-render-2',
-      'Inner-render-2-1',
-      'Inner-didUpdate-2-1',
-      'Inner-callback-1',
-      'Outer-didUpdate-2',
-      'Inner-setState-2',
-      'Outer-callback-2',
-      'Inner-render-2-2',
-      'Inner-didUpdate-2-2',
-      'Inner-callback-2',
+      "Outer-render-2",
+      "Inner-render-2-1",
+      "Inner-didUpdate-2-1",
+      "Inner-callback-1",
+      "Outer-didUpdate-2",
+      "Inner-setState-2",
+      "Outer-callback-2",
+      "Inner-render-2-2",
+      "Inner-didUpdate-2-2",
+      "Inner-callback-2",
     ]);
   });
 
-  it('should flush updates in the correct order across roots', async () => {
+  it("should flush updates in the correct order across roots", async () => {
     const instances = [];
     const updates = [];
 
@@ -824,13 +828,13 @@ describe('ReactUpdates', () => {
             <MockComponent
               depth={this.props.depth + 1}
               count={this.props.count}
-            />,
+            />
           );
         }
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<MockComponent depth={0} count={2} />);
@@ -848,11 +852,11 @@ describe('ReactUpdates', () => {
     expect(updates).toEqual([0, 1, 2, 0, 1, 2]);
   });
 
-  it('should queue nested updates', async () => {
+  it("should queue nested updates", async () => {
     // See https://github.com/facebook/react/issues/1147
 
     class X extends React.Component {
-      state = {s: 0};
+      state = { s: 0 };
 
       render() {
         if (this.state.s === 0) {
@@ -867,9 +871,9 @@ describe('ReactUpdates', () => {
       }
 
       go = () => {
-        this.setState({s: 1});
-        this.setState({s: 0});
-        this.setState({s: 1});
+        this.setState({ s: 1 });
+        this.setState({ s: 0 });
+        this.setState({ s: 1 });
       };
     }
 
@@ -893,34 +897,34 @@ describe('ReactUpdates', () => {
       }
     }
 
-    let container = document.createElement('div');
+    let container = document.createElement("div");
     let root = ReactDOMClient.createRoot(container);
     let x;
     await act(() => {
-      root.render(<X ref={current => (x = current)} />);
+      root.render(<X ref={(current) => (x = current)} />);
     });
 
-    container = document.createElement('div');
+    container = document.createElement("div");
     root = ReactDOMClient.createRoot(container);
     let y;
     await act(() => {
-      root.render(<Y ref={current => (y = current)} />);
+      root.render(<Y ref={(current) => (y = current)} />);
     });
 
-    expect(findDOMNode(x).textContent).toBe('0');
+    expect(findDOMNode(x).textContent).toBe("0");
 
     await act(() => {
       y.forceUpdate();
     });
-    expect(findDOMNode(x).textContent).toBe('1');
+    expect(findDOMNode(x).textContent).toBe("1");
   });
 
-  it('should queue updates from during mount', async () => {
+  it("should queue updates from during mount", async () => {
     // See https://github.com/facebook/react/issues/1353
     let a;
 
     class A extends React.Component {
-      state = {x: 0};
+      state = { x: 0 };
 
       UNSAFE_componentWillMount() {
         a = this;
@@ -933,7 +937,7 @@ describe('ReactUpdates', () => {
 
     class B extends React.Component {
       UNSAFE_componentWillMount() {
-        a.setState({x: 1});
+        a.setState({ x: 1 });
       }
 
       render() {
@@ -941,7 +945,7 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
 
     await act(() => {
@@ -949,23 +953,23 @@ describe('ReactUpdates', () => {
         <div>
           <A />
           <B />
-        </div>,
+        </div>
       );
     });
 
-    expect(container.firstChild.textContent).toBe('A1');
+    expect(container.firstChild.textContent).toBe("A1");
   });
 
-  it('calls componentWillReceiveProps setState callback properly', async () => {
+  it("calls componentWillReceiveProps setState callback properly", async () => {
     class A extends React.Component {
-      state = {x: this.props.x};
+      state = { x: this.props.x };
 
       UNSAFE_componentWillReceiveProps(nextProps) {
         const newX = nextProps.x;
-        this.setState({x: newX}, function () {
+        this.setState({ x: newX }, function () {
           // State should have updated by the time this callback gets called
           expect(this.state.x).toBe(newX);
-          Scheduler.log('Callback');
+          Scheduler.log("Callback");
         });
       }
 
@@ -974,7 +978,7 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<A x={1} />);
@@ -986,28 +990,28 @@ describe('ReactUpdates', () => {
       root.render(<A x={2} />);
     });
 
-    assertLog(['Callback']);
+    assertLog(["Callback"]);
   });
 
-  it('does not call render after a component as been deleted', async () => {
+  it("does not call render after a component as been deleted", async () => {
     let componentA = null;
     let componentB = null;
 
     class B extends React.Component {
-      state = {updates: 0};
+      state = { updates: 0 };
 
       componentDidMount() {
         componentB = this;
       }
 
       render() {
-        Scheduler.log('B');
+        Scheduler.log("B");
         return <div />;
       }
     }
 
     class A extends React.Component {
-      state = {showB: true};
+      state = { showB: true };
 
       componentDidMount() {
         componentA = this;
@@ -1017,24 +1021,24 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<A />);
     });
-    assertLog(['B']);
+    assertLog(["B"]);
 
     await act(() => {
       // B will have scheduled an update but the batching should ensure that its
       // update never fires.
-      componentB.setState({updates: 1});
-      componentA.setState({showB: false});
+      componentB.setState({ updates: 1 });
+      componentA.setState({ showB: false });
     });
 
     assertLog([]);
   });
 
-  it('throws in setState if the update callback is not a function', async () => {
+  it("throws in setState if the update callback is not a function", async () => {
     function Foo() {
       this.a = 1;
       this.b = 2;
@@ -1048,66 +1052,66 @@ describe('ReactUpdates', () => {
       }
     }
 
-    let container = document.createElement('div');
+    let container = document.createElement("div");
     let root = ReactDOMClient.createRoot(container);
     let component;
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(async () => {
       await act(() => {
-        component.setState({}, 'no');
+        component.setState({}, "no");
       });
     }).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: no',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: no"
     );
     assertConsoleErrorDev(
       [
-        'Expected the last optional `callback` argument to be ' +
-          'a function. Instead received: no.',
+        "Expected the last optional `callback` argument to be " +
+          "a function. Instead received: no.",
       ],
-      {withoutStack: true},
+      { withoutStack: true }
     );
-    container = document.createElement('div');
+    container = document.createElement("div");
     root = ReactDOMClient.createRoot(container);
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(async () => {
       await act(() => {
-        component.setState({}, {foo: 'bar'});
+        component.setState({}, { foo: "bar" });
       });
     }).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: [object Object]',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: [object Object]"
     );
     assertConsoleErrorDev(
       [
-        'Expected the last optional `callback` argument to be ' +
+        "Expected the last optional `callback` argument to be " +
           "a function. Instead received: { foo: 'bar' }.",
       ],
-      {withoutStack: true},
+      { withoutStack: true }
     );
-    container = document.createElement('div');
+    container = document.createElement("div");
     root = ReactDOMClient.createRoot(container);
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(
       act(() => {
         component.setState({}, new Foo());
-      }),
+      })
     ).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: [object Object]',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: [object Object]"
     );
   });
 
-  it('throws in forceUpdate if the update callback is not a function', async () => {
+  it("throws in forceUpdate if the update callback is not a function", async () => {
     function Foo() {
       this.a = 1;
       this.b = 2;
@@ -1121,67 +1125,67 @@ describe('ReactUpdates', () => {
       }
     }
 
-    let container = document.createElement('div');
+    let container = document.createElement("div");
     let root = ReactDOMClient.createRoot(container);
     let component;
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(async () => {
       await act(() => {
-        component.forceUpdate('no');
+        component.forceUpdate("no");
       });
     }).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: no',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: no"
     );
     assertConsoleErrorDev(
       [
-        'Expected the last optional `callback` argument to be ' +
-          'a function. Instead received: no.',
+        "Expected the last optional `callback` argument to be " +
+          "a function. Instead received: no.",
       ],
-      {withoutStack: true},
+      { withoutStack: true }
     );
-    container = document.createElement('div');
+    container = document.createElement("div");
     root = ReactDOMClient.createRoot(container);
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(async () => {
       await act(() => {
-        component.forceUpdate({foo: 'bar'});
+        component.forceUpdate({ foo: "bar" });
       });
     }).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: [object Object]',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: [object Object]"
     );
     assertConsoleErrorDev(
       [
-        'Expected the last optional `callback` argument to be ' +
+        "Expected the last optional `callback` argument to be " +
           "a function. Instead received: { foo: 'bar' }.",
       ],
-      {withoutStack: true},
+      { withoutStack: true }
     );
     // Make sure the warning is deduplicated and doesn't fire again
-    container = document.createElement('div');
+    container = document.createElement("div");
     root = ReactDOMClient.createRoot(container);
     await act(() => {
-      root.render(<A ref={current => (component = current)} />);
+      root.render(<A ref={(current) => (component = current)} />);
     });
 
     await expect(
       act(() => {
         component.forceUpdate(new Foo());
-      }),
+      })
     ).rejects.toThrowError(
-      'Invalid argument passed as callback. Expected a function. Instead ' +
-        'received: [object Object]',
+      "Invalid argument passed as callback. Expected a function. Instead " +
+        "received: [object Object]"
     );
   });
 
-  it('does not update one component twice in a batch (#2410)', async () => {
+  it("does not update one component twice in a batch (#2410)", async () => {
     let parent;
     class Parent extends React.Component {
       childRef = React.createRef();
@@ -1203,12 +1207,12 @@ describe('ReactUpdates', () => {
     let once = false;
 
     class Child extends React.Component {
-      state = {updated: false};
+      state = { updated: false };
 
       UNSAFE_componentWillUpdate() {
         if (!once) {
           once = true;
-          this.setState({updated: true});
+          this.setState({ updated: true });
         }
       }
 
@@ -1229,7 +1233,7 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Parent />);
@@ -1244,19 +1248,19 @@ describe('ReactUpdates', () => {
     expect.assertions(6);
   });
 
-  it('does not update one component twice in a batch (#6371)', async () => {
+  it("does not update one component twice in a batch (#6371)", async () => {
     let callbacks = [];
     function emitChange() {
-      callbacks.forEach(c => c());
+      callbacks.forEach((c) => c());
     }
 
     class App extends React.Component {
       constructor(props) {
         super(props);
-        this.state = {showChild: true};
+        this.state = { showChild: true };
       }
       componentDidMount() {
-        this.setState({showChild: false});
+        this.setState({ showChild: false });
       }
       render() {
         return (
@@ -1284,14 +1288,14 @@ describe('ReactUpdates', () => {
         callbacks.push(this.onChange);
       }
       componentWillUnmount() {
-        callbacks = callbacks.filter(c => c !== this.onChange);
+        callbacks = callbacks.filter((c) => c !== this.onChange);
       }
       render() {
         return <div key={Math.random()} onClick={function () {}} />;
       }
     }
 
-    const root = ReactDOMClient.createRoot(document.createElement('div'));
+    const root = ReactDOMClient.createRoot(document.createElement("div"));
     await act(() => {
       root.render(<App />);
     });
@@ -1300,101 +1304,101 @@ describe('ReactUpdates', () => {
     expect(true).toBe(true);
   });
 
-  it('handles reentrant mounting in synchronous mode', async () => {
+  it("handles reentrant mounting in synchronous mode", async () => {
     let onChangeCalled = false;
     class Editor extends React.Component {
       render() {
         return <div>{this.props.text}</div>;
       }
       componentDidMount() {
-        Scheduler.log('Mount');
+        Scheduler.log("Mount");
         // This should be called only once but we guard just in case.
         if (!this.props.rendered) {
-          this.props.onChange({rendered: true});
+          this.props.onChange({ rendered: true });
         }
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     function render() {
       root.render(
         <Editor
-          onChange={newProps => {
+          onChange={(newProps) => {
             onChangeCalled = true;
-            props = {...props, ...newProps};
+            props = { ...props, ...newProps };
             render();
           }}
           {...props}
-        />,
+        />
       );
     }
 
-    let props = {text: 'hello', rendered: false};
+    let props = { text: "hello", rendered: false };
     await act(() => {
       render();
     });
-    assertLog(['Mount']);
-    props = {...props, text: 'goodbye'};
+    assertLog(["Mount"]);
+    props = { ...props, text: "goodbye" };
     await act(() => {
       render();
     });
 
     assertLog([]);
-    expect(container.textContent).toBe('goodbye');
+    expect(container.textContent).toBe("goodbye");
     expect(onChangeCalled).toBeTruthy();
   });
 
-  it('mounts and unmounts are batched', async () => {
-    const container = document.createElement('div');
+  it("mounts and unmounts are batched", async () => {
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
 
     await act(() => {
       root.render(<div>Hello</div>);
-      expect(container.textContent).toBe('');
+      expect(container.textContent).toBe("");
       root.unmount(container);
-      expect(container.textContent).toBe('');
+      expect(container.textContent).toBe("");
     });
 
-    expect(container.textContent).toBe('');
+    expect(container.textContent).toBe("");
   });
 
-  it('uses correct base state for setState inside render phase', async () => {
+  it("uses correct base state for setState inside render phase", async () => {
     class Foo extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       render() {
         const memoizedStep = this.state.step;
-        this.setState(baseState => {
+        this.setState((baseState) => {
           const baseStep = baseState.step;
           Scheduler.log(`base: ${baseStep}, memoized: ${memoizedStep}`);
-          return baseStep === 0 ? {step: 1} : null;
+          return baseStep === 0 ? { step: 1 } : null;
         });
         return null;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<Foo />);
     });
     assertConsoleErrorDev([
-      'Cannot update during an existing state transition (such as within `render`). ' +
-        'Render methods should be a pure function of props and state.\n' +
-        '    in Foo (at **)',
+      "Cannot update during an existing state transition (such as within `render`). " +
+        "Render methods should be a pure function of props and state.\n" +
+        "    in Foo (at **)",
     ]);
 
-    assertLog(['base: 0, memoized: 0', 'base: 1, memoized: 1']);
+    assertLog(["base: 0, memoized: 0", "base: 1, memoized: 1"]);
   });
 
-  it('does not re-render if state update is null', async () => {
-    const container = document.createElement('div');
+  it("does not re-render if state update is null", async () => {
+    const container = document.createElement("div");
 
     let instance;
     class Foo extends React.Component {
       render() {
         instance = this;
-        Scheduler.log('render');
+        Scheduler.log("render");
         return <div />;
       }
     }
@@ -1403,28 +1407,28 @@ describe('ReactUpdates', () => {
       root.render(<Foo />);
     });
 
-    assertLog(['render']);
+    assertLog(["render"]);
     await act(() => {
       instance.setState(() => null);
     });
     assertLog([]);
   });
 
-  it('synchronously renders hidden subtrees', async () => {
-    const container = document.createElement('div');
+  it("synchronously renders hidden subtrees", async () => {
+    const container = document.createElement("div");
 
     function Baz() {
-      Scheduler.log('Baz');
+      Scheduler.log("Baz");
       return null;
     }
 
     function Bar() {
-      Scheduler.log('Bar');
+      Scheduler.log("Bar");
       return null;
     }
 
     function Foo() {
-      Scheduler.log('Foo');
+      Scheduler.log("Foo");
       return (
         <div>
           <div hidden={true}>
@@ -1440,21 +1444,21 @@ describe('ReactUpdates', () => {
       // Mount
       root.render(<Foo />);
     });
-    assertLog(['Foo', 'Bar', 'Baz']);
+    assertLog(["Foo", "Bar", "Baz"]);
 
     await act(() => {
       // Update
       root.render(<Foo />);
     });
-    assertLog(['Foo', 'Bar', 'Baz']);
+    assertLog(["Foo", "Bar", "Baz"]);
   });
 
   // @gate www
-  it('delays sync updates inside hidden subtrees in Concurrent Mode', async () => {
-    const container = document.createElement('div');
+  it("delays sync updates inside hidden subtrees in Concurrent Mode", async () => {
+    const container = document.createElement("div");
 
     function Baz() {
-      Scheduler.log('Baz');
+      Scheduler.log("Baz");
       return <p>baz</p>;
     }
 
@@ -1462,14 +1466,14 @@ describe('ReactUpdates', () => {
     function Bar() {
       const [counter, _setCounter] = React.useState(0);
       setCounter = _setCounter;
-      Scheduler.log('Bar');
+      Scheduler.log("Bar");
       return <p>bar {counter}</p>;
     }
 
     function Foo() {
-      Scheduler.log('Foo');
+      Scheduler.log("Foo");
       React.useEffect(() => {
-        Scheduler.log('Foo#effect');
+        Scheduler.log("Foo#effect");
       });
       return (
         <div>
@@ -1485,35 +1489,35 @@ describe('ReactUpdates', () => {
     let hiddenDiv;
     await act(async () => {
       root.render(<Foo />);
-      await waitFor(['Foo', 'Baz', 'Foo#effect']);
+      await waitFor(["Foo", "Baz", "Foo#effect"]);
       hiddenDiv = container.firstChild.firstChild;
       expect(hiddenDiv.hidden).toBe(true);
-      expect(hiddenDiv.innerHTML).toBe('');
+      expect(hiddenDiv.innerHTML).toBe("");
       // Run offscreen update
-      await waitForAll(['Bar']);
+      await waitForAll(["Bar"]);
       expect(hiddenDiv.hidden).toBe(true);
-      expect(hiddenDiv.innerHTML).toBe('<p>bar 0</p>');
+      expect(hiddenDiv.innerHTML).toBe("<p>bar 0</p>");
     });
 
     ReactDOM.flushSync(() => {
       setCounter(1);
     });
     // Should not flush yet
-    expect(hiddenDiv.innerHTML).toBe('<p>bar 0</p>');
+    expect(hiddenDiv.innerHTML).toBe("<p>bar 0</p>");
 
     // Run offscreen update
-    await waitForAll(['Bar']);
-    expect(hiddenDiv.innerHTML).toBe('<p>bar 1</p>');
+    await waitForAll(["Bar"]);
+    expect(hiddenDiv.innerHTML).toBe("<p>bar 1</p>");
   });
 
-  it('can render ridiculously large number of roots without triggering infinite update loop error', async () => {
-    function Component({trigger}) {
+  it("can render ridiculously large number of roots without triggering infinite update loop error", async () => {
+    function Component({ trigger }) {
       const [state, setState] = React.useState(0);
 
       React.useEffect(() => {
         if (trigger) {
-          Scheduler.log('Trigger');
-          setState(c => c + 1);
+          Scheduler.log("Trigger");
+          setState((c) => c + 1);
         }
       }, [trigger]);
 
@@ -1525,13 +1529,13 @@ describe('ReactUpdates', () => {
         const limit = 1200;
         for (let i = 0; i < limit; i++) {
           if (i < limit - 1) {
-            ReactDOMClient.createRoot(document.createElement('div')).render(
-              <Component />,
+            ReactDOMClient.createRoot(document.createElement("div")).render(
+              <Component />
             );
           } else {
             // The "nested update limit" error isn't thrown until setState
-            ReactDOMClient.createRoot(document.createElement('div')).render(
-              <Component trigger={true} />,
+            ReactDOMClient.createRoot(document.createElement("div")).render(
+              <Component trigger={true} />
             );
           }
         }
@@ -1541,27 +1545,27 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const root = ReactDOMClient.createRoot(document.createElement('div'));
+    const root = ReactDOMClient.createRoot(document.createElement("div"));
     await act(() => {
       root.render(<Foo />);
     });
 
     // Make sure the setState trigger runs.
-    assertLog(['Trigger']);
+    assertLog(["Trigger"]);
   });
 
-  it('resets the update counter for unrelated updates', async () => {
-    const container = document.createElement('div');
+  it("resets the update counter for unrelated updates", async () => {
+    const container = document.createElement("div");
     const ref = React.createRef();
 
     class EventuallyTerminating extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       componentDidMount() {
-        this.setState({step: 1});
+        this.setState({ step: 1 });
       }
       componentDidUpdate() {
         if (this.state.step < limit) {
-          this.setState({step: this.state.step + 1});
+          this.setState({ step: this.state.step + 1 });
         }
       }
       render() {
@@ -1575,7 +1579,7 @@ describe('ReactUpdates', () => {
       await act(() => {
         root.render(<EventuallyTerminating ref={ref} />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
 
     // Verify that we don't go over the limit if these updates are unrelated.
     limit -= 10;
@@ -1585,34 +1589,34 @@ describe('ReactUpdates', () => {
     expect(container.textContent).toBe(limit.toString());
 
     await act(() => {
-      ref.current.setState({step: 0});
+      ref.current.setState({ step: 0 });
     });
     expect(container.textContent).toBe(limit.toString());
 
     await act(() => {
-      ref.current.setState({step: 0});
+      ref.current.setState({ step: 0 });
     });
     expect(container.textContent).toBe(limit.toString());
 
     limit += 10;
     await expect(async () => {
       await act(() => {
-        ref.current.setState({step: 0});
+        ref.current.setState({ step: 0 });
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
     expect(ref.current).toBe(null);
   });
 
-  it('does not fall into an infinite update loop', async () => {
+  it("does not fall into an infinite update loop", async () => {
     class NonTerminating extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
 
       componentDidMount() {
-        this.setState({step: 1});
+        this.setState({ step: 1 });
       }
 
       componentDidUpdate() {
-        this.setState({step: 2});
+        this.setState({ step: 2 });
       }
 
       render() {
@@ -1625,42 +1629,42 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
 
     await expect(async () => {
       await act(() => {
         root.render(<NonTerminating />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
   });
 
-  it('does not fall into an infinite update loop with useLayoutEffect', async () => {
+  it("does not fall into an infinite update loop with useLayoutEffect", async () => {
     function NonTerminating() {
       const [step, setStep] = React.useState(0);
       React.useLayoutEffect(() => {
-        setStep(x => x + 1);
+        setStep((x) => x + 1);
       });
       return step;
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await expect(async () => {
       await act(() => {
         root.render(<NonTerminating />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
   });
 
-  it('can recover after falling into an infinite update loop', async () => {
+  it("can recover after falling into an infinite update loop", async () => {
     class NonTerminating extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       componentDidMount() {
-        this.setState({step: 1});
+        this.setState({ step: 1 });
       }
       componentDidUpdate() {
-        this.setState({step: 2});
+        this.setState({ step: 2 });
       }
       render() {
         return this.state.step;
@@ -1668,42 +1672,42 @@ describe('ReactUpdates', () => {
     }
 
     class Terminating extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       componentDidMount() {
-        this.setState({step: 1});
+        this.setState({ step: 1 });
       }
       render() {
         return this.state.step;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await expect(async () => {
       await act(() => {
         root.render(<NonTerminating />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
 
     await act(() => {
       root.render(<Terminating />);
     });
-    expect(container.textContent).toBe('1');
+    expect(container.textContent).toBe("1");
 
     await expect(async () => {
       await act(() => {
         root.render(<NonTerminating />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
     await act(() => {
       root.render(<Terminating />);
     });
-    expect(container.textContent).toBe('1');
+    expect(container.textContent).toBe("1");
   });
 
-  it('does not fall into mutually recursive infinite update loop with same container', async () => {
+  it("does not fall into mutually recursive infinite update loop with same container", async () => {
     // Note: this test would fail if there were two or more different roots.
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     class A extends React.Component {
       componentDidMount() {
@@ -1727,12 +1731,12 @@ describe('ReactUpdates', () => {
       await act(() => {
         root.render(<A />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
   });
 
-  it('does not fall into an infinite error loop', async () => {
+  it("does not fall into an infinite error loop", async () => {
     function BadRender() {
-      throw new Error('error');
+      throw new Error("error");
     }
 
     class ErrorBoundary extends React.Component {
@@ -1748,29 +1752,29 @@ describe('ReactUpdates', () => {
     }
 
     class NonTerminating extends React.Component {
-      state = {step: 0};
+      state = { step: 0 };
       remount() {
-        this.setState(state => ({step: state.step + 1}));
+        this.setState((state) => ({ step: state.step + 1 }));
       }
       render() {
         return <ErrorBoundary key={this.state.step} parent={this} />;
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await expect(async () => {
       await act(() => {
         root.render(<NonTerminating />);
       });
-    }).rejects.toThrow('Maximum');
+    }).rejects.toThrow("Maximum");
   });
 
-  it('can schedule ridiculously many updates within the same batch without triggering a maximum update error', async () => {
+  it("can schedule ridiculously many updates within the same batch without triggering a maximum update error", async () => {
     const subscribers = [];
     const limit = 1200;
     class Child extends React.Component {
-      state = {value: 'initial'};
+      state = { value: "initial" };
       componentDidMount() {
         subscribers.push(this);
       }
@@ -1789,15 +1793,15 @@ describe('ReactUpdates', () => {
       }
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
     await act(() => {
       root.render(<App />);
     });
 
     await act(() => {
-      subscribers.forEach(s => {
-        s.setState({value: 'update'});
+      subscribers.forEach((s) => {
+        s.setState({ value: "update" });
       });
     });
 
@@ -1805,7 +1809,7 @@ describe('ReactUpdates', () => {
   });
 
   it("does not infinite loop if there's a synchronous render phase update on another component", async () => {
-    if (gate(flags => !flags.enableInfiniteRenderLoopDetection)) {
+    if (gate((flags) => !flags.enableInfiniteRenderLoopDetection)) {
       return;
     }
     let setState;
@@ -1817,26 +1821,26 @@ describe('ReactUpdates', () => {
 
     function Child(step) {
       // This will cause an infinite update loop, and a warning in dev.
-      setState(n => n + 1);
+      setState((n) => n + 1);
       return null;
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
 
     await expect(async () => {
       await act(() => ReactDOM.flushSync(() => root.render(<App />)));
-    }).rejects.toThrow('Maximum update depth exceeded');
+    }).rejects.toThrow("Maximum update depth exceeded");
     assertConsoleErrorDev([
-      'Cannot update a component (`App`) while rendering a different component (`Child`). ' +
-        'To locate the bad setState() call inside `Child`, ' +
-        'follow the stack trace as described in https://react.dev/link/setstate-in-render\n' +
-        '    in App (at **)',
+      "Cannot update a component (`App`) while rendering a different component (`Child`). " +
+        "To locate the bad setState() call inside `Child`, " +
+        "follow the stack trace as described in https://react.dev/link/setstate-in-render\n" +
+        "    in App (at **)",
     ]);
   });
 
   it("does not infinite loop if there's an async render phase update on another component", async () => {
-    if (gate(flags => !flags.enableInfiniteRenderLoopDetection)) {
+    if (gate((flags) => !flags.enableInfiniteRenderLoopDetection)) {
       return;
     }
     let setState;
@@ -1848,34 +1852,34 @@ describe('ReactUpdates', () => {
 
     function Child(step) {
       // This will cause an infinite update loop, and a warning in dev.
-      setState(n => n + 1);
+      setState((n) => n + 1);
       return null;
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const root = ReactDOMClient.createRoot(container);
 
     await expect(async () => {
       await act(() => {
         React.startTransition(() => root.render(<App />));
       });
-    }).rejects.toThrow('Maximum update depth exceeded');
+    }).rejects.toThrow("Maximum update depth exceeded");
 
     assertConsoleErrorDev([
-      'Cannot update a component (`App`) while rendering a different component (`Child`). ' +
-        'To locate the bad setState() call inside `Child`, ' +
-        'follow the stack trace as described in https://react.dev/link/setstate-in-render\n' +
-        '    in App (at **)',
+      "Cannot update a component (`App`) while rendering a different component (`Child`). " +
+        "To locate the bad setState() call inside `Child`, " +
+        "follow the stack trace as described in https://react.dev/link/setstate-in-render\n" +
+        "    in App (at **)",
     ]);
   });
 
   // TODO: Replace this branch with @gate pragmas
-  if (__DEV__) {
-    it('warns about a deferred infinite update loop with useEffect', async () => {
+  if (false) {
+    it("warns about a deferred infinite update loop with useEffect", async () => {
       function NonTerminating() {
         const [step, setStep] = React.useState(0);
         React.useEffect(function myEffect() {
-          setStep(x => x + 1);
+          setStep((x) => x + 1);
         });
         return step;
       }
@@ -1888,28 +1892,28 @@ describe('ReactUpdates', () => {
       let ownerStack = null;
       let debugStack = null;
       const originalConsoleError = console.error;
-      console.error = e => {
+      console.error = (e) => {
         error = e;
         ownerStack = React.captureOwnerStack();
         debugStack = new Error().stack;
-        Scheduler.log('stop');
+        Scheduler.log("stop");
       };
       try {
-        const container = document.createElement('div');
+        const container = document.createElement("div");
         const root = ReactDOMClient.createRoot(container);
         root.render(<App />);
-        await waitFor(['stop']);
+        await waitFor(["stop"]);
       } finally {
         console.error = originalConsoleError;
       }
 
-      expect(error).toContain('Maximum update depth exceeded');
+      expect(error).toContain("Maximum update depth exceeded");
       // The currently executing effect should be on the native stack
-      expect(debugStack).toContain('at myEffect');
-      expect(ownerStack).toContain('at App');
+      expect(debugStack).toContain("at myEffect");
+      expect(ownerStack).toContain("at App");
     });
 
-    it('can have nested updates if they do not cross the limit', async () => {
+    it("can have nested updates if they do not cross the limit", async () => {
       let _setStep;
       const LIMIT = 50;
 
@@ -1918,53 +1922,53 @@ describe('ReactUpdates', () => {
         _setStep = setStep;
         React.useEffect(() => {
           if (step < LIMIT) {
-            setStep(x => x + 1);
+            setStep((x) => x + 1);
           }
         });
         Scheduler.log(step);
         return step;
       }
 
-      const container = document.createElement('div');
+      const container = document.createElement("div");
       const root = ReactDOMClient.createRoot(container);
       await act(() => {
         root.render(<Terminating />);
       });
 
-      assertLog(Array.from({length: LIMIT + 1}, (_, k) => k));
-      expect(container.textContent).toBe('50');
+      assertLog(Array.from({ length: LIMIT + 1 }, (_, k) => k));
+      expect(container.textContent).toBe("50");
       await act(() => {
         _setStep(0);
       });
-      expect(container.textContent).toBe('50');
+      expect(container.textContent).toBe("50");
     });
 
-    it('can have many updates inside useEffect without triggering a warning', async () => {
+    it("can have many updates inside useEffect without triggering a warning", async () => {
       function Terminating() {
         const [step, setStep] = React.useState(0);
         React.useEffect(() => {
           for (let i = 0; i < 1000; i++) {
-            setStep(x => x + 1);
+            setStep((x) => x + 1);
           }
-          Scheduler.log('Done');
+          Scheduler.log("Done");
         }, []);
         return step;
       }
 
-      const container = document.createElement('div');
+      const container = document.createElement("div");
       const root = ReactDOMClient.createRoot(container);
       await act(() => {
         root.render(<Terminating />);
       });
 
-      assertLog(['Done']);
-      expect(container.textContent).toBe('1000');
+      assertLog(["Done"]);
+      expect(container.textContent).toBe("1000");
     });
   }
 
-  it('prevents infinite update loop triggered by synchronous updates in useEffect', async () => {
+  it("prevents infinite update loop triggered by synchronous updates in useEffect", async () => {
     // Ignore flushSync warning
-    spyOnDev(console, 'error').mockImplementation(() => {});
+    spyOnDev(console, "error").mockImplementation(() => {});
 
     function NonTerminating() {
       const [step, setStep] = React.useState(0);
@@ -1984,12 +1988,12 @@ describe('ReactUpdates', () => {
       return step;
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const errors = [];
     const root = ReactDOMClient.createRoot(container, {
       onUncaughtError: (error, errorInfo) => {
         errors.push(
-          `${error.message}${normalizeCodeLocInfo(errorInfo.componentStack)}`,
+          `${error.message}${normalizeCodeLocInfo(errorInfo.componentStack)}`
         );
       },
     });
@@ -2000,17 +2004,17 @@ describe('ReactUpdates', () => {
     });
 
     expect(errors).toEqual([
-      'Maximum update depth exceeded. ' +
-        'This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. ' +
-        'React limits the number of nested updates to prevent infinite loops.' +
-        '\n    in NonTerminating (at **)',
+      "Maximum update depth exceeded. " +
+        "This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. " +
+        "React limits the number of nested updates to prevent infinite loops." +
+        "\n    in NonTerminating (at **)",
     ]);
   });
 
-  it('prevents infinite update loop triggered by too many updates in ref callbacks', async () => {
+  it("prevents infinite update loop triggered by too many updates in ref callbacks", async () => {
     let scheduleUpdate;
     function TooManyRefUpdates() {
-      const [count, _scheduleUpdate] = React.useReducer(c => c + 1, 0);
+      const [count, _scheduleUpdate] = React.useReducer((c) => c + 1, 0);
       scheduleUpdate = _scheduleUpdate;
 
       return (
@@ -2019,18 +2023,19 @@ describe('ReactUpdates', () => {
             for (let i = 0; i < 50; i++) {
               scheduleUpdate(1);
             }
-          }}>
+          }}
+        >
           {count}
         </div>
       );
     }
 
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     const errors = [];
     const root = ReactDOMClient.createRoot(container, {
       onUncaughtError: (error, errorInfo) => {
         errors.push(
-          `${error.message}${normalizeCodeLocInfo(errorInfo.componentStack)}`,
+          `${error.message}${normalizeCodeLocInfo(errorInfo.componentStack)}`
         );
       },
     });
@@ -2039,11 +2044,11 @@ describe('ReactUpdates', () => {
     });
 
     expect(errors).toEqual([
-      'Maximum update depth exceeded. ' +
-        'This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. ' +
-        'React limits the number of nested updates to prevent infinite loops.' +
-        '\n    in div' +
-        '\n    in TooManyRefUpdates (at **)',
+      "Maximum update depth exceeded. " +
+        "This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. " +
+        "React limits the number of nested updates to prevent infinite loops." +
+        "\n    in div" +
+        "\n    in TooManyRefUpdates (at **)",
     ]);
   });
 });

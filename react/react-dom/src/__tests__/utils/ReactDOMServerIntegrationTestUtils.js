@@ -7,10 +7,10 @@
  * @emails react-core
  */
 
-'use strict';
+"use strict";
 
-const stream = require('stream');
-const shouldIgnoreConsoleError = require('internal-test-utils/shouldIgnoreConsoleError');
+const stream = require("stream");
+const shouldIgnoreConsoleError = require("internal-test-utils/shouldIgnoreConsoleError");
 
 module.exports = function (initModules) {
   let ReactDOM;
@@ -19,27 +19,27 @@ module.exports = function (initModules) {
   let act;
 
   function resetModules() {
-    ({ReactDOM, ReactDOMClient, ReactDOMServer} = initModules());
-    act = require('internal-test-utils').act;
+    ({ ReactDOM, ReactDOMClient, ReactDOMServer } = initModules());
+    act = require("internal-test-utils").act;
   }
 
   function shouldUseDocument(reactElement) {
     // Used for whole document tests.
-    return reactElement && reactElement.type === 'html';
+    return reactElement && reactElement.type === "html";
   }
 
   function getContainerFromMarkup(reactElement, markup) {
     if (shouldUseDocument(reactElement)) {
-      const doc = document.implementation.createHTMLDocument('');
+      const doc = document.implementation.createHTMLDocument("");
       doc.open();
       doc.write(
         markup ||
-          '<!doctype html><html><meta charset=utf-8><title>test doc</title>',
+          "<!doctype html><html><meta charset=utf-8><title>test doc</title>"
       );
       doc.close();
       return doc;
     } else {
-      const container = document.createElement('div');
+      const container = document.createElement("div");
       container.innerHTML = markup;
       return container;
     }
@@ -56,7 +56,7 @@ module.exports = function (initModules) {
           onRecoverableError(e) {
             if (
               e.message.startsWith(
-                'There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering.',
+                "There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering."
               )
             ) {
               // We ignore this extra error because it shouldn't really need to be there if
@@ -86,7 +86,7 @@ module.exports = function (initModules) {
     } else {
       // TODO: Rewrite tests that use this helper to enumerate expected errors.
       // This will enable the helper to use the assertConsoleErrorDev instead of spying.
-      spyOnDev(console, 'error').mockImplementation(() => {});
+      spyOnDev(console, "error").mockImplementation(() => {});
     }
 
     const result = await fn();
@@ -105,7 +105,7 @@ module.exports = function (initModules) {
       }
       if (filteredWarnings.length !== count) {
         console.log(
-          `We expected ${count} warning(s), but saw ${filteredWarnings.length} warning(s).`,
+          `We expected ${count} warning(s), but saw ${filteredWarnings.length} warning(s).`
         );
         if (filteredWarnings.length > 0) {
           console.log(`We saw these warnings:`);
@@ -113,7 +113,7 @@ module.exports = function (initModules) {
             console.log(...filteredWarnings[i]);
           }
         }
-        if (__DEV__) {
+        if (false) {
           expect(console.error).toHaveBeenCalledTimes(count);
         }
       }
@@ -127,7 +127,7 @@ module.exports = function (initModules) {
     reactElement,
     domElement,
     forceHydrate,
-    errorCount = 0,
+    errorCount = 0
   ) {
     return expectErrors(async () => {
       await asyncReactDOMRender(reactElement, domElement, forceHydrate);
@@ -138,10 +138,10 @@ module.exports = function (initModules) {
   async function renderIntoString(reactElement, errorCount = 0) {
     return await expectErrors(
       () =>
-        new Promise(resolve =>
-          resolve(ReactDOMServer.renderToString(reactElement)),
+        new Promise((resolve) =>
+          resolve(ReactDOMServer.renderToString(reactElement))
         ),
-      errorCount,
+      errorCount
     );
   }
 
@@ -158,7 +158,7 @@ module.exports = function (initModules) {
   class DrainWritable extends stream.Writable {
     constructor(options) {
       super(options);
-      this.buffer = '';
+      this.buffer = "";
     }
 
     _write(chunk, encoding, cb) {
@@ -178,9 +178,9 @@ module.exports = function (initModules) {
             },
           });
           s.pipe(writable);
-          writable.on('finish', () => resolve(writable.buffer));
+          writable.on("finish", () => resolve(writable.buffer));
         }),
-      errorCount,
+      errorCount
     );
   }
 
@@ -202,7 +202,7 @@ module.exports = function (initModules) {
       // Documents can't be rendered from scratch.
       return clientRenderOnServerString(element, errorCount);
     }
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     return renderIntoDom(element, container, false, errorCount);
   };
 
@@ -217,7 +217,7 @@ module.exports = function (initModules) {
       element,
       container,
       true,
-      errorCount,
+      errorCount
     );
     let clientNode = firstClientNode;
 
@@ -245,7 +245,7 @@ module.exports = function (initModules) {
       element,
       shouldUseDocument(element)
         ? '<html><body><div id="badIdWhichWillCauseMismatch" /></body></html>'
-        : '<div id="badIdWhichWillCauseMismatch"></div>',
+        : '<div id="badIdWhichWillCauseMismatch"></div>'
     );
 
     await renderIntoDom(element, container, true, errorCount + 1);
@@ -261,16 +261,16 @@ module.exports = function (initModules) {
       // so instead, we'll render the children into the document element.
       cleanContainer = getContainerFromMarkup(
         element,
-        '<html></html>',
+        "<html></html>"
       ).documentElement;
       element = element.props.children;
     } else {
-      cleanContainer = document.createElement('div');
+      cleanContainer = document.createElement("div");
     }
     await asyncReactDOMRender(element, cleanContainer, true);
     // This gives us the expected text content.
     const cleanTextContent =
-      (cleanContainer.lastChild && cleanContainer.lastChild.textContent) || '';
+      (cleanContainer.lastChild && cleanContainer.lastChild.textContent) || "";
 
     // The only guarantee is that text content has been patched up if needed.
     expect(hydratedTextContent).toBe(cleanTextContent);
@@ -331,11 +331,11 @@ module.exports = function (initModules) {
   function itThrows(desc, testFn, partialMessage) {
     it(`throws ${desc}`, () => {
       return testFn().then(
-        () => expect(false).toBe('The promise resolved and should not have.'),
-        err => {
+        () => expect(false).toBe("The promise resolved and should not have."),
+        (err) => {
           expect(err).toBeInstanceOf(Error);
           expect(err.message).toContain(partialMessage);
-        },
+        }
       );
     });
   }
@@ -344,12 +344,12 @@ module.exports = function (initModules) {
     itThrows(
       `when rendering ${desc} with server string render`,
       () => testFn(serverRender),
-      partialMessage,
+      partialMessage
     );
     itThrows(
       `when rendering ${desc} with clean client render`,
       () => testFn(clientCleanRender),
-      partialMessage,
+      partialMessage
     );
 
     // we subtract one from the warning count here because the throw means that it won't
@@ -358,9 +358,9 @@ module.exports = function (initModules) {
       `when rendering ${desc} with client render on top of bad server markup`,
       () =>
         testFn((element, warningCount = 0) =>
-          clientRenderOnBadMarkup(element, warningCount - 1),
+          clientRenderOnBadMarkup(element, warningCount - 1)
         ),
-      partialMessage,
+      partialMessage
     );
   }
 
@@ -374,7 +374,7 @@ module.exports = function (initModules) {
       clientElement,
       domElement.parentNode,
       true,
-      shouldMatch ? 0 : 1,
+      shouldMatch ? 0 : 1
     );
   }
 

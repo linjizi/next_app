@@ -7,47 +7,47 @@
  * @flow
  */
 
-import type {AnyNativeEvent} from '../PluginModuleType';
-import type {DOMEventName} from '../DOMEventNames';
-import type {DispatchQueue} from '../DOMPluginEventSystem';
-import type {EventSystemFlags} from '../EventSystemFlags';
-import type {Fiber} from 'react-reconciler/src/ReactInternalTypes';
-import type {FormStatus} from 'react-dom-bindings/src/shared/ReactDOMFormActions';
+import type { AnyNativeEvent } from "../PluginModuleType";
+import type { DOMEventName } from "../DOMEventNames";
+import type { DispatchQueue } from "../DOMPluginEventSystem";
+import type { EventSystemFlags } from "../EventSystemFlags";
+import type { Fiber } from "react-reconciler/src/ReactInternalTypes";
+import type { FormStatus } from "react-dom-bindings/src/shared/ReactDOMFormActions";
 
-import {enableTrustedTypesIntegration} from 'shared/ReactFeatureFlags';
-import {getFiberCurrentPropsFromNode} from '../../client/ReactDOMComponentTree';
-import {startHostTransition} from 'react-reconciler/src/ReactFiberReconciler';
-import {didCurrentEventScheduleTransition} from 'react-reconciler/src/ReactFiberRootScheduler';
-import sanitizeURL from 'react-dom-bindings/src/shared/sanitizeURL';
-import {checkAttributeStringCoercion} from 'shared/CheckStringCoercion';
+import { enableTrustedTypesIntegration } from "shared/ReactFeatureFlags";
+import { getFiberCurrentPropsFromNode } from "../../client/ReactDOMComponentTree";
+import { startHostTransition } from "react-reconciler/src/ReactFiberReconciler";
+import { didCurrentEventScheduleTransition } from "react-reconciler/src/ReactFiberRootScheduler";
+import sanitizeURL from "react-dom-bindings/src/shared/sanitizeURL";
+import { checkAttributeStringCoercion } from "shared/CheckStringCoercion";
 
-import {SyntheticEvent} from '../SyntheticEvent';
+import { SyntheticEvent } from "../SyntheticEvent";
 
 function coerceFormActionProp(
-  actionProp: mixed,
-): string | (FormData => void | Promise<void>) | null {
+  actionProp: mixed
+): string | ((FormData) => void | Promise<void>) | null {
   // This should match the logic in ReactDOMComponent
   if (
     actionProp == null ||
-    typeof actionProp === 'symbol' ||
-    typeof actionProp === 'boolean'
+    typeof actionProp === "symbol" ||
+    typeof actionProp === "boolean"
   ) {
     return null;
-  } else if (typeof actionProp === 'function') {
+  } else if (typeof actionProp === "function") {
     return (actionProp: any);
   } else {
-    if (__DEV__) {
-      checkAttributeStringCoercion(actionProp, 'action');
+    if (false) {
+      checkAttributeStringCoercion(actionProp, "action");
     }
     return (sanitizeURL(
-      enableTrustedTypesIntegration ? actionProp : '' + (actionProp: any),
+      enableTrustedTypesIntegration ? actionProp : "" + (actionProp: any)
     ): any);
   }
 }
 
 function createFormDataWithSubmitter(
   form: HTMLFormElement,
-  submitter: HTMLInputElement | HTMLButtonElement,
+  submitter: HTMLInputElement | HTMLButtonElement
 ) {
   // The submitter's value should be included in the FormData.
   // It should be in the document order in the form.
@@ -57,11 +57,11 @@ function createFormDataWithSubmitter(
   // TODO: FormData takes a second argument that it's the submitter but this
   // is fairly new so not all browsers support it yet. Switch to that technique
   // when available.
-  const temp = submitter.ownerDocument.createElement('input');
+  const temp = submitter.ownerDocument.createElement("input");
   temp.name = submitter.name;
   temp.value = submitter.value;
   if (form.id) {
-    temp.setAttribute('form', form.id);
+    temp.setAttribute("form", form.id);
   }
   (submitter.parentNode: any).insertBefore(temp, submitter);
   const formData = new FormData(form);
@@ -80,9 +80,9 @@ function extractEvents(
   nativeEvent: AnyNativeEvent,
   nativeEventTarget: null | EventTarget,
   eventSystemFlags: EventSystemFlags,
-  targetContainer: EventTarget,
+  targetContainer: EventTarget
 ) {
-  if (domEventName !== 'submit') {
+  if (domEventName !== "submit") {
     return;
   }
   if (!maybeTargetInst || maybeTargetInst.stateNode !== nativeEventTarget) {
@@ -93,7 +93,7 @@ function extractEvents(
   const formInst = maybeTargetInst;
   const form: HTMLFormElement = (nativeEventTarget: any);
   let action = coerceFormActionProp(
-    (getFiberCurrentPropsFromNode(form): any).action,
+    (getFiberCurrentPropsFromNode(form): any).action
   );
   let submitter: null | void | HTMLInputElement | HTMLButtonElement =
     (nativeEvent: any).submitter;
@@ -103,7 +103,7 @@ function extractEvents(
     submitterAction = submitterProps
       ? coerceFormActionProp((submitterProps: any).formAction)
       : // The built-in Flow type is ?string, wider than the spec
-        ((submitter.getAttribute('formAction'): any): string | null);
+        ((submitter.getAttribute("formAction"): any): string | null);
     if (submitterAction !== null) {
       // The submitter overrides the form action.
       action = submitterAction;
@@ -114,11 +114,11 @@ function extractEvents(
   }
 
   const event = new SyntheticEvent(
-    'action',
-    'action',
+    "action",
+    "action",
     null,
     nativeEvent,
-    nativeEventTarget,
+    nativeEventTarget
   );
 
   function submitForm() {
@@ -138,7 +138,7 @@ function extractEvents(
           method: form.method,
           action: action,
         };
-        if (__DEV__) {
+        if (false) {
           Object.freeze(pendingState);
         }
         startHostTransition(
@@ -149,13 +149,13 @@ function extractEvents(
           // functions, one that sets the form status and one that invokes
           // the action.
           null,
-          formData,
+          formData
         );
       } else {
         // No earlier event scheduled a transition. Exit without setting a
         // pending form status.
       }
-    } else if (typeof action === 'function') {
+    } else if (typeof action === "function") {
       // A form action was provided. Prevent native navigation.
       event.preventDefault();
 
@@ -169,7 +169,7 @@ function extractEvents(
         method: form.method,
         action: action,
       };
-      if (__DEV__) {
+      if (false) {
         Object.freeze(pendingState);
       }
       startHostTransition(formInst, pendingState, action, formData);
@@ -191,13 +191,13 @@ function extractEvents(
   });
 }
 
-export {extractEvents};
+export { extractEvents };
 
 export function dispatchReplayedFormAction(
   formInst: Fiber,
   form: HTMLFormElement,
-  action: FormData => void | Promise<void>,
-  formData: FormData,
+  action: (FormData) => void | Promise<void>,
+  formData: FormData
 ): void {
   const pendingState: FormStatus = {
     pending: true,
@@ -205,7 +205,7 @@ export function dispatchReplayedFormAction(
     method: form.method,
     action: action,
   };
-  if (__DEV__) {
+  if (false) {
     Object.freeze(pendingState);
   }
   startHostTransition(formInst, pendingState, action, formData);

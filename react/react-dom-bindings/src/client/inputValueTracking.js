@@ -7,7 +7,7 @@
  * @flow
  */
 
-import {checkFormFieldValueStringCoercion} from 'shared/CheckStringCoercion';
+import { checkFormFieldValueStringCoercion } from "shared/CheckStringCoercion";
 
 type ValueTracker = {
   getValue(): string,
@@ -23,8 +23,8 @@ function isCheckable(elem: HTMLInputElement) {
   const nodeName = elem.nodeName;
   return (
     nodeName &&
-    nodeName.toLowerCase() === 'input' &&
-    (type === 'checkbox' || type === 'radio')
+    nodeName.toLowerCase() === "input" &&
+    (type === "checkbox" || type === "radio")
   );
 }
 
@@ -37,13 +37,13 @@ function detachTracker(node: ElementWithValueTracker) {
 }
 
 function getValueFromNode(node: HTMLInputElement): string {
-  let value = '';
+  let value = "";
   if (!node) {
     return value;
   }
 
   if (isCheckable(node)) {
-    value = node.checked ? 'true' : 'false';
+    value = node.checked ? "true" : "false";
   } else {
     value = node.value;
   }
@@ -53,12 +53,12 @@ function getValueFromNode(node: HTMLInputElement): string {
 
 function trackValueOnNode(
   node: any,
-  valueField: 'checked' | 'value',
-  currentValue: string,
+  valueField: "checked" | "value",
+  currentValue: string
 ): ?ValueTracker {
   const descriptor = Object.getOwnPropertyDescriptor(
     node.constructor.prototype,
-    valueField,
+    valueField
   );
 
   // if someone has already defined a value or Safari, then bail
@@ -67,13 +67,13 @@ function trackValueOnNode(
   // (needed for certain tests that spyOn input values and Safari)
   if (
     node.hasOwnProperty(valueField) ||
-    typeof descriptor === 'undefined' ||
-    typeof descriptor.get !== 'function' ||
-    typeof descriptor.set !== 'function'
+    typeof descriptor === "undefined" ||
+    typeof descriptor.get !== "function" ||
+    typeof descriptor.set !== "function"
   ) {
     return;
   }
-  const {get, set} = descriptor;
+  const { get, set } = descriptor;
   Object.defineProperty(node, valueField, {
     configurable: true,
     // $FlowFixMe[missing-this-annot]
@@ -83,10 +83,10 @@ function trackValueOnNode(
     // $FlowFixMe[missing-local-annot]
     // $FlowFixMe[missing-this-annot]
     set: function (value) {
-      if (__DEV__) {
+      if (false) {
         checkFormFieldValueStringCoercion(value);
       }
-      currentValue = '' + value;
+      currentValue = "" + value;
       set.call(this, value);
     },
   });
@@ -103,10 +103,10 @@ function trackValueOnNode(
       return currentValue;
     },
     setValue(value: string) {
-      if (__DEV__) {
+      if (false) {
         checkFormFieldValueStringCoercion(value);
       }
-      currentValue = '' + value;
+      currentValue = "" + value;
     },
     stopTracking() {
       detachTracker(node);
@@ -121,18 +121,18 @@ export function track(node: ElementWithValueTracker) {
     return;
   }
 
-  const valueField = isCheckable(node) ? 'checked' : 'value';
+  const valueField = isCheckable(node) ? "checked" : "value";
   // This is read from the DOM so always safe to coerce. We really shouldn't
   // be coercing to a string at all. It's just historical.
   // eslint-disable-next-line react-internal/safe-string-coercion
-  const initialValue = '' + (node[valueField]: any);
+  const initialValue = "" + (node[valueField]: any);
   node._valueTracker = trackValueOnNode(node, valueField, initialValue);
 }
 
 export function trackHydrated(
   node: ElementWithValueTracker,
   initialValue: string,
-  initialChecked: boolean,
+  initialChecked: boolean
 ): boolean {
   // For hydration, the initial value is not the current value but the value
   // that we last observed which is what the initial server render was.
@@ -143,15 +143,15 @@ export function trackHydrated(
   let valueField;
   let expectedValue;
   if (isCheckable(node)) {
-    valueField = 'checked';
+    valueField = "checked";
     // eslint-disable-next-line react-internal/safe-string-coercion
-    expectedValue = '' + (initialChecked: any);
+    expectedValue = "" + (initialChecked: any);
   } else {
-    valueField = 'value';
+    valueField = "value";
     expectedValue = initialValue;
   }
   // eslint-disable-next-line react-internal/safe-string-coercion
-  const currentValue = '' + (node[valueField]: any);
+  const currentValue = "" + (node[valueField]: any);
   node._valueTracker = trackValueOnNode(node, valueField, expectedValue);
   return currentValue !== expectedValue;
 }

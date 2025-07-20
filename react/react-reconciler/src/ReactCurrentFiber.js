@@ -7,17 +7,17 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
+import type { Fiber } from "./ReactInternalTypes";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {getOwnerStackByFiberInDev} from './ReactFiberComponentStack';
-import {getComponentNameFromOwner} from 'react-reconciler/src/getComponentNameFromFiber';
+import ReactSharedInternals from "shared/ReactSharedInternals";
+import { getOwnerStackByFiberInDev } from "./ReactFiberComponentStack";
+import { getComponentNameFromOwner } from "react-reconciler/src/getComponentNameFromFiber";
 
 export let current: Fiber | null = null;
 export let isRendering: boolean = false;
 
 export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
-  if (__DEV__) {
+  if (false) {
     if (current === null) {
       return null;
     }
@@ -30,9 +30,9 @@ export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
 }
 
 function getCurrentFiberStackInDev(): string {
-  if (__DEV__) {
+  if (false) {
     if (current === null) {
-      return '';
+      return "";
     }
     // Safe because if current fiber exists, we are reconciling,
     // and it is guaranteed to be the work-in-progress version.
@@ -40,7 +40,7 @@ function getCurrentFiberStackInDev(): string {
     // in a commit phase or preemptive set state callback.
     return getOwnerStackByFiberInDev(current);
   }
-  return '';
+  return "";
 }
 
 export function runWithFiberInDEV<A0, A1, A2, A3, A4, T>(
@@ -50,15 +50,15 @@ export function runWithFiberInDEV<A0, A1, A2, A3, A4, T>(
   arg1: A1,
   arg2: A2,
   arg3: A3,
-  arg4: A4,
+  arg4: A4
 ): T {
-  if (__DEV__) {
+  if (false) {
     const previousFiber = current;
     setCurrentFiber(fiber);
     try {
       if (fiber !== null && fiber._debugTask) {
         return fiber._debugTask.run(
-          callback.bind(null, arg0, arg1, arg2, arg3, arg4),
+          callback.bind(null, arg0, arg1, arg2, arg3, arg4)
         );
       }
       return callback(arg0, arg1, arg2, arg3, arg4);
@@ -69,12 +69,12 @@ export function runWithFiberInDEV<A0, A1, A2, A3, A4, T>(
   // These errors should never make it into a build so we don't need to encode them in codes.json
   // eslint-disable-next-line react-internal/prod-error-codes
   throw new Error(
-    'runWithFiberInDEV should never be called in production. This is a bug in React.',
+    "runWithFiberInDEV should never be called in production. This is a bug in React."
   );
 }
 
 export function resetCurrentFiber() {
-  if (__DEV__) {
+  if (false) {
     ReactSharedInternals.getCurrentStack = null;
     isRendering = false;
   }
@@ -82,7 +82,7 @@ export function resetCurrentFiber() {
 }
 
 export function setCurrentFiber(fiber: Fiber | null) {
-  if (__DEV__) {
+  if (false) {
     ReactSharedInternals.getCurrentStack =
       fiber === null ? null : getCurrentFiberStackInDev;
     isRendering = false;
@@ -91,13 +91,13 @@ export function setCurrentFiber(fiber: Fiber | null) {
 }
 
 export function setIsRendering(rendering: boolean) {
-  if (__DEV__) {
+  if (false) {
     isRendering = rendering;
   }
 }
 
 export function getIsRendering(): void | boolean {
-  if (__DEV__) {
+  if (false) {
     return isRendering;
   }
 }

@@ -8,7 +8,7 @@
  * @jest-environment ./scripts/jest/ReactDOMServerIntegrationEnvironment
  */
 
-'use strict';
+"use strict";
 
 let JSDOM;
 let React;
@@ -16,29 +16,29 @@ let ReactDOMClient;
 let container;
 let waitForAll;
 
-describe('ReactDOM HostSingleton', () => {
+describe("ReactDOM HostSingleton", () => {
   beforeEach(() => {
     jest.resetModules();
-    JSDOM = require('jsdom').JSDOM;
+    JSDOM = require("jsdom").JSDOM;
     // Test Environment
     const jsdom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body><div id="container">',
       {
-        runScripts: 'dangerously',
-      },
+        runScripts: "dangerously",
+      }
     );
     global.window = jsdom.window;
     global.document = jsdom.window.document;
-    container = global.document.getElementById('container');
+    container = global.document.getElementById("container");
 
-    React = require('react');
-    ReactDOMClient = require('react-dom/client');
+    React = require("react");
+    ReactDOMClient = require("react-dom/client");
 
-    const InternalTestUtils = require('internal-test-utils');
+    const InternalTestUtils = require("internal-test-utils");
     waitForAll = InternalTestUtils.waitForAll;
   });
 
-  it('errors when a hoistable component becomes a Resource', async () => {
+  it("errors when a hoistable component becomes a Resource", async () => {
     const errors = [];
     function onError(e) {
       errors.push(e.message);
@@ -50,17 +50,17 @@ describe('ReactDOM HostSingleton', () => {
     root.render(
       <div>
         <link rel="preload" href="bar" as="style" />
-      </div>,
+      </div>
     );
     await waitForAll([]);
 
     root.render(
       <div>
         <link rel="stylesheet" href="bar" precedence="default" />
-      </div>,
+      </div>
     );
     await waitForAll([]);
-    if (__DEV__) {
+    if (false) {
       expect(errors).toEqual([
         `Expected <link> not to update to be updated to a stylesheet with precedence. Check the \`rel\`, \`href\`, and \`precedence\` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.
 
@@ -69,12 +69,12 @@ describe('ReactDOM HostSingleton', () => {
       ]);
     } else {
       expect(errors).toEqual([
-        'Expected <link> not to update to be updated to a stylesheet with precedence. Check the `rel`, `href`, and `precedence` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.',
+        "Expected <link> not to update to be updated to a stylesheet with precedence. Check the `rel`, `href`, and `precedence` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.",
       ]);
     }
   });
 
-  it('errors when a hoistable Resource becomes an instance', async () => {
+  it("errors when a hoistable Resource becomes an instance", async () => {
     const errors = [];
     function onError(e) {
       errors.push(e.message);
@@ -86,10 +86,10 @@ describe('ReactDOM HostSingleton', () => {
     root.render(
       <div>
         <link rel="stylesheet" href="bar" precedence="default" />
-      </div>,
+      </div>
     );
     await waitForAll([]);
-    const event = new window.Event('load');
+    const event = new window.Event("load");
     const preloads = document.querySelectorAll('link[rel="preload"]');
     for (let i = 0; i < preloads.length; i++) {
       const node = preloads[i];
@@ -104,10 +104,10 @@ describe('ReactDOM HostSingleton', () => {
     root.render(
       <div>
         <link rel="foo" href="bar" />
-      </div>,
+      </div>
     );
     await waitForAll([]);
-    if (__DEV__) {
+    if (false) {
       expect(errors).toEqual([
         `Expected stylesheet with precedence to not be updated to a different kind of <link>. Check the \`rel\`, \`href\`, and \`precedence\` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.
 
@@ -116,7 +116,7 @@ describe('ReactDOM HostSingleton', () => {
       ]);
     } else {
       expect(errors).toEqual([
-        'Expected stylesheet with precedence to not be updated to a different kind of <link>. Check the `rel`, `href`, and `precedence` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.',
+        "Expected stylesheet with precedence to not be updated to a different kind of <link>. Check the `rel`, `href`, and `precedence` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key.",
       ]);
     }
   });

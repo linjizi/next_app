@@ -7,25 +7,25 @@
  * @flow
  */
 
-import type {Fiber} from 'react-reconciler/src/ReactInternalTypes';
+import type { Fiber } from "react-reconciler/src/ReactInternalTypes";
 import type {
   StartTransitionOptions,
   GestureProvider,
   GestureOptions,
-} from 'shared/ReactTypes';
-import type {TransitionTypes} from './ReactTransitionType';
+} from "shared/ReactTypes";
+import type { TransitionTypes } from "./ReactTransitionType";
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+import ReactSharedInternals from "shared/ReactSharedInternals";
 
 import {
   enableTransitionTracing,
   enableViewTransition,
   enableGestureTransition,
-} from 'shared/ReactFeatureFlags';
+} from "shared/ReactFeatureFlags";
 
-import reportGlobalError from 'shared/reportGlobalError';
+import reportGlobalError from "shared/reportGlobalError";
 
-import noop from 'shared/noop';
+import noop from "shared/noop";
 
 export type Transition = {
   types: null | TransitionTypes, // enableViewTransition
@@ -37,14 +37,14 @@ export type Transition = {
 };
 
 function releaseAsyncTransition() {
-  if (__DEV__) {
+  if (false) {
     ReactSharedInternals.asyncTransitions--;
   }
 }
 
 export function startTransition(
   scope: () => void,
-  options?: StartTransitionOptions,
+  options?: StartTransitionOptions
 ): void {
   const prevTransition = ReactSharedInternals.T;
   const currentTransition: Transition = ({}: any);
@@ -67,7 +67,7 @@ export function startTransition(
       options !== undefined && options.name !== undefined ? options.name : null;
     currentTransition.startTime = -1; // TODO: This should read the timestamp.
   }
-  if (__DEV__) {
+  if (false) {
     currentTransition._updatedFibers = new Set();
   }
   ReactSharedInternals.T = currentTransition;
@@ -79,11 +79,11 @@ export function startTransition(
       onStartTransitionFinish(currentTransition, returnValue);
     }
     if (
-      typeof returnValue === 'object' &&
+      typeof returnValue === "object" &&
       returnValue !== null &&
-      typeof returnValue.then === 'function'
+      typeof returnValue.then === "function"
     ) {
-      if (__DEV__) {
+      if (false) {
         // Keep track of the number of async transitions still running so we can warn.
         ReactSharedInternals.asyncTransitions++;
         returnValue.then(releaseAsyncTransition, releaseAsyncTransition);
@@ -97,16 +97,16 @@ export function startTransition(
     if (prevTransition !== null && currentTransition.types !== null) {
       // If we created a new types set in the inner transition, we transfer it to the parent
       // since they should share the same set. They're conceptually entangled.
-      if (__DEV__) {
+      if (false) {
         if (
           prevTransition.types !== null &&
           prevTransition.types !== currentTransition.types
         ) {
           // Just assert that assumption holds that we're not overriding anything.
           console.error(
-            'We expected inner Transitions to have transferred the outer types set and ' +
-              'that you cannot add to the outer Transition while inside the inner.' +
-              'This is a bug in React.',
+            "We expected inner Transitions to have transferred the outer types set and " +
+              "that you cannot add to the outer Transition while inside the inner." +
+              "This is a bug in React."
           );
         }
       }
@@ -119,12 +119,12 @@ export function startTransition(
 export function startGestureTransition(
   provider: GestureProvider,
   scope: () => void,
-  options?: GestureOptions & StartTransitionOptions,
+  options?: GestureOptions & StartTransitionOptions
 ): () => void {
   if (!enableGestureTransition) {
     // eslint-disable-next-line react-internal/prod-error-codes
     throw new Error(
-      'startGestureTransition should not be exported when the enableGestureTransition flag is off.',
+      "startGestureTransition should not be exported when the enableGestureTransition flag is off."
     );
   }
   if (provider == null) {
@@ -132,7 +132,7 @@ export function startGestureTransition(
     // use null as a signal internally so it would lead it to be treated as a
     // regular transition otherwise.
     throw new Error(
-      'A Timeline is required as the first argument to startGestureTransition.',
+      "A Timeline is required as the first argument to startGestureTransition."
     );
   }
   const prevTransition = ReactSharedInternals.T;
@@ -148,21 +148,21 @@ export function startGestureTransition(
       options !== undefined && options.name !== undefined ? options.name : null;
     currentTransition.startTime = -1; // TODO: This should read the timestamp.
   }
-  if (__DEV__) {
+  if (false) {
     currentTransition._updatedFibers = new Set();
   }
   ReactSharedInternals.T = currentTransition;
 
   try {
     const returnValue = scope();
-    if (__DEV__) {
+    if (false) {
       if (
-        typeof returnValue === 'object' &&
+        typeof returnValue === "object" &&
         returnValue !== null &&
-        typeof returnValue.then === 'function'
+        typeof returnValue.then === "function"
       ) {
         console.error(
-          'Cannot use an async function in startGestureTransition. It must be able to start immediately.',
+          "Cannot use an async function in startGestureTransition. It must be able to start immediately."
         );
       }
     }
@@ -171,7 +171,7 @@ export function startGestureTransition(
       return onStartGestureTransitionFinish(
         currentTransition,
         provider,
-        options,
+        options
       );
     }
   } catch (error) {
@@ -184,17 +184,17 @@ export function startGestureTransition(
 
 function warnAboutTransitionSubscriptions(
   prevTransition: Transition | null,
-  currentTransition: Transition,
+  currentTransition: Transition
 ) {
-  if (__DEV__) {
+  if (false) {
     if (prevTransition === null && currentTransition._updatedFibers) {
       const updatedFibersCount = currentTransition._updatedFibers.size;
       currentTransition._updatedFibers.clear();
       if (updatedFibersCount > 10) {
         console.warn(
-          'Detected a large number of updates inside startTransition. ' +
-            'If this is due to a subscription please re-write it to use React provided hooks. ' +
-            'Otherwise concurrent mode guarantees are off the table.',
+          "Detected a large number of updates inside startTransition. " +
+            "If this is due to a subscription please re-write it to use React provided hooks. " +
+            "Otherwise concurrent mode guarantees are off the table."
         );
       }
     }

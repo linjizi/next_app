@@ -7,24 +7,24 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
-import type {ViewTransitionProps} from 'shared/ReactTypes';
-import {runWithFiberInDEV} from './ReactCurrentFiber';
+import type { Fiber } from "./ReactInternalTypes";
+import type { ViewTransitionProps } from "shared/ReactTypes";
+import { runWithFiberInDEV } from "./ReactCurrentFiber";
 
 // Use in DEV to track mounted named ViewTransitions. This is used to warn for
 // duplicate names. This should technically be tracked per Document because you could
 // have two different documents that can have separate namespaces, but to keep things
 // simple we just use a global Map. Technically it should also include any manually
 // assigned view-transition-name outside React too.
-const mountedNamedViewTransitions: Map<string, Fiber> = __DEV__
+const mountedNamedViewTransitions: Map<string, Fiber> = false
   ? new Map()
   : (null: any);
-const didWarnAboutName: {[string]: boolean} = __DEV__ ? {} : (null: any);
+const didWarnAboutName: { [string]: boolean } = false ? {} : (null: any);
 
 export function trackNamedViewTransition(fiber: Fiber): void {
-  if (__DEV__) {
+  if (false) {
     const name = (fiber.memoizedProps: ViewTransitionProps).name;
-    if (name != null && name !== 'auto') {
+    if (name != null && name !== "auto") {
       const existing = mountedNamedViewTransitions.get(name);
       if (existing !== undefined) {
         if (existing !== fiber && existing !== fiber.alternate) {
@@ -33,17 +33,17 @@ export function trackNamedViewTransition(fiber: Fiber): void {
             const stringifiedName = JSON.stringify(name);
             runWithFiberInDEV(fiber, () => {
               console.error(
-                'There are two <ViewTransition name=%s> components with the same name mounted ' +
-                  'at the same time. This is not supported and will cause View Transitions ' +
-                  'to error. Try to use a more unique name e.g. by using a namespace prefix ' +
-                  'and adding the id of an item to the name.',
-                stringifiedName,
+                "There are two <ViewTransition name=%s> components with the same name mounted " +
+                  "at the same time. This is not supported and will cause View Transitions " +
+                  "to error. Try to use a more unique name e.g. by using a namespace prefix " +
+                  "and adding the id of an item to the name.",
+                stringifiedName
               );
             });
             runWithFiberInDEV(existing, () => {
               console.error(
-                'The existing <ViewTransition name=%s> duplicate has this stack trace.',
-                stringifiedName,
+                "The existing <ViewTransition name=%s> duplicate has this stack trace.",
+                stringifiedName
               );
             });
           }
@@ -56,9 +56,9 @@ export function trackNamedViewTransition(fiber: Fiber): void {
 }
 
 export function untrackNamedViewTransition(fiber: Fiber): void {
-  if (__DEV__) {
+  if (false) {
     const name = (fiber.memoizedProps: ViewTransitionProps).name;
-    if (name != null && name !== 'auto') {
+    if (name != null && name !== "auto") {
       const existing = mountedNamedViewTransitions.get(name);
       if (
         existing !== undefined &&

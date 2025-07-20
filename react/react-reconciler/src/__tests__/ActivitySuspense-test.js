@@ -14,14 +14,14 @@ let waitForPaint;
 let assertLog;
 let use;
 
-describe('Activity Suspense', () => {
+describe("Activity Suspense", () => {
   beforeEach(() => {
     jest.resetModules();
 
-    React = require('react');
-    ReactNoop = require('react-noop-renderer');
-    Scheduler = require('scheduler');
-    act = require('internal-test-utils').act;
+    React = require("react");
+    ReactNoop = require("react-noop-renderer");
+    Scheduler = require("scheduler");
+    act = require("internal-test-utils").act;
     LegacyHidden = React.unstable_LegacyHidden;
     Activity = React.unstable_Activity;
     Suspense = React.Suspense;
@@ -30,7 +30,7 @@ describe('Activity Suspense', () => {
     startTransition = React.startTransition;
     use = React.use;
 
-    const InternalTestUtils = require('internal-test-utils');
+    const InternalTestUtils = require("internal-test-utils");
     waitFor = InternalTestUtils.waitFor;
     waitForPaint = InternalTestUtils.waitForPaint;
     assertLog = InternalTestUtils.assertLog;
@@ -42,13 +42,13 @@ describe('Activity Suspense', () => {
     const record = textCache.get(text);
     if (record === undefined) {
       const newRecord = {
-        status: 'resolved',
+        status: "resolved",
         value: text,
       };
       textCache.set(text, newRecord);
-    } else if (record.status === 'pending') {
+    } else if (record.status === "pending") {
       const resolve = record.resolve;
-      record.status = 'resolved';
+      record.status = "resolved";
       record.value = text;
       resolve();
     }
@@ -58,23 +58,23 @@ describe('Activity Suspense', () => {
     const record = textCache.get(text);
     if (record !== undefined) {
       switch (record.status) {
-        case 'pending':
+        case "pending":
           Scheduler.log(`Suspend! [${text}]`);
           return use(record.value);
-        case 'rejected':
+        case "rejected":
           throw record.value;
-        case 'resolved':
+        case "resolved":
           return record.value;
       }
     } else {
       Scheduler.log(`Suspend! [${text}]`);
       let resolve;
-      const promise = new Promise(_resolve => {
+      const promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       const newRecord = {
-        status: 'pending',
+        status: "pending",
         value: promise,
         resolve,
       };
@@ -84,19 +84,19 @@ describe('Activity Suspense', () => {
     }
   }
 
-  function Text({text}) {
+  function Text({ text }) {
     Scheduler.log(text);
     return text;
   }
 
-  function AsyncText({text}) {
+  function AsyncText({ text }) {
     readText(text);
     Scheduler.log(text);
     return text;
   }
 
   // @gate enableActivity
-  it('basic example of suspending inside hidden tree', async () => {
+  it("basic example of suspending inside hidden tree", async () => {
     const root = ReactNoop.createRoot();
 
     function App() {
@@ -120,25 +120,25 @@ describe('Activity Suspense', () => {
     await act(() => {
       root.render(<App />);
     });
-    assertLog(['Visible', 'Suspend! [Hidden]']);
+    assertLog(["Visible", "Suspend! [Hidden]"]);
     expect(root).toMatchRenderedOutput(<span>Visible</span>);
 
     // When the data resolves, we should be able to finish prerendering
     // the hidden tree.
     await act(async () => {
-      await resolveText('Hidden');
+      await resolveText("Hidden");
     });
-    assertLog(['Hidden']);
+    assertLog(["Hidden"]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Visible</span>
         <span hidden={true}>Hidden</span>
-      </>,
+      </>
     );
   });
 
   // @gate enableLegacyHidden
-  test('LegacyHidden does not handle suspense', async () => {
+  test("LegacyHidden does not handle suspense", async () => {
     const root = ReactNoop.createRoot();
 
     function App() {
@@ -160,26 +160,26 @@ describe('Activity Suspense', () => {
     await act(() => {
       root.render(<App />);
     });
-    assertLog(['Visible', 'Suspend! [Hidden]', 'Loading...']);
+    assertLog(["Visible", "Suspend! [Hidden]", "Loading..."]);
     // Nearest Suspense boundary switches to a fallback even though the
     // suspended content is hidden.
     expect(root).toMatchRenderedOutput(
       <>
         <span hidden={true}>Visible</span>
         Loading...
-      </>,
+      </>
     );
   });
 
   // @gate __DEV__ && enableActivity
-  test('Regression: Suspending on hide should not infinite loop.', async () => {
+  test("Regression: Suspending on hide should not infinite loop.", async () => {
     // This regression only repros in public act.
     global.IS_REACT_ACT_ENVIRONMENT = true;
     const root = ReactNoop.createRoot();
 
     let setMode;
-    function Container({text}) {
-      const [mode, _setMode] = React.useState('visible');
+    function Container({ text }) {
+      const [mode, _setMode] = React.useState("visible");
       setMode = _setMode;
       useEffect(() => {
         return () => {
@@ -201,36 +201,36 @@ describe('Activity Suspense', () => {
       root.render(<Container text="hello" />);
     });
     assertLog([
-      'Suspend! [hello]',
+      "Suspend! [hello]",
       // pre-warming
-      'Suspend! [hello]',
+      "Suspend! [hello]",
     ]);
-    expect(root).toMatchRenderedOutput('Loading');
+    expect(root).toMatchRenderedOutput("Loading");
 
     await React.act(async () => {
-      await resolveText('hello');
+      await resolveText("hello");
     });
-    assertLog(['hello']);
-    expect(root).toMatchRenderedOutput('hello');
+    assertLog(["hello"]);
+    expect(root).toMatchRenderedOutput("hello");
 
     await React.act(() => {
-      setMode('hidden');
+      setMode("hidden");
     });
-    assertLog(['Clear [hello]', 'Suspend! [hello]']);
-    expect(root).toMatchRenderedOutput('');
+    assertLog(["Clear [hello]", "Suspend! [hello]"]);
+    expect(root).toMatchRenderedOutput("");
   });
 
   // @gate enableActivity
   test("suspending inside currently hidden tree that's switching to visible", async () => {
     const root = ReactNoop.createRoot();
 
-    function Details({open, children}) {
+    function Details({ open, children }) {
       return (
         <Suspense fallback={<Text text="Loading..." />}>
           <span>
-            <Text text={open ? 'Open' : 'Closed'} />
+            <Text text={open ? "Open" : "Closed"} />
           </span>
-          <Activity mode={open ? 'visible' : 'hidden'}>
+          <Activity mode={open ? "visible" : "hidden"}>
             <span>{children}</span>
           </Activity>
         </Suspense>
@@ -244,10 +244,10 @@ describe('Activity Suspense', () => {
       root.render(
         <Details open={false}>
           <AsyncText text="Async" />
-        </Details>,
+        </Details>
       );
     });
-    assertLog(['Closed', 'Suspend! [Async]']);
+    assertLog(["Closed", "Suspend! [Async]"]);
     expect(root).toMatchRenderedOutput(<span>Closed</span>);
 
     // But when we switch the boundary from hidden to visible, it should
@@ -257,15 +257,15 @@ describe('Activity Suspense', () => {
         root.render(
           <Details open={true}>
             <AsyncText text="Async" />
-          </Details>,
+          </Details>
         );
       });
     });
     assertLog([
-      'Open',
-      'Suspend! [Async]',
+      "Open",
+      "Suspend! [Async]",
       // pre-warming
-      'Loading...',
+      "Loading...",
     ]);
     // It should suspend with delay to prevent the already-visible Suspense
     // boundary from switching to a fallback
@@ -273,19 +273,19 @@ describe('Activity Suspense', () => {
 
     // Resolve the data and finish rendering
     await act(async () => {
-      await resolveText('Async');
+      await resolveText("Async");
     });
     assertLog([
       // pre-warming
-      'Open',
+      "Open",
       // end pre-warming
-      'Async',
+      "Async",
     ]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Open</span>
         <span>Async</span>
-      </>,
+      </>
     );
   });
 
@@ -293,13 +293,13 @@ describe('Activity Suspense', () => {
   test("suspending inside currently visible tree that's switching to hidden", async () => {
     const root = ReactNoop.createRoot();
 
-    function Details({open, children}) {
+    function Details({ open, children }) {
       return (
         <Suspense fallback={<Text text="Loading..." />}>
           <span>
-            <Text text={open ? 'Open' : 'Closed'} />
+            <Text text={open ? "Open" : "Closed"} />
           </span>
-          <Activity mode={open ? 'visible' : 'hidden'}>
+          <Activity mode={open ? "visible" : "hidden"}>
             <span>{children}</span>
           </Activity>
         </Suspense>
@@ -311,15 +311,15 @@ describe('Activity Suspense', () => {
       root.render(
         <Details open={true}>
           <Text text="(empty)" />
-        </Details>,
+        </Details>
       );
     });
-    assertLog(['Open', '(empty)']);
+    assertLog(["Open", "(empty)"]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Open</span>
         <span>(empty)</span>
-      </>,
+      </>
     );
 
     // Update that suspends inside the currently visible tree
@@ -328,15 +328,15 @@ describe('Activity Suspense', () => {
         root.render(
           <Details open={true}>
             <AsyncText text="Async" />
-          </Details>,
+          </Details>
         );
       });
     });
     assertLog([
-      'Open',
-      'Suspend! [Async]',
+      "Open",
+      "Suspend! [Async]",
       // pre-warming
-      'Loading...',
+      "Loading...",
     ]);
     // It should suspend with delay to prevent the already-visible Suspense
     // boundary from switching to a fallback
@@ -344,7 +344,7 @@ describe('Activity Suspense', () => {
       <>
         <span>Open</span>
         <span>(empty)</span>
-      </>,
+      </>
     );
 
     // Update that hides the suspended tree
@@ -353,45 +353,45 @@ describe('Activity Suspense', () => {
         root.render(
           <Details open={false}>
             <AsyncText text="Async" />
-          </Details>,
+          </Details>
         );
       });
     });
     // Now the visible part of the tree can commit without being blocked
     // by the suspended content, which is hidden.
-    assertLog(['Closed', 'Suspend! [Async]']);
+    assertLog(["Closed", "Suspend! [Async]"]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Closed</span>
         <span hidden={true}>(empty)</span>
-      </>,
+      </>
     );
 
     // Resolve the data and finish rendering
     await act(async () => {
-      await resolveText('Async');
+      await resolveText("Async");
     });
-    assertLog(['Async']);
+    assertLog(["Async"]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Closed</span>
         <span hidden={true}>Async</span>
-      </>,
+      </>
     );
   });
 
   // @gate enableActivity
-  test('update that suspends inside hidden tree', async () => {
+  test("update that suspends inside hidden tree", async () => {
     let setText;
     function Child() {
-      const [text, _setText] = useState('A');
+      const [text, _setText] = useState("A");
       setText = _setText;
       return <AsyncText text={text} />;
     }
 
-    function App({show}) {
+    function App({ show }) {
       return (
-        <Activity mode={show ? 'visible' : 'hidden'}>
+        <Activity mode={show ? "visible" : "hidden"}>
           <span>
             <Child />
           </span>
@@ -400,25 +400,25 @@ describe('Activity Suspense', () => {
     }
 
     const root = ReactNoop.createRoot();
-    resolveText('A');
+    resolveText("A");
     await act(() => {
       root.render(<App show={false} />);
     });
-    assertLog(['A']);
+    assertLog(["A"]);
 
     await act(() => {
       startTransition(() => {
-        setText('B');
+        setText("B");
       });
     });
   });
 
   // @gate enableActivity
-  test('updates at multiple priorities that suspend inside hidden tree', async () => {
+  test("updates at multiple priorities that suspend inside hidden tree", async () => {
     let setText;
     let setStep;
     function Child() {
-      const [text, _setText] = useState('A');
+      const [text, _setText] = useState("A");
       setText = _setText;
 
       const [step, _setStep] = useState(0);
@@ -427,9 +427,9 @@ describe('Activity Suspense', () => {
       return <AsyncText text={text + step} />;
     }
 
-    function App({show}) {
+    function App({ show }) {
       return (
-        <Activity mode={show ? 'visible' : 'hidden'}>
+        <Activity mode={show ? "visible" : "hidden"}>
           <span>
             <Child />
           </span>
@@ -438,11 +438,11 @@ describe('Activity Suspense', () => {
     }
 
     const root = ReactNoop.createRoot();
-    resolveText('A0');
+    resolveText("A0");
     await act(() => {
       root.render(<App show={false} />);
     });
-    assertLog(['A0']);
+    assertLog(["A0"]);
     expect(root).toMatchRenderedOutput(<span hidden={true}>A0</span>);
 
     await act(() => {
@@ -450,28 +450,28 @@ describe('Activity Suspense', () => {
         setStep(1);
       });
       ReactNoop.flushSync(() => {
-        setText('B');
+        setText("B");
       });
     });
     assertLog([
       // The high priority render suspends again
-      'Suspend! [B0]',
+      "Suspend! [B0]",
       // There's still pending work in another lane, so we should attempt
       // that, too.
-      'Suspend! [B1]',
+      "Suspend! [B1]",
     ]);
     expect(root).toMatchRenderedOutput(<span hidden={true}>A0</span>);
 
     // Resolve the data and finish rendering
     await act(() => {
-      resolveText('B1');
+      resolveText("B1");
     });
-    assertLog(['B1']);
+    assertLog(["B1"]);
     expect(root).toMatchRenderedOutput(<span hidden={true}>B1</span>);
   });
 
   // @gate enableActivity
-  test('detect updates to a hidden tree during a concurrent event', async () => {
+  test("detect updates to a hidden tree during a concurrent event", async () => {
     // This is a pretty complex test case. It relates to how we detect if an
     // update is made to a hidden tree: when scheduling the update, we walk up
     // the fiber return path to see if any of the parents is a hidden Activity
@@ -481,7 +481,7 @@ describe('Activity Suspense', () => {
     // current render has finished.
 
     let setInner;
-    function Child({outer}) {
+    function Child({ outer }) {
       const [inner, _setInner] = useState(0);
       setInner = _setInner;
 
@@ -489,32 +489,32 @@ describe('Activity Suspense', () => {
         // Inner and outer values are always updated simultaneously, so they
         // should always be consistent.
         if (inner !== outer) {
-          Scheduler.log('Tearing! Inner and outer are inconsistent!');
+          Scheduler.log("Tearing! Inner and outer are inconsistent!");
         } else {
-          Scheduler.log('Inner and outer are consistent');
+          Scheduler.log("Inner and outer are consistent");
         }
       }, [inner, outer]);
 
-      return <Text text={'Inner: ' + inner} />;
+      return <Text text={"Inner: " + inner} />;
     }
 
     let setOuter;
-    function App({show}) {
+    function App({ show }) {
       const [outer, _setOuter] = useState(0);
       setOuter = _setOuter;
       return (
         <>
-          <Activity mode={show ? 'visible' : 'hidden'}>
+          <Activity mode={show ? "visible" : "hidden"}>
             <span>
               <Child outer={outer} />
             </span>
           </Activity>
           <span>
-            <Text text={'Outer: ' + outer} />
+            <Text text={"Outer: " + outer} />
           </span>
           <Suspense fallback={<Text text="Loading..." />}>
             <span>
-              <Text text={'Sibling: ' + outer} />
+              <Text text={"Sibling: " + outer} />
             </span>
           </Suspense>
         </>
@@ -523,22 +523,22 @@ describe('Activity Suspense', () => {
 
     // Render a hidden tree
     const root = ReactNoop.createRoot();
-    resolveText('Async: 0');
+    resolveText("Async: 0");
     await act(() => {
       root.render(<App show={true} />);
     });
     assertLog([
-      'Inner: 0',
-      'Outer: 0',
-      'Sibling: 0',
-      'Inner and outer are consistent',
+      "Inner: 0",
+      "Outer: 0",
+      "Sibling: 0",
+      "Inner and outer are consistent",
     ]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Inner: 0</span>
         <span>Outer: 0</span>
         <span>Sibling: 0</span>
-      </>,
+      </>
     );
 
     await act(async () => {
@@ -554,7 +554,7 @@ describe('Activity Suspense', () => {
       await waitFor([
         // The outer update will commit, but the inner update is deferred until
         // a later render.
-        'Outer: 1',
+        "Outer: 1",
       ]);
 
       // Assert that we haven't committed quite yet
@@ -563,7 +563,7 @@ describe('Activity Suspense', () => {
           <span>Inner: 0</span>
           <span>Outer: 0</span>
           <span>Sibling: 0</span>
-        </>,
+        </>
       );
 
       // Before the tree commits, schedule a concurrent event. The inner update
@@ -574,13 +574,13 @@ describe('Activity Suspense', () => {
       });
 
       // Finish rendering and commit the in-progress render.
-      await waitForPaint(['Sibling: 1']);
+      await waitForPaint(["Sibling: 1"]);
       expect(root).toMatchRenderedOutput(
         <>
           <span hidden={true}>Inner: 0</span>
           <span>Outer: 1</span>
           <span>Sibling: 1</span>
-        </>,
+        </>
       );
 
       // Now reveal the hidden tree at high priority.
@@ -592,24 +592,24 @@ describe('Activity Suspense', () => {
         // is processed, even though they share the same lane. If the second
         // update were erroneously processed, then Inner would be inconsistent
         // with Outer.
-        'Inner: 1',
-        'Outer: 1',
-        'Sibling: 1',
-        'Inner and outer are consistent',
+        "Inner: 1",
+        "Outer: 1",
+        "Sibling: 1",
+        "Inner and outer are consistent",
       ]);
     });
     assertLog([
-      'Inner: 2',
-      'Outer: 2',
-      'Sibling: 2',
-      'Inner and outer are consistent',
+      "Inner: 2",
+      "Outer: 2",
+      "Sibling: 2",
+      "Inner and outer are consistent",
     ]);
     expect(root).toMatchRenderedOutput(
       <>
         <span>Inner: 2</span>
         <span>Outer: 2</span>
         <span>Sibling: 2</span>
-      </>,
+      </>
     );
   });
 });

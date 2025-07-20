@@ -28,12 +28,12 @@ beforeEach(() => {
   prevActGlobal = global.IS_REACT_ACT_ENVIRONMENT;
   global.IS_REACT_ACT_ENVIRONMENT = true;
   jest.resetModules();
-  jest.unmock('scheduler');
+  jest.unmock("scheduler");
   yields = [];
-  React = require('react');
-  ReactDOMClient = require('react-dom/client');
+  React = require("react");
+  ReactDOMClient = require("react-dom/client");
   act = React.act;
-  container = document.createElement('div');
+  container = document.createElement("div");
   document.body.appendChild(container);
 });
 
@@ -43,7 +43,7 @@ afterEach(() => {
 });
 
 // @gate __DEV__
-test('can use act to flush effects', async () => {
+test("can use act to flush effects", async () => {
   function App() {
     React.useEffect(() => {
       yields.push(100);
@@ -60,14 +60,14 @@ test('can use act to flush effects', async () => {
 });
 
 // @gate __DEV__
-test('flushes effects on every call', async () => {
+test("flushes effects on every call", async () => {
   function App() {
     const [ctr, setCtr] = React.useState(0);
     React.useEffect(() => {
       yields.push(ctr);
     });
     return (
-      <button id="button" onClick={() => setCtr(x => x + 1)}>
+      <button id="button" onClick={() => setCtr((x) => x + 1)}>
         {ctr}
       </button>
     );
@@ -80,9 +80,9 @@ test('flushes effects on every call', async () => {
 
   expect(clearLog()).toEqual([0]);
 
-  const button = container.querySelector('#button');
+  const button = container.querySelector("#button");
   function click() {
-    button.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+    button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   }
 
   act(() => {
@@ -96,7 +96,7 @@ test('flushes effects on every call', async () => {
   expect(clearLog()).toEqual([4]);
   act(click);
   expect(clearLog()).toEqual([5]);
-  expect(button.innerHTML).toEqual('5');
+  expect(button.innerHTML).toEqual("5");
 });
 
 // @gate __DEV__
@@ -105,7 +105,7 @@ test("should keep flushing effects until they're done", async () => {
     const [ctr, setCtr] = React.useState(0);
     React.useEffect(() => {
       if (ctr < 5) {
-        setCtr(x => x + 1);
+        setCtr((x) => x + 1);
       }
     });
     return ctr;
@@ -116,11 +116,11 @@ test("should keep flushing effects until they're done", async () => {
     root.render(<App />);
   });
 
-  expect(container.innerHTML).toEqual('5');
+  expect(container.innerHTML).toEqual("5");
 });
 
 // @gate __DEV__
-test('should flush effects only on exiting the outermost act', async () => {
+test("should flush effects only on exiting the outermost act", async () => {
   function App() {
     React.useEffect(() => {
       yields.push(0);
@@ -142,7 +142,7 @@ test('should flush effects only on exiting the outermost act', async () => {
 });
 
 // @gate __DEV__
-test('can handle cascading promises', async () => {
+test("can handle cascading promises", async () => {
   // this component triggers an effect, that waits a tick,
   // then sets state. repeats this 5 times.
   function App() {
@@ -150,7 +150,7 @@ test('can handle cascading promises', async () => {
     async function ticker() {
       await null;
       await act(() => {
-        setState(x => x + 1);
+        setState((x) => x + 1);
       });
     }
     React.useEffect(() => {
@@ -166,5 +166,5 @@ test('can handle cascading promises', async () => {
   });
   // all 5 ticks present and accounted for
   expect(clearLog()).toEqual([0, 1, 2, 3, 4]);
-  expect(container.innerHTML).toBe('5');
+  expect(container.innerHTML).toBe("5");
 });

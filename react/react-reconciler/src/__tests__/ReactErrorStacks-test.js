@@ -7,7 +7,7 @@
  * @emails react-core
  * @jest-environment node
  */
-'use strict';
+"use strict";
 
 let React;
 let Suspense;
@@ -16,7 +16,7 @@ let ViewTransition;
 let ReactNoop;
 let waitForAll;
 
-describe('ReactFragment', () => {
+describe("ReactFragment", () => {
   let didCatchErrors = [];
   let rootCaughtErrors = [];
   let SomethingThatErrors;
@@ -26,12 +26,12 @@ describe('ReactFragment', () => {
   beforeEach(function () {
     jest.resetModules();
 
-    React = require('react');
+    React = require("react");
     Suspense = React.Suspense;
     Activity = React.unstable_Activity;
     ViewTransition = React.unstable_ViewTransition;
-    ReactNoop = require('react-noop-renderer');
-    const InternalTestUtils = require('internal-test-utils');
+    ReactNoop = require("react-noop-renderer");
+    const InternalTestUtils = require("internal-test-utils");
     waitForAll = InternalTestUtils.waitForAll;
 
     didCatchErrors = [];
@@ -43,12 +43,12 @@ describe('ReactFragment', () => {
         normalizeCodeLocInfo(errorInfo.componentStack),
         React.captureOwnerStack
           ? normalizeCodeLocInfo(React.captureOwnerStack())
-          : null,
+          : null
       );
     };
 
     SomethingThatErrors = () => {
-      throw new Error('uh oh');
+      throw new Error("uh oh");
     };
 
     // eslint-disable-next-line no-shadow
@@ -59,13 +59,13 @@ describe('ReactFragment', () => {
       }
 
       static getDerivedStateFromError(error) {
-        return {errored: true};
+        return { errored: true };
       }
 
       componentDidCatch(err, errInfo) {
         didCatchErrors.push(
           err.message,
-          normalizeCodeLocInfo(errInfo.componentStack),
+          normalizeCodeLocInfo(errInfo.componentStack)
         );
       }
 
@@ -80,20 +80,20 @@ describe('ReactFragment', () => {
 
   function componentStack(components) {
     return components
-      .map(component => `\n    in ${component} (at **)`)
-      .join('');
+      .map((component) => `\n    in ${component} (at **)`)
+      .join("");
   }
 
   function normalizeCodeLocInfo(str) {
     return (
       str &&
       str.replace(/\n +(?:at|in) ([^\(]+) [^\n]*/g, function (m, name) {
-        return '\n    in ' + name + ' (at **)';
+        return "\n    in " + name + " (at **)";
       })
     );
   }
 
-  it('retains component and owner stacks when rethrowing an error', async () => {
+  it("retains component and owner stacks when rethrowing an error", async () => {
     class RethrowingBoundary extends React.Component {
       static getDerivedStateFromError(error) {
         throw error;
@@ -120,33 +120,33 @@ describe('ReactFragment', () => {
     }).render(
       <CatchingBoundary>
         <Foo />
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'Bar',
-        'RethrowingBoundary',
-        'Foo',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "Bar",
+        "RethrowingBoundary",
+        "Foo",
+        "CatchingBoundary",
       ]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'Bar',
-        'RethrowingBoundary',
-        'Foo',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "Bar",
+        "RethrowingBoundary",
+        "Foo",
+        "CatchingBoundary",
       ]),
-      __DEV__ ? componentStack(['Bar', 'Foo']) : null,
+      false ? componentStack(["Bar", "Foo"]) : null,
     ]);
   });
 
-  it('includes built-in for Suspense', async () => {
+  it("includes built-in for Suspense", async () => {
     ReactNoop.createRoot({
       onCaughtError,
     }).render(
@@ -154,21 +154,21 @@ describe('ReactFragment', () => {
         <Suspense>
           <SomethingThatErrors />
         </Suspense>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
-      componentStack(['SomethingThatErrors', 'Suspense', 'CatchingBoundary']),
+      "uh oh",
+      componentStack(["SomethingThatErrors", "Suspense", "CatchingBoundary"]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
-      componentStack(['SomethingThatErrors', 'Suspense', 'CatchingBoundary']),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      "uh oh",
+      componentStack(["SomethingThatErrors", "Suspense", "CatchingBoundary"]),
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 
-  it('includes built-in for Suspense fallbacks', async () => {
+  it("includes built-in for Suspense fallbacks", async () => {
     const SomethingThatSuspends = React.lazy(() => {
       return new Promise(() => {});
     });
@@ -180,30 +180,30 @@ describe('ReactFragment', () => {
         <Suspense fallback={<SomethingThatErrors />}>
           <SomethingThatSuspends />
         </Suspense>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'Suspense Fallback',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "Suspense Fallback",
+        "CatchingBoundary",
       ]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'Suspense Fallback',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "Suspense Fallback",
+        "CatchingBoundary",
       ]),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 
   // @gate enableActivity
-  it('includes built-in for Activity', async () => {
+  it("includes built-in for Activity", async () => {
     ReactNoop.createRoot({
       onCaughtError,
     }).render(
@@ -211,22 +211,22 @@ describe('ReactFragment', () => {
         <Activity>
           <SomethingThatErrors />
         </Activity>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
-      componentStack(['SomethingThatErrors', 'Activity', 'CatchingBoundary']),
+      "uh oh",
+      componentStack(["SomethingThatErrors", "Activity", "CatchingBoundary"]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
-      componentStack(['SomethingThatErrors', 'Activity', 'CatchingBoundary']),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      "uh oh",
+      componentStack(["SomethingThatErrors", "Activity", "CatchingBoundary"]),
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 
   // @gate enableViewTransition
-  it('includes built-in for ViewTransition', async () => {
+  it("includes built-in for ViewTransition", async () => {
     ReactNoop.createRoot({
       onCaughtError,
     }).render(
@@ -234,32 +234,32 @@ describe('ReactFragment', () => {
         <ViewTransition>
           <SomethingThatErrors />
         </ViewTransition>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'ViewTransition',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "ViewTransition",
+        "CatchingBoundary",
       ]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'ViewTransition',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "ViewTransition",
+        "CatchingBoundary",
       ]),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 
-  it('includes built-in for Lazy', async () => {
+  it("includes built-in for Lazy", async () => {
     // Lazy component throws
     const LazyComponent = React.lazy(() => {
-      throw new Error('uh oh');
+      throw new Error("uh oh");
     });
 
     ReactNoop.createRoot({
@@ -267,22 +267,22 @@ describe('ReactFragment', () => {
     }).render(
       <CatchingBoundary>
         <LazyComponent />
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
-      componentStack(['Lazy', 'CatchingBoundary']),
+      "uh oh",
+      componentStack(["Lazy", "CatchingBoundary"]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
-      componentStack(['Lazy', 'CatchingBoundary']),
-      __DEV__ ? '' : null, // No owner stack
+      "uh oh",
+      componentStack(["Lazy", "CatchingBoundary"]),
+      false ? "" : null, // No owner stack
     ]);
   });
 
   // @gate enableSuspenseList
-  it('includes built-in for SuspenseList', async () => {
+  it("includes built-in for SuspenseList", async () => {
     const SuspenseList = React.unstable_SuspenseList;
 
     ReactNoop.createRoot({
@@ -292,29 +292,29 @@ describe('ReactFragment', () => {
         <SuspenseList revealOrder="independent">
           <SomethingThatErrors />
         </SuspenseList>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'SuspenseList',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "SuspenseList",
+        "CatchingBoundary",
       ]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
-        'SuspenseList',
-        'CatchingBoundary',
+        "SomethingThatErrors",
+        "SuspenseList",
+        "CatchingBoundary",
       ]),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 
-  it('does not include built-in for Fragment', async () => {
+  it("does not include built-in for Fragment", async () => {
     ReactNoop.createRoot({
       onCaughtError,
     }).render(
@@ -322,25 +322,25 @@ describe('ReactFragment', () => {
         <>
           <SomethingThatErrors />
         </>
-      </CatchingBoundary>,
+      </CatchingBoundary>
     );
     await waitForAll([]);
     expect(didCatchErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
+        "SomethingThatErrors",
         // No Fragment
-        'CatchingBoundary',
+        "CatchingBoundary",
       ]),
     ]);
     expect(rootCaughtErrors).toEqual([
-      'uh oh',
+      "uh oh",
       componentStack([
-        'SomethingThatErrors',
+        "SomethingThatErrors",
         // No Fragment
-        'CatchingBoundary',
+        "CatchingBoundary",
       ]),
-      __DEV__ ? componentStack(['SomethingThatErrors']) : null,
+      false ? componentStack(["SomethingThatErrors"]) : null,
     ]);
   });
 });

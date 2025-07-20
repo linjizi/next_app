@@ -7,23 +7,23 @@
  * @flow
  */
 
-import type {Fiber} from './ReactInternalTypes';
-import type {StackCursor} from './ReactFiberStack';
+import type { Fiber } from "./ReactInternalTypes";
+import type { StackCursor } from "./ReactFiberStack";
 
-import {disableLegacyContext} from 'shared/ReactFeatureFlags';
-import {ClassComponent, HostRoot} from './ReactWorkTags';
-import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
+import { disableLegacyContext } from "shared/ReactFeatureFlags";
+import { ClassComponent, HostRoot } from "./ReactWorkTags";
+import getComponentNameFromFiber from "react-reconciler/src/getComponentNameFromFiber";
 
-import {createCursor, push, pop} from './ReactFiberStack';
+import { createCursor, push, pop } from "./ReactFiberStack";
 
 let warnedAboutMissingGetChildContext;
 
-if (__DEV__) {
-  warnedAboutMissingGetChildContext = ({}: {[string]: boolean});
+if (false) {
+  warnedAboutMissingGetChildContext = ({}: { [string]: boolean });
 }
 
 export const emptyContextObject: {} = {};
-if (__DEV__) {
+if (false) {
   Object.freeze(emptyContextObject);
 }
 
@@ -40,7 +40,7 @@ let previousContext: Object = emptyContextObject;
 function getUnmaskedContext(
   workInProgress: Fiber,
   Component: Function,
-  didPushOwnContextIfProvider: boolean,
+  didPushOwnContextIfProvider: boolean
 ): Object {
   if (disableLegacyContext) {
     return emptyContextObject;
@@ -59,7 +59,7 @@ function getUnmaskedContext(
 function cacheContext(
   workInProgress: Fiber,
   unmaskedContext: Object,
-  maskedContext: Object,
+  maskedContext: Object
 ): void {
   if (disableLegacyContext) {
     return;
@@ -72,7 +72,7 @@ function cacheContext(
 
 function getMaskedContext(
   workInProgress: Fiber,
-  unmaskedContext: Object,
+  unmaskedContext: Object
 ): Object {
   if (disableLegacyContext) {
     return emptyContextObject;
@@ -94,7 +94,7 @@ function getMaskedContext(
       return instance.__reactInternalMemoizedMaskedChildContext;
     }
 
-    const context: {[string]: $FlowFixMe} = {};
+    const context: { [string]: $FlowFixMe } = {};
     for (const key in contextTypes) {
       context[key] = unmaskedContext[key];
     }
@@ -147,15 +147,15 @@ function popTopLevelContextObject(fiber: Fiber): void {
 function pushTopLevelContextObject(
   fiber: Fiber,
   context: Object,
-  didChange: boolean,
+  didChange: boolean
 ): void {
   if (disableLegacyContext) {
     return;
   } else {
     if (contextStackCursor.current !== emptyContextObject) {
       throw new Error(
-        'Unexpected context found on stack. ' +
-          'This error is likely caused by a bug in React. Please file an issue.',
+        "Unexpected context found on stack. " +
+          "This error is likely caused by a bug in React. Please file an issue."
       );
     }
 
@@ -167,7 +167,7 @@ function pushTopLevelContextObject(
 function processChildContext(
   fiber: Fiber,
   type: any,
-  parentContext: Object,
+  parentContext: Object
 ): Object {
   if (disableLegacyContext) {
     return parentContext;
@@ -177,18 +177,18 @@ function processChildContext(
 
     // TODO (bvaughn) Replace this behavior with an invariant() in the future.
     // It has only been added in Fiber to match the (unintentional) behavior in Stack.
-    if (typeof instance.getChildContext !== 'function') {
-      if (__DEV__) {
-        const componentName = getComponentNameFromFiber(fiber) || 'Unknown';
+    if (typeof instance.getChildContext !== "function") {
+      if (false) {
+        const componentName = getComponentNameFromFiber(fiber) || "Unknown";
 
         if (!warnedAboutMissingGetChildContext[componentName]) {
           warnedAboutMissingGetChildContext[componentName] = true;
           console.error(
-            '%s.childContextTypes is specified but there is no getChildContext() method ' +
-              'on the instance. You can either define getChildContext() on %s or remove ' +
-              'childContextTypes from it.',
+            "%s.childContextTypes is specified but there is no getChildContext() method " +
+              "on the instance. You can either define getChildContext() on %s or remove " +
+              "childContextTypes from it.",
             componentName,
-            componentName,
+            componentName
           );
         }
       }
@@ -200,13 +200,13 @@ function processChildContext(
       if (!(contextKey in childContextTypes)) {
         throw new Error(
           `${
-            getComponentNameFromFiber(fiber) || 'Unknown'
-          }.getChildContext(): key "${contextKey}" is not defined in childContextTypes.`,
+            getComponentNameFromFiber(fiber) || "Unknown"
+          }.getChildContext(): key "${contextKey}" is not defined in childContextTypes.`
         );
       }
     }
 
-    return {...parentContext, ...childContext};
+    return { ...parentContext, ...childContext };
   }
 }
 
@@ -229,7 +229,7 @@ function pushContextProvider(workInProgress: Fiber): boolean {
     push(
       didPerformWorkStackCursor,
       didPerformWorkStackCursor.current,
-      workInProgress,
+      workInProgress
     );
 
     return true;
@@ -239,7 +239,7 @@ function pushContextProvider(workInProgress: Fiber): boolean {
 function invalidateContextProvider(
   workInProgress: Fiber,
   type: any,
-  didChange: boolean,
+  didChange: boolean
 ): void {
   if (disableLegacyContext) {
     return;
@@ -248,8 +248,8 @@ function invalidateContextProvider(
 
     if (!instance) {
       throw new Error(
-        'Expected to have an instance by this point. ' +
-          'This error is likely caused by a bug in React. Please file an issue.',
+        "Expected to have an instance by this point. " +
+          "This error is likely caused by a bug in React. Please file an issue."
       );
     }
 
@@ -260,7 +260,7 @@ function invalidateContextProvider(
       const mergedContext = processChildContext(
         workInProgress,
         type,
-        previousContext,
+        previousContext
       );
       instance.__reactInternalMemoizedMergedChildContext = mergedContext;
 
@@ -302,8 +302,8 @@ function findCurrentUnmaskedContext(fiber: Fiber): Object {
     } while (node !== null);
 
     throw new Error(
-      'Found unexpected detached subtree parent. ' +
-        'This error is likely caused by a bug in React. Please file an issue.',
+      "Found unexpected detached subtree parent. " +
+        "This error is likely caused by a bug in React. Please file an issue."
     );
   }
 }
