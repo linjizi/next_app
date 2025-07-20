@@ -35,7 +35,6 @@ import type {TransitionTypes} from 'react/src/ReactTransitionType';
 
 import {
   enableCreateEventHandleAPI,
-  enableSchedulingProfiler,
   disableLegacyContext,
   alwaysThrottleRetries,
   enableInfiniteRenderLoopDetection,
@@ -1655,47 +1654,6 @@ function handleThrow(root: FiberRoot, thrownValue: any): void {
     );
     return;
   }
-
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-    switch (workInProgressSuspendedReason) {
-      case SuspendedOnError: {
-        markComponentErrored(
-          erroredWork,
-          thrownValue,
-          workInProgressRootRenderLanes,
-        );
-        break;
-      }
-      case SuspendedOnData:
-      case SuspendedOnAction:
-      case SuspendedOnImmediate:
-      case SuspendedOnDeprecatedThrowPromise:
-      case SuspendedAndReadyToContinue: {
-        const wakeable: Wakeable = (thrownValue: any);
-        markComponentSuspended(
-          erroredWork,
-          wakeable,
-          workInProgressRootRenderLanes,
-        );
-        break;
-      }
-      case SuspendedOnInstance: {
-        // This is conceptually like a suspend, but it's not associated with
-        // a particular wakeable. It's associated with a host resource (e.g.
-        // a CSS file or an image) that hasn't loaded yet. DevTools doesn't
-        // handle this currently.
-        break;
-      }
-      case SuspendedOnHydration: {
-        // This is conceptually like a suspend, but it's not associated with
-        // a particular wakeable. DevTools doesn't seem to care about this case,
-        // currently. It's similar to if the component were interrupted, which
-        // we don't mark with a special function.
-        break;
-      }
-    }
-  }
 }
 
 export function shouldRemainOnPreviousScreen(): boolean {
@@ -1884,12 +1842,8 @@ function renderRootSync(
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) {
 
-    workInProgressTransitions = getTransitionsForLanes(root, lanes);
+    workInProgressTransitions = null;
     prepareFreshStack(root, lanes);
-  }
-
-  if (enableSchedulingProfiler) {
-    markRenderStarted(lanes);
   }
 
   let didSuspendInShell = false;
@@ -1981,10 +1935,6 @@ function renderRootSync(
   popDispatcher(prevDispatcher);
   popAsyncDispatcher(prevAsyncDispatcher);
 
-  if (enableSchedulingProfiler) {
-    markRenderStopped();
-  }
-
   if (workInProgress !== null) {
     // Did not complete the tree. This can happen if something suspended in
     // the shell.
@@ -2031,10 +1981,6 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
     // If we were previously in prerendering mode, check if we received any new
     // data during an interleaved event.
     workInProgressRootIsPrerendering = checkIfRootIsPrerendering(root, lanes);
-  }
-
-  if (enableSchedulingProfiler) {
-    markRenderStarted(lanes);
   }
 
   outer: do {
@@ -2237,15 +2183,9 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
   // Check if the tree has completed.
   if (workInProgress !== null) {
     // Still work remaining.
-    if (enableSchedulingProfiler) {
-      markRenderYielded();
-    }
     return RootInProgress;
   } else {
     // Completed the tree.
-    if (enableSchedulingProfiler) {
-      markRenderStopped();
-    }
 
     // Set this to null to indicate there's no in-progress render.
     workInProgressRoot = null;
@@ -2675,14 +2615,7 @@ function commitRoot(
     throw new Error('Should not already be working.');
   }
 
-  if (enableSchedulingProfiler) {
-    markCommitStarted(lanes);
-  }
-
   if (finishedWork === null) {
-    if (enableSchedulingProfiler) {
-      markCommitStopped();
-    }
     if (enableGestureTransition) {
       // Stop any gestures that were completed and is now being reverted.
       if (root.stoppingGestures !== null) {
@@ -3001,13 +2934,7 @@ function flushLayoutEffects(): void {
       // The next phase is the layout phase, where we call effects that read
       // the host tree after it's been mutated. The idiomatic use case for this is
       // layout, but class component lifecycles also fire here for legacy reasons.
-      if (enableSchedulingProfiler) {
-        markLayoutEffectsStarted(lanes);
-      }
       commitLayoutEffects(finishedWork, root, lanes);
-      if (enableSchedulingProfiler) {
-        markLayoutEffectsStopped();
-      }
     } finally {
       // Reset the priority to the previous non-sync value.
       executionContext = prevExecutionContext;
@@ -3183,10 +3110,6 @@ function flushSpawnedWork(): void {
 
   // If layout work was scheduled, flush it now.
   flushSyncWorkOnAllRoots();
-
-  if (enableSchedulingProfiler) {
-    markCommitStopped();
-  }
 }
 
 function commitGestureOnRoot(
@@ -3404,10 +3327,6 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
 
   let passiveEffectStartTime = 0;
 
-  if (enableSchedulingProfiler) {
-    markPassiveEffectsStarted(lanes);
-  }
-
   const prevExecutionContext = executionContext;
   executionContext |= CommitContext;
 
@@ -3419,10 +3338,6 @@ function flushPassiveEffectsImpl(wasDelayedCommit: void | boolean) {
     transitions,
     pendingEffectsRenderEndTime,
   );
-
-  if (enableSchedulingProfiler) {
-    markPassiveEffectsStopped();
-  }
 
   executionContext = prevExecutionContext;
 

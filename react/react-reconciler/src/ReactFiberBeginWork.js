@@ -327,17 +327,6 @@ let didWarnAboutRevealOrder;
 let didWarnAboutTailOptions;
 let didWarnAboutClassNameOnViewTransition;
 
-if (false) {
-  didWarnAboutBadClass = ({}: { [string]: boolean });
-  didWarnAboutContextTypeOnFunctionComponent = ({}: { [string]: boolean });
-  didWarnAboutContextTypes = ({}: { [string]: boolean });
-  didWarnAboutGetDerivedStateOnFunctionComponent = ({}: { [string]: boolean });
-  didWarnAboutReassigningProps = false;
-  didWarnAboutRevealOrder = ({}: { [string]: boolean });
-  didWarnAboutTailOptions = ({}: { [string]: boolean });
-  didWarnAboutClassNameOnViewTransition = ({}: { [string]: boolean });
-}
-
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -480,17 +469,11 @@ function updateMemoComponent(
     const type = Component.type;
     if (isSimpleFunctionComponent(type) && Component.compare === null) {
       let resolvedType = type;
-      if (false) {
-        resolvedType = resolveFunctionForHotReloading(type);
-      }
       // If this is a plain function component without default props,
       // and with only the default shallow comparison, we upgrade it
       // to a SimpleMemoComponent to allow fast path updates.
       workInProgress.tag = SimpleMemoComponent;
       workInProgress.type = resolvedType;
-      if (false) {
-        validateFunctionComponentInDev(workInProgress, type);
-      }
       return updateSimpleMemoComponent(
         current,
         workInProgress,
@@ -549,12 +532,7 @@ function updateSimpleMemoComponent(
   // We'll need to figure out if this is fine or can cause issues.
   if (current !== null) {
     const prevProps = current.memoizedProps;
-    if (
-      shallowEqual(prevProps, nextProps) &&
-      current.ref === workInProgress.ref &&
-      // Prevent bailout if the implementation changed due to hot reload.
-      (false ? workInProgress.type === current.type : true)
-    ) {
+    if (shallowEqual(prevProps, nextProps) && current.ref === workInProgress.ref) {
       didReceiveUpdate = false;
 
       // The props are shallowly equal. Reuse the previous props object, like we
@@ -850,22 +828,6 @@ function mountActivityChildren(
   nextProps: ActivityProps,
   renderLanes: Lanes
 ) {
-  if (false) {
-    const hiddenProp = (nextProps: any).hidden;
-    if (hiddenProp !== undefined) {
-      console.error(
-        '<Activity> doesn\'t accept a hidden prop. Use mode="hidden" instead.\n' +
-          "- <Activity %s>\n" +
-          "+ <Activity %s>",
-        hiddenProp === true
-          ? "hidden"
-          : hiddenProp === false
-          ? "hidden={false}"
-          : "hidden={...}",
-        hiddenProp ? 'mode="hidden"' : 'mode="visible"'
-      );
-    }
-  }
   const nextChildren = nextProps.children;
   const nextMode = nextProps.mode;
   const mode = workInProgress.mode;
@@ -1247,14 +1209,6 @@ function updateTracingMarkerComponent(
       workInProgress.flags |= Passive;
     }
   } else {
-    if (false) {
-      if (current.memoizedProps.name !== nextProps.name) {
-        console.error(
-          "Changing the name of a tracing marker after mount is not supported. " +
-            "To remount the tracing marker, pass it a new key."
-        );
-      }
-    }
   }
 
   const instance: TracingMarkerInstance | null = workInProgress.stateNode;
@@ -1363,57 +1317,6 @@ function updateFunctionComponent(
   nextProps: any,
   renderLanes: Lanes
 ) {
-  if (false) {
-    if (
-      Component.prototype &&
-      typeof Component.prototype.render === "function"
-    ) {
-      const componentName = getComponentNameFromType(Component) || "Unknown";
-
-      if (!didWarnAboutBadClass[componentName]) {
-        console.error(
-          "The <%s /> component appears to have a render method, but doesn't extend React.Component. " +
-            "This is likely to cause errors. Change %s to extend React.Component instead.",
-          componentName,
-          componentName
-        );
-        didWarnAboutBadClass[componentName] = true;
-      }
-    }
-
-    if (workInProgress.mode & StrictLegacyMode) {
-      ReactStrictModeWarnings.recordLegacyContextWarning(workInProgress, null);
-    }
-
-    if (current === null) {
-      // Some validations were previously done in mountIndeterminateComponent however and are now run
-      // in updateFuntionComponent but only on mount
-      validateFunctionComponentInDev(workInProgress, workInProgress.type);
-
-      if (Component.contextTypes) {
-        const componentName = getComponentNameFromType(Component) || "Unknown";
-
-        if (!didWarnAboutContextTypes[componentName]) {
-          didWarnAboutContextTypes[componentName] = true;
-          if (disableLegacyContext) {
-            console.error(
-              "%s uses the legacy contextTypes API which was removed in React 19. " +
-                "Use React.createContext() with React.useContext() instead. " +
-                "(https://react.dev/link/legacy-context)",
-              componentName
-            );
-          } else {
-            console.error(
-              "%s uses the legacy contextTypes API which will be removed soon. " +
-                "Use React.createContext() with React.useContext() instead. " +
-                "(https://react.dev/link/legacy-context)",
-              componentName
-            );
-          }
-        }
-      }
-    }
-  }
 
   let context;
   if (!disableLegacyContext && !disableLegacyContextForFunctionComponents) {
@@ -1427,27 +1330,15 @@ function updateFunctionComponent(
   if (enableSchedulingProfiler) {
     markComponentRenderStarted(workInProgress);
   }
-  if (false) {
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      Component,
-      nextProps,
-      context,
-      renderLanes
-    );
-    hasId = checkDidRenderIdHook();
-  } else {
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      Component,
-      nextProps,
-      context,
-      renderLanes
-    );
-    hasId = checkDidRenderIdHook();
-  }
+  nextChildren = renderWithHooks(
+    current,
+    workInProgress,
+    Component,
+    nextProps,
+    context,
+    renderLanes
+  );
+  hasId = checkDidRenderIdHook();
   if (enableSchedulingProfiler) {
     markComponentRenderStopped();
   }
@@ -1517,48 +1408,6 @@ function updateClassComponent(
   nextProps: any,
   renderLanes: Lanes
 ) {
-  if (false) {
-    // This is used by DevTools to force a boundary to error.
-    switch (shouldError(workInProgress)) {
-      case false: {
-        const instance = workInProgress.stateNode;
-        const ctor = workInProgress.type;
-        // TODO This way of resetting the error boundary state is a hack.
-        // Is there a better way to do this?
-        const tempInstance = new ctor(
-          workInProgress.memoizedProps,
-          instance.context
-        );
-        const state = tempInstance.state;
-        instance.updater.enqueueSetState(instance, state, null);
-        break;
-      }
-      case true: {
-        workInProgress.flags |= DidCapture;
-        workInProgress.flags |= ShouldCapture;
-        // eslint-disable-next-line react-internal/prod-error-codes
-        const error = new Error("Simulated error coming from DevTools");
-        const lane = pickArbitraryLane(renderLanes);
-        workInProgress.lanes = mergeLanes(workInProgress.lanes, lane);
-        // Schedule the error boundary to re-render using updated state
-        const root: FiberRoot | null = getWorkInProgressRoot();
-        if (root === null) {
-          throw new Error(
-            "Expected a work-in-progress root. This is a bug in React. Please file an issue."
-          );
-        }
-        const update = createClassErrorUpdate(lane);
-        initializeClassErrorUpdate(
-          update,
-          root,
-          workInProgress,
-          createCapturedValueAtFiber(error, workInProgress)
-        );
-        enqueueCapturedUpdate(workInProgress, update);
-        break;
-      }
-    }
-  }
 
   // Push context providers early to prevent context stack mismatches.
   // During mounting we don't know the child context yet as the instance doesn't exist.
@@ -1606,19 +1455,6 @@ function updateClassComponent(
     hasContext,
     renderLanes
   );
-  if (false) {
-    const inst = workInProgress.stateNode;
-    if (shouldUpdate && inst.props !== nextProps) {
-      if (!didWarnAboutReassigningProps) {
-        console.error(
-          "It looks like %s is reassigning its own `this.props` while rendering. " +
-            "This is not supported and can lead to confusing bugs.",
-          getComponentNameFromFiber(workInProgress) || "a component"
-        );
-      }
-      didWarnAboutReassigningProps = true;
-    }
-  }
   return nextUnitOfWork;
 }
 
@@ -1647,9 +1483,6 @@ function finishClassComponent(
   const instance = workInProgress.stateNode;
 
   // Rerender
-  if (false) {
-    setCurrentFiber(workInProgress);
-  }
   let nextChildren;
   if (
     didCaptureError &&
@@ -1669,19 +1502,7 @@ function finishClassComponent(
     if (enableSchedulingProfiler) {
       markComponentRenderStarted(workInProgress);
     }
-    if (false) {
-      nextChildren = callRenderInDEV(instance);
-      if (workInProgress.mode & StrictLegacyMode) {
-        setIsStrictModeForDevtools(true);
-        try {
-          callRenderInDEV(instance);
-        } finally {
-          setIsStrictModeForDevtools(false);
-        }
-      }
-    } else {
-      nextChildren = instance.render();
-    }
+    nextChildren = instance.render();
     if (enableSchedulingProfiler) {
       markComponentRenderStopped();
     }
@@ -2021,13 +1842,9 @@ function mountLazyComponent(
   const props = workInProgress.pendingProps;
   const lazyComponent: LazyComponentType<any, any> = elementType;
   let Component;
-  if (false) {
-    Component = callLazyInitInDEV(lazyComponent);
-  } else {
-    const payload = lazyComponent._payload;
-    const init = lazyComponent._init;
-    Component = init(payload);
-  }
+  const payload = lazyComponent._payload;
+  const init = lazyComponent._init;
+  Component = init(payload);
   // Store the unwrapped component in the type.
   workInProgress.type = Component;
 
@@ -2035,10 +1852,6 @@ function mountLazyComponent(
     if (isFunctionClassComponent(Component)) {
       const resolvedProps = resolveClassComponentProps(Component, props);
       workInProgress.tag = ClassComponent;
-      if (false) {
-        workInProgress.type = Component =
-          resolveClassForHotReloading(Component);
-      }
       return updateClassComponent(
         null,
         workInProgress,
@@ -2048,11 +1861,6 @@ function mountLazyComponent(
       );
     } else {
       workInProgress.tag = FunctionComponent;
-      if (false) {
-        validateFunctionComponentInDev(workInProgress, Component);
-        workInProgress.type = Component =
-          resolveFunctionForHotReloading(Component);
-      }
       return updateFunctionComponent(
         null,
         workInProgress,
@@ -2065,10 +1873,6 @@ function mountLazyComponent(
     const $$typeof = Component.$$typeof;
     if ($$typeof === REACT_FORWARD_REF_TYPE) {
       workInProgress.tag = ForwardRef;
-      if (false) {
-        workInProgress.type = Component =
-          resolveForwardRefForHotReloading(Component);
-      }
       return updateForwardRef(
         null,
         workInProgress,
@@ -2089,15 +1893,6 @@ function mountLazyComponent(
   }
 
   let hint = "";
-  if (false) {
-    if (
-      Component !== null &&
-      typeof Component === "object" &&
-      Component.$$typeof === REACT_LAZY_TYPE
-    ) {
-      hint = " Did you wrap a component in React.lazy() more than once?";
-    }
-  }
 
   const loggedComponent = getComponentNameFromType(Component) || Component;
 
@@ -2147,45 +1942,6 @@ function mountIncompleteClassComponent(
     hasContext,
     renderLanes
   );
-}
-
-function validateFunctionComponentInDev(workInProgress: Fiber, Component: any) {
-  if (false) {
-    if (Component && Component.childContextTypes) {
-      console.error(
-        "childContextTypes cannot be defined on a function component.\n" +
-          "  %s.childContextTypes = ...",
-        Component.displayName || Component.name || "Component"
-      );
-    }
-
-    if (typeof Component.getDerivedStateFromProps === "function") {
-      const componentName = getComponentNameFromType(Component) || "Unknown";
-
-      if (!didWarnAboutGetDerivedStateOnFunctionComponent[componentName]) {
-        console.error(
-          "%s: Function components do not support getDerivedStateFromProps.",
-          componentName
-        );
-        didWarnAboutGetDerivedStateOnFunctionComponent[componentName] = true;
-      }
-    }
-
-    if (
-      typeof Component.contextType === "object" &&
-      Component.contextType !== null
-    ) {
-      const componentName = getComponentNameFromType(Component) || "Unknown";
-
-      if (!didWarnAboutContextTypeOnFunctionComponent[componentName]) {
-        console.error(
-          "%s: Function components do not support contextType.",
-          componentName
-        );
-        didWarnAboutContextTypeOnFunctionComponent[componentName] = true;
-      }
-    }
-  }
 }
 
 const SUSPENDED_MARKER: SuspenseState = {
@@ -2288,13 +2044,6 @@ function updateSuspenseComponent(
   renderLanes: Lanes
 ) {
   const nextProps: SuspenseProps = workInProgress.pendingProps;
-
-  // This is used by DevTools to force a boundary to suspend.
-  if (false) {
-    if (shouldSuspend(workInProgress)) {
-      workInProgress.flags |= DidCapture;
-    }
-  }
 
   let showFallback = false;
   const didSuspend = (workInProgress.flags & DidCapture) !== NoFlags;
@@ -2891,29 +2640,19 @@ function updateDehydratedSuspenseComponent(
       let message;
       let stack = null;
       let componentStack = null;
-      if (false) {
-        ({ digest, message, stack, componentStack } =
-          getSuspenseInstanceFallbackErrorDetails(suspenseInstance));
-      } else {
-        ({ digest } =
-          getSuspenseInstanceFallbackErrorDetails(suspenseInstance));
-      }
+      ({ digest } =
+        getSuspenseInstanceFallbackErrorDetails(suspenseInstance));
 
       // TODO: Figure out a better signal than encoding a magic digest value.
       if (!enablePostpone || digest !== "POSTPONE") {
         let error: Error;
-        if (false && message) {
-          // eslint-disable-next-line react-internal/prod-error-codes
-          error = new Error(message);
-        } else {
-          error = new Error(
-            "The server could not finish this Suspense boundary, likely " +
-              "due to an error during server rendering. " +
-              "Switched to client rendering."
-          );
-        }
+        error = new Error(
+          "The server could not finish this Suspense boundary, likely " +
+            "due to an error during server rendering. " +
+            "Switched to client rendering."
+        );
         // Replace the stack with the server stack
-        error.stack = (false && stack) || "";
+        error.stack = "";
         (error: any).digest = digest;
         const capturedValue = createCapturedValueFromError(
           error,
@@ -3168,119 +2907,6 @@ function findLastContentRow(firstChild: null | Fiber): null | Fiber {
   return lastContentRow;
 }
 
-function validateRevealOrder(revealOrder: SuspenseListRevealOrder) {
-  if (false) {
-    const cacheKey = revealOrder == null ? "null" : revealOrder;
-    if (
-      revealOrder !== "forwards" &&
-      revealOrder !== "unstable_legacy-backwards" &&
-      revealOrder !== "together" &&
-      revealOrder !== "independent" &&
-      !didWarnAboutRevealOrder[cacheKey]
-    ) {
-      didWarnAboutRevealOrder[cacheKey] = true;
-      if (revealOrder == null) {
-        console.error(
-          'The default for the <SuspenseList revealOrder="..."> prop is changing. ' +
-            "To be future compatible you must explictly specify either " +
-            '"independent" (the current default), "together", "forwards" or "legacy_unstable-backwards".'
-        );
-      } else if (revealOrder === "backwards") {
-        console.error(
-          'The rendering order of <SuspenseList revealOrder="backwards"> is changing. ' +
-            'To be future compatible you must specify revealOrder="legacy_unstable-backwards" instead.'
-        );
-      } else if (typeof revealOrder === "string") {
-        switch (revealOrder.toLowerCase()) {
-          case "together":
-          case "forwards":
-          case "backwards":
-          case "independent": {
-            console.error(
-              '"%s" is not a valid value for revealOrder on <SuspenseList />. ' +
-                'Use lowercase "%s" instead.',
-              revealOrder,
-              revealOrder.toLowerCase()
-            );
-            break;
-          }
-          case "forward":
-          case "backward": {
-            console.error(
-              '"%s" is not a valid value for revealOrder on <SuspenseList />. ' +
-                'React uses the -s suffix in the spelling. Use "%ss" instead.',
-              revealOrder,
-              revealOrder.toLowerCase()
-            );
-            break;
-          }
-          default:
-            console.error(
-              '"%s" is not a supported revealOrder on <SuspenseList />. ' +
-                'Did you mean "independent", "together", "forwards" or "backwards"?',
-              revealOrder
-            );
-            break;
-        }
-      } else {
-        console.error(
-          "%s is not a supported value for revealOrder on <SuspenseList />. " +
-            'Did you mean "independent", "together", "forwards" or "backwards"?',
-          revealOrder
-        );
-      }
-    }
-  }
-}
-
-function validateTailOptions(
-  tailMode: SuspenseListTailMode,
-  revealOrder: SuspenseListRevealOrder
-) {
-  if (false) {
-    const cacheKey = tailMode == null ? "null" : tailMode;
-    if (!didWarnAboutTailOptions[cacheKey]) {
-      if (tailMode == null) {
-        if (
-          revealOrder === "forwards" ||
-          revealOrder === "backwards" ||
-          revealOrder === "unstable_legacy-backwards"
-        ) {
-          didWarnAboutTailOptions[cacheKey] = true;
-          console.error(
-            'The default for the <SuspenseList tail="..."> prop is changing. ' +
-              "To be future compatible you must explictly specify either " +
-              '"visible" (the current default), "collapsed" or "hidden".'
-          );
-        }
-      } else if (
-        tailMode !== "visible" &&
-        tailMode !== "collapsed" &&
-        tailMode !== "hidden"
-      ) {
-        didWarnAboutTailOptions[cacheKey] = true;
-        console.error(
-          '"%s" is not a supported value for tail on <SuspenseList />. ' +
-            'Did you mean "visible", "collapsed" or "hidden"?',
-          tailMode
-        );
-      } else if (
-        revealOrder !== "forwards" &&
-        revealOrder !== "backwards" &&
-        revealOrder !== "unstable_legacy-backwards"
-      ) {
-        didWarnAboutTailOptions[cacheKey] = true;
-        console.error(
-          '<SuspenseList tail="%s" /> is only valid if revealOrder is ' +
-            '"forwards" or "backwards". ' +
-            'Did you mean to specify revealOrder="forwards"?',
-          tailMode
-        );
-      }
-    }
-  }
-}
-
 function initSuspenseListRenderState(
   workInProgress: Fiber,
   isBackwards: boolean,
@@ -3347,8 +2973,6 @@ function updateSuspenseListComponent(
   }
   pushSuspenseListContext(workInProgress, suspenseContext);
 
-  validateRevealOrder(revealOrder);
-  validateTailOptions(tailMode, revealOrder);
   validateSuspenseListChildren(newChildren, revealOrder);
 
   reconcileChildren(current, workInProgress, newChildren, renderLanes);
@@ -3474,25 +3098,6 @@ function updateViewTransition(
       pushMaterializedTreeId(workInProgress);
     }
   }
-  if (false) {
-    // $FlowFixMe[prop-missing]
-    if (pendingProps.className !== undefined) {
-      const example =
-        typeof pendingProps.className === "string"
-          ? JSON.stringify(pendingProps.className)
-          : "{...}";
-      if (!didWarnAboutClassNameOnViewTransition[example]) {
-        didWarnAboutClassNameOnViewTransition[example] = true;
-        console.error(
-          '<ViewTransition> doesn\'t accept a "className" prop. It has been renamed to "default".\n' +
-            "-   <ViewTransition className=%s>\n" +
-            "+   <ViewTransition default=%s>",
-          example,
-          example
-        );
-      }
-    }
-  }
   if (current !== null && current.memoizedProps.name !== pendingProps.name) {
     // If the name changes, we schedule a ref effect to create a new ref instance.
     workInProgress.flags |= Ref | RefStatic;
@@ -3540,17 +3145,6 @@ function updateContextProvider(
   const newProps = workInProgress.pendingProps;
   const newValue = newProps.value;
 
-  if (false) {
-    if (!("value" in newProps)) {
-      if (!hasWarnedAboutUsingNoValuePropOnContextProvider) {
-        hasWarnedAboutUsingNoValuePropOnContextProvider = true;
-        console.error(
-          "The `value` prop is required for the `<Context.Provider>`. Did you misspell it or forget to pass it?"
-        );
-      }
-    }
-  }
-
   pushProvider(workInProgress, context, newValue);
 
   const newChildren = newProps.children;
@@ -3568,28 +3162,13 @@ function updateContextConsumer(
   const newProps = workInProgress.pendingProps;
   const render = newProps.children;
 
-  if (false) {
-    if (typeof render !== "function") {
-      console.error(
-        "A context consumer was rendered with multiple children, or a child " +
-          "that isn't a function. A context consumer expects a single child " +
-          "that is a function. If you did pass a function, make sure there " +
-          "is no trailing or leading whitespace around it."
-      );
-    }
-  }
-
   prepareToReadContext(workInProgress, renderLanes);
   const newValue = readContext(context);
   if (enableSchedulingProfiler) {
     markComponentRenderStarted(workInProgress);
   }
   let newChildren;
-  if (false) {
-    newChildren = callComponentInDEV(render, newValue, undefined);
-  } else {
-    newChildren = render(newValue);
-  }
+  newChildren = render(newValue);
   if (enableSchedulingProfiler) {
     markComponentRenderStopped();
   }
@@ -3677,77 +3256,6 @@ function bailoutOnAlreadyFinishedWork(
   // fibers and continue.
   cloneChildFibers(current, workInProgress);
   return workInProgress.child;
-}
-
-function remountFiber(
-  current: Fiber,
-  oldWorkInProgress: Fiber,
-  newWorkInProgress: Fiber
-): Fiber | null {
-  if (false) {
-    const returnFiber = oldWorkInProgress.return;
-    if (returnFiber === null) {
-      // eslint-disable-next-line react-internal/prod-error-codes
-      throw new Error("Cannot swap the root fiber.");
-    }
-
-    // Disconnect from the old current.
-    // It will get deleted.
-    current.alternate = null;
-    oldWorkInProgress.alternate = null;
-
-    // Connect to the new tree.
-    newWorkInProgress.index = oldWorkInProgress.index;
-    newWorkInProgress.sibling = oldWorkInProgress.sibling;
-    newWorkInProgress.return = oldWorkInProgress.return;
-    newWorkInProgress.ref = oldWorkInProgress.ref;
-
-    if (false) {
-      newWorkInProgress._debugInfo = oldWorkInProgress._debugInfo;
-    }
-
-    // Replace the child/sibling pointers above it.
-    if (oldWorkInProgress === returnFiber.child) {
-      returnFiber.child = newWorkInProgress;
-    } else {
-      let prevSibling = returnFiber.child;
-      if (prevSibling === null) {
-        // eslint-disable-next-line react-internal/prod-error-codes
-        throw new Error("Expected parent to have a child.");
-      }
-      // $FlowFixMe[incompatible-use] found when upgrading Flow
-      while (prevSibling.sibling !== oldWorkInProgress) {
-        // $FlowFixMe[incompatible-use] found when upgrading Flow
-        prevSibling = prevSibling.sibling;
-        if (prevSibling === null) {
-          // eslint-disable-next-line react-internal/prod-error-codes
-          throw new Error("Expected to find the previous sibling.");
-        }
-      }
-      // $FlowFixMe[incompatible-use] found when upgrading Flow
-      prevSibling.sibling = newWorkInProgress;
-    }
-
-    // Delete the old fiber and place the new one.
-    // Since the old fiber is disconnected, we have to schedule it manually.
-    const deletions = returnFiber.deletions;
-    if (deletions === null) {
-      returnFiber.deletions = [current];
-      returnFiber.flags |= ChildDeletion;
-    } else {
-      deletions.push(current);
-    }
-
-    newWorkInProgress.flags |= Placement;
-
-    // Restart work from the new fiber.
-    return newWorkInProgress;
-  } else {
-    throw new Error(
-      "Did not expect this call in production. " +
-        "This is a bug in React. Please file an issue."
-    );
-  }
 }
 
 function checkScheduledUpdateOrContext(
@@ -4020,33 +3528,12 @@ function beginWork(
   workInProgress: Fiber,
   renderLanes: Lanes
 ): Fiber | null {
-  if (false) {
-    if (workInProgress._debugNeedsRemount && current !== null) {
-      // This will restart the begin phase with a new fiber.
-      const copiedFiber = createFiberFromTypeAndProps(
-        workInProgress.type,
-        workInProgress.key,
-        workInProgress.pendingProps,
-        workInProgress._debugOwner || null,
-        workInProgress.mode,
-        workInProgress.lanes
-      );
-      copiedFiber._debugStack = workInProgress._debugStack;
-      copiedFiber._debugTask = workInProgress._debugTask;
-      return remountFiber(current, workInProgress, copiedFiber);
-    }
-  }
 
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
-    if (
-      oldProps !== newProps ||
-      hasLegacyContextChanged() ||
-      // Force a re-render if the implementation changed due to hot reload:
-      (false ? workInProgress.type !== current.type : false)
-    ) {
+    if (oldProps !== newProps || hasLegacyContextChanged()) {
       // If props or context changed, mark the fiber as having performed work.
       // This may be unset if the props are determined to be equal later (memo).
       didReceiveUpdate = true;
