@@ -34,19 +34,10 @@ import { getHostTransitionProvider } from "./ReactFiberHostContext";
 const valueCursor: StackCursor<mixed> = createCursor(null);
 
 let rendererCursorDEV: StackCursor<Object | null>;
-if (false) {
-  rendererCursorDEV = createCursor(null);
-}
+
 let renderer2CursorDEV: StackCursor<Object | null>;
-if (false) {
-  renderer2CursorDEV = createCursor(null);
-}
 
 let rendererSigil;
-if (false) {
-  // Use this to detect multiple renderers using the same context
-  rendererSigil = {};
-}
 
 let currentlyRenderingFiber: Fiber | null = null;
 let lastContextDependency: ContextDependency<mixed> | null = null;
@@ -58,21 +49,12 @@ export function resetContextDependencies(): void {
   // cannot be called outside the render phase.
   currentlyRenderingFiber = null;
   lastContextDependency = null;
-  if (false) {
-    isDisallowedContextReadInDEV = false;
-  }
 }
 
 export function enterDisallowedContextReadInDEV(): void {
-  if (false) {
-    isDisallowedContextReadInDEV = true;
-  }
 }
 
 export function exitDisallowedContextReadInDEV(): void {
-  if (false) {
-    isDisallowedContextReadInDEV = false;
-  }
 }
 
 export function pushProvider<T>(
@@ -84,40 +66,10 @@ export function pushProvider<T>(
     push(valueCursor, context._currentValue, providerFiber);
 
     context._currentValue = nextValue;
-    if (false) {
-      push(rendererCursorDEV, context._currentRenderer, providerFiber);
-
-      if (
-        context._currentRenderer !== undefined &&
-        context._currentRenderer !== null &&
-        context._currentRenderer !== rendererSigil
-      ) {
-        console.error(
-          "Detected multiple renderers concurrently rendering the " +
-            "same context provider. This is currently unsupported."
-        );
-      }
-      context._currentRenderer = rendererSigil;
-    }
   } else {
     push(valueCursor, context._currentValue2, providerFiber);
 
     context._currentValue2 = nextValue;
-    if (false) {
-      push(renderer2CursorDEV, context._currentRenderer2, providerFiber);
-
-      if (
-        context._currentRenderer2 !== undefined &&
-        context._currentRenderer2 !== null &&
-        context._currentRenderer2 !== rendererSigil
-      ) {
-        console.error(
-          "Detected multiple renderers concurrently rendering the " +
-            "same context provider. This is currently unsupported."
-        );
-      }
-      context._currentRenderer2 = rendererSigil;
-    }
   }
 }
 
@@ -129,18 +81,8 @@ export function popProvider(
 
   if (isPrimaryRenderer) {
     context._currentValue = currentValue;
-    if (false) {
-      const currentRenderer = rendererCursorDEV.current;
-      pop(rendererCursorDEV, providerFiber);
-      context._currentRenderer = currentRenderer;
-    }
   } else {
     context._currentValue2 = currentValue;
-    if (false) {
-      const currentRenderer2 = renderer2CursorDEV.current;
-      pop(renderer2CursorDEV, providerFiber);
-      context._currentRenderer2 = currentRenderer2;
-    }
   }
 
   pop(valueCursor, providerFiber);
@@ -177,14 +119,6 @@ export function scheduleContextWorkOnParentPath(
       break;
     }
     node = node.return;
-  }
-  if (false) {
-    if (node !== propagationRoot) {
-      console.error(
-        "Expected to find the propagation root when scheduling context work. " +
-          "This error is likely caused by a bug in React. Please file an issue."
-      );
-    }
   }
 }
 
@@ -500,18 +434,6 @@ export function prepareToReadContext(
 }
 
 export function readContext<T>(context: ReactContext<T>): T {
-  if (false) {
-    // This warning would fire if you read context inside a Hook like useMemo.
-    // Unlike the class check below, it's not enforced in production for perf.
-    if (isDisallowedContextReadInDEV) {
-      console.error(
-        "Context can only be read while React is rendering. " +
-          "In classes, you can read it in the render method or getDerivedStateFromProps. " +
-          "In function components, you can read it directly in the function body, but not " +
-          "inside Hooks like useReducer() or useMemo()."
-      );
-    }
-  }
   return readContextForConsumer(currentlyRenderingFiber, context);
 }
 

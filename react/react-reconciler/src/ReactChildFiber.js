@@ -81,26 +81,6 @@ let thenableIndexCounter: number = 0;
 // Server Components Meta Data
 let currentDebugInfo: null | ReactDebugInfo = null;
 
-function pushDebugInfo(
-  debugInfo: null | ReactDebugInfo
-): null | ReactDebugInfo {
-  if (!false) {
-    return null;
-  }
-  const previousDebugInfo = currentDebugInfo;
-  if (debugInfo == null) {
-    // Leave inplace
-  } else if (previousDebugInfo === null) {
-    currentDebugInfo = debugInfo;
-  } else {
-    // If we have two debugInfo, we need to create a new one. This makes the array no longer
-    // live so we'll miss any future updates if we received more so ideally we should always
-    // do this after both have fully resolved/unsuspended.
-    currentDebugInfo = previousDebugInfo.concat(debugInfo);
-  }
-  return previousDebugInfo;
-}
-
 let didWarnAboutMaps;
 let didWarnAboutGenerators;
 let ownerHasKeyUseWarning;
@@ -112,98 +92,6 @@ let warnForMissingKey = (
   child: mixed
 ) => {};
 
-if (false) {
-  didWarnAboutMaps = false;
-  didWarnAboutGenerators = false;
-
-  /**
-   * Warn if there's no key explicitly set on dynamic arrays of children or
-   * object keys are not valid. This allows us to keep track of children between
-   * updates.
-   */
-  ownerHasKeyUseWarning = ({}: { [string]: boolean });
-  ownerHasFunctionTypeWarning = ({}: { [string]: boolean });
-  ownerHasSymbolTypeWarning = ({}: { [string]: boolean });
-
-  warnForMissingKey = (
-    returnFiber: Fiber,
-    workInProgress: Fiber,
-    child: mixed
-  ) => {
-    if (child === null || typeof child !== "object") {
-      return;
-    }
-    if (
-      !child._store ||
-      ((child._store.validated || child.key != null) &&
-        child._store.validated !== 2)
-    ) {
-      return;
-    }
-
-    if (typeof child._store !== "object") {
-      throw new Error(
-        "React Component in warnForMissingKey should have a _store. " +
-          "This error is likely caused by a bug in React. Please file an issue."
-      );
-    }
-
-    // $FlowFixMe[cannot-write] unable to narrow type from mixed to writable object
-    child._store.validated = 1;
-
-    const componentName = getComponentNameFromFiber(returnFiber);
-
-    const componentKey = componentName || "null";
-    if (ownerHasKeyUseWarning[componentKey]) {
-      return;
-    }
-    ownerHasKeyUseWarning[componentKey] = true;
-
-    const childOwner = child._owner;
-    const parentOwner = returnFiber._debugOwner;
-
-    let currentComponentErrorInfo = "";
-    if (parentOwner && typeof parentOwner.tag === "number") {
-      const name = getComponentNameFromFiber((parentOwner: any));
-      if (name) {
-        currentComponentErrorInfo =
-          "\n\nCheck the render method of `" + name + "`.";
-      }
-    }
-    if (!currentComponentErrorInfo) {
-      if (componentName) {
-        currentComponentErrorInfo = `\n\nCheck the top-level render call using <${componentName}>.`;
-      }
-    }
-
-    // Usually the current owner is the offender, but if it accepts children as a
-    // property, it may be the creator of the child that's responsible for
-    // assigning it a key.
-    let childOwnerAppendix = "";
-    if (childOwner != null && parentOwner !== childOwner) {
-      let ownerName = null;
-      if (typeof childOwner.tag === "number") {
-        ownerName = getComponentNameFromFiber((childOwner: any));
-      } else if (typeof childOwner.name === "string") {
-        ownerName = childOwner.name;
-      }
-      if (ownerName) {
-        // Give the component that originally created this child.
-        childOwnerAppendix = ` It was passed a child from ${ownerName}.`;
-      }
-    }
-
-    runWithFiberInDEV(workInProgress, () => {
-      console.error(
-        'Each child in a list should have a unique "key" prop.' +
-          "%s%s See https://react.dev/link/warning-keys for more information.",
-        currentComponentErrorInfo,
-        childOwnerAppendix
-      );
-    });
-  };
-}
-
 // Given a fragment, validate that it can only be provided with fragment props
 // We do this here instead of BeginWork because the Fragment fiber doesn't have
 // the whole props object, only the children and is shared with arrays.
@@ -212,47 +100,6 @@ function validateFragmentProps(
   fiber: null | Fiber,
   returnFiber: Fiber
 ) {
-  if (false) {
-    const keys = Object.keys(element.props);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (
-        key !== "children" &&
-        key !== "key" &&
-        (enableFragmentRefs ? key !== "ref" : true)
-      ) {
-        if (fiber === null) {
-          // For unkeyed root fragments without refs (enableFragmentRefs),
-          // there's no Fiber. We create a fake one just for error stack handling.
-          fiber = createFiberFromElement(element, returnFiber.mode, 0);
-          if (false) {
-            fiber._debugInfo = currentDebugInfo;
-          }
-          fiber.return = returnFiber;
-        }
-        runWithFiberInDEV(
-          fiber,
-          (erroredKey) => {
-            if (enableFragmentRefs) {
-              console.error(
-                "Invalid prop `%s` supplied to `React.Fragment`. " +
-                  "React.Fragment can only have `key`, `ref`, and `children` props.",
-                erroredKey
-              );
-            } else {
-              console.error(
-                "Invalid prop `%s` supplied to `React.Fragment`. " +
-                  "React.Fragment can only have `key` and `children` props.",
-                erroredKey
-              );
-            }
-          },
-          key
-        );
-        break;
-      }
-    }
-  }
 }
 
 function unwrapThenable<T>(thenable: Thenable<T>): T {
@@ -299,75 +146,7 @@ function throwOnInvalidObjectType(returnFiber: Fiber, newChild: Object) {
   );
 }
 
-function warnOnFunctionType(returnFiber: Fiber, invalidChild: Function) {
-  if (false) {
-    const parentName = getComponentNameFromFiber(returnFiber) || "Component";
-
-    if (ownerHasFunctionTypeWarning[parentName]) {
-      return;
-    }
-    ownerHasFunctionTypeWarning[parentName] = true;
-
-    const name = invalidChild.displayName || invalidChild.name || "Component";
-
-    if (returnFiber.tag === HostRoot) {
-      console.error(
-        "Functions are not valid as a React child. This may happen if " +
-          "you return %s instead of <%s /> from render. " +
-          "Or maybe you meant to call this function rather than return it.\n" +
-          "  root.render(%s)",
-        name,
-        name,
-        name
-      );
-    } else {
-      console.error(
-        "Functions are not valid as a React child. This may happen if " +
-          "you return %s instead of <%s /> from render. " +
-          "Or maybe you meant to call this function rather than return it.\n" +
-          "  <%s>{%s}</%s>",
-        name,
-        name,
-        parentName,
-        name,
-        parentName
-      );
-    }
-  }
-}
-
-function warnOnSymbolType(returnFiber: Fiber, invalidChild: symbol) {
-  if (false) {
-    const parentName = getComponentNameFromFiber(returnFiber) || "Component";
-
-    if (ownerHasSymbolTypeWarning[parentName]) {
-      return;
-    }
-    ownerHasSymbolTypeWarning[parentName] = true;
-
-    // eslint-disable-next-line react-internal/safe-string-coercion
-    const name = String(invalidChild);
-
-    if (returnFiber.tag === HostRoot) {
-      console.error(
-        "Symbols are not valid as a React child.\n" + "  root.render(%s)",
-        name
-      );
-    } else {
-      console.error(
-        "Symbols are not valid as a React child.\n" + "  <%s>%s</%s>",
-        parentName,
-        name,
-        parentName
-      );
-    }
-  }
-}
-
 function resolveLazy(lazyType: any) {
-  if (false) {
-    return callLazyInitInDEV(lazyType);
-  }
   const payload = lazyType._payload;
   const init = lazyType._init;
   return init(payload);
@@ -498,20 +277,11 @@ function createChildReconciler(
       // Insert
       const created = createFiberFromText(textContent, returnFiber.mode, lanes);
       created.return = returnFiber;
-      if (false) {
-        // We treat the parent as the owner for stack purposes.
-        created._debugOwner = returnFiber;
-        created._debugTask = returnFiber._debugTask;
-        created._debugInfo = currentDebugInfo;
-      }
       return created;
     } else {
       // Update
       const existing = useFiber(current, textContent);
       existing.return = returnFiber;
-      if (false) {
-        existing._debugInfo = currentDebugInfo;
-      }
       return existing;
     }
   }
@@ -540,8 +310,6 @@ function createChildReconciler(
     if (current !== null) {
       if (
         current.elementType === elementType ||
-        // Keep this check inline so it only runs on the false path:
-        (false ? isCompatibleFamilyForHotReloading(current, element) : false) ||
         // Lazy types should reconcile their resolved type.
         // We need to do this after the Hot Reloading check above,
         // because hot reloading has different semantics than prod because
@@ -555,10 +323,6 @@ function createChildReconciler(
         const existing = useFiber(current, element.props);
         coerceRef(existing, element);
         existing.return = returnFiber;
-        if (false) {
-          existing._debugOwner = element._owner;
-          existing._debugInfo = currentDebugInfo;
-        }
         return existing;
       }
     }
@@ -566,9 +330,6 @@ function createChildReconciler(
     const created = createFiberFromElement(element, returnFiber.mode, lanes);
     coerceRef(created, element);
     created.return = returnFiber;
-    if (false) {
-      created._debugInfo = currentDebugInfo;
-    }
     return created;
   }
 
@@ -587,17 +348,11 @@ function createChildReconciler(
       // Insert
       const created = createFiberFromPortal(portal, returnFiber.mode, lanes);
       created.return = returnFiber;
-      if (false) {
-        created._debugInfo = currentDebugInfo;
-      }
       return created;
     } else {
       // Update
       const existing = useFiber(current, portal.children || []);
       existing.return = returnFiber;
-      if (false) {
-        existing._debugInfo = currentDebugInfo;
-      }
       return existing;
     }
   }
@@ -618,20 +373,11 @@ function createChildReconciler(
         key
       );
       created.return = returnFiber;
-      if (false) {
-        // We treat the parent as the owner for stack purposes.
-        created._debugOwner = returnFiber;
-        created._debugTask = returnFiber._debugTask;
-        created._debugInfo = currentDebugInfo;
-      }
       return created;
     } else {
       // Update
       const existing = useFiber(current, fragment);
       existing.return = returnFiber;
-      if (false) {
-        existing._debugInfo = currentDebugInfo;
-      }
       return existing;
     }
   }
@@ -656,12 +402,6 @@ function createChildReconciler(
         lanes
       );
       created.return = returnFiber;
-      if (false) {
-        // We treat the parent as the owner for stack purposes.
-        created._debugOwner = returnFiber;
-        created._debugTask = returnFiber._debugTask;
-        created._debugInfo = currentDebugInfo;
-      }
       return created;
     }
 
@@ -675,11 +415,6 @@ function createChildReconciler(
           );
           coerceRef(created, newChild);
           created.return = returnFiber;
-          if (false) {
-            const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
-            created._debugInfo = currentDebugInfo;
-            currentDebugInfo = prevDebugInfo;
-          }
           return created;
         }
         case REACT_PORTAL_TYPE: {
@@ -689,21 +424,14 @@ function createChildReconciler(
             lanes
           );
           created.return = returnFiber;
-          if (false) {
-            created._debugInfo = currentDebugInfo;
-          }
           return created;
         }
         case REACT_LAZY_TYPE: {
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           let resolvedChild;
-          if (false) {
-            resolvedChild = callLazyInitInDEV(newChild);
-          } else {
-            const payload = newChild._payload;
-            const init = newChild._init;
-            resolvedChild = init(payload);
-          }
+          const payload = newChild._payload;
+          const init = newChild._init;
+          resolvedChild = init(payload);
           const created = createChild(returnFiber, resolvedChild, lanes);
           currentDebugInfo = prevDebugInfo;
           return created;
@@ -723,14 +451,6 @@ function createChildReconciler(
           null
         );
         created.return = returnFiber;
-        if (false) {
-          // We treat the parent as the owner for stack purposes.
-          created._debugOwner = returnFiber;
-          created._debugTask = returnFiber._debugTask;
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
-          created._debugInfo = currentDebugInfo;
-          currentDebugInfo = prevDebugInfo;
-        }
         return created;
       }
 
@@ -739,7 +459,7 @@ function createChildReconciler(
       // Unwrap the inner value and recursively call this function again.
       if (typeof newChild.then === "function") {
         const thenable: Thenable<any> = (newChild: any);
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const created = createChild(
           returnFiber,
           unwrapThenable(thenable),
@@ -759,15 +479,6 @@ function createChildReconciler(
       }
 
       throwOnInvalidObjectType(returnFiber, newChild);
-    }
-
-    if (false) {
-      if (typeof newChild === "function") {
-        warnOnFunctionType(returnFiber, newChild);
-      }
-      if (typeof newChild === "symbol") {
-        warnOnSymbolType(returnFiber, newChild);
-      }
     }
 
     return null;
@@ -806,7 +517,7 @@ function createChildReconciler(
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE: {
           if (newChild.key === key) {
-            const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+            const prevDebugInfo = null;
             const updated = updateElement(
               returnFiber,
               oldFiber,
@@ -827,15 +538,11 @@ function createChildReconciler(
           }
         }
         case REACT_LAZY_TYPE: {
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           let resolvedChild;
-          if (false) {
-            resolvedChild = callLazyInitInDEV(newChild);
-          } else {
-            const payload = newChild._payload;
-            const init = newChild._init;
-            resolvedChild = init(payload);
-          }
+          const payload = newChild._payload;
+          const init = newChild._init;
+          resolvedChild = init(payload);
           const updated = updateSlot(
             returnFiber,
             oldFiber,
@@ -857,7 +564,7 @@ function createChildReconciler(
           return null;
         }
 
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const updated = updateFragment(
           returnFiber,
           oldFiber,
@@ -874,7 +581,7 @@ function createChildReconciler(
       // Unwrap the inner value and recursively call this function again.
       if (typeof newChild.then === "function") {
         const thenable: Thenable<any> = (newChild: any);
-        const prevDebugInfo = pushDebugInfo((thenable: any)._debugInfo);
+        const prevDebugInfo = null;
         const updated = updateSlot(
           returnFiber,
           oldFiber,
@@ -896,15 +603,6 @@ function createChildReconciler(
       }
 
       throwOnInvalidObjectType(returnFiber, newChild);
-    }
-
-    if (false) {
-      if (typeof newChild === "function") {
-        warnOnFunctionType(returnFiber, newChild);
-      }
-      if (typeof newChild === "symbol") {
-        warnOnSymbolType(returnFiber, newChild);
-      }
     }
 
     return null;
@@ -941,7 +639,7 @@ function createChildReconciler(
             existingChildren.get(
               newChild.key === null ? newIdx : newChild.key
             ) || null;
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           const updated = updateElement(
             returnFiber,
             matchedFiber,
@@ -959,15 +657,11 @@ function createChildReconciler(
           return updatePortal(returnFiber, matchedFiber, newChild, lanes);
         }
         case REACT_LAZY_TYPE: {
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           let resolvedChild;
-          if (false) {
-            resolvedChild = callLazyInitInDEV(newChild);
-          } else {
-            const payload = newChild._payload;
-            const init = newChild._init;
-            resolvedChild = init(payload);
-          }
+          const payload = newChild._payload;
+          const init = newChild._init;
+          resolvedChild = init(payload);
           const updated = updateFromMap(
             existingChildren,
             returnFiber,
@@ -987,7 +681,7 @@ function createChildReconciler(
           typeof newChild[ASYNC_ITERATOR] === "function")
       ) {
         const matchedFiber = existingChildren.get(newIdx) || null;
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const updated = updateFragment(
           returnFiber,
           matchedFiber,
@@ -1004,7 +698,7 @@ function createChildReconciler(
       // Unwrap the inner value and recursively call this function again.
       if (typeof newChild.then === "function") {
         const thenable: Thenable<any> = (newChild: any);
-        const prevDebugInfo = pushDebugInfo((thenable: any)._debugInfo);
+        const prevDebugInfo = null;
         const updated = updateFromMap(
           existingChildren,
           returnFiber,
@@ -1030,15 +724,6 @@ function createChildReconciler(
       throwOnInvalidObjectType(returnFiber, newChild);
     }
 
-    if (false) {
-      if (typeof newChild === "function") {
-        warnOnFunctionType(returnFiber, newChild);
-      }
-      if (typeof newChild === "symbol") {
-        warnOnSymbolType(returnFiber, newChild);
-      }
-    }
-
     return null;
   }
 
@@ -1051,59 +736,6 @@ function createChildReconciler(
     child: mixed,
     knownKeys: Set<string> | null
   ): Set<string> | null {
-    if (false) {
-      if (typeof child !== "object" || child === null) {
-        return knownKeys;
-      }
-      switch (child.$$typeof) {
-        case REACT_ELEMENT_TYPE:
-        case REACT_PORTAL_TYPE:
-          warnForMissingKey(returnFiber, workInProgress, child);
-          const key = child.key;
-          if (typeof key !== "string") {
-            break;
-          }
-          if (knownKeys === null) {
-            knownKeys = new Set();
-            knownKeys.add(key);
-            break;
-          }
-          if (!knownKeys.has(key)) {
-            knownKeys.add(key);
-            break;
-          }
-          runWithFiberInDEV(workInProgress, () => {
-            console.error(
-              "Encountered two children with the same key, `%s`. " +
-                "Keys should be unique so that components maintain their identity " +
-                "across updates. Non-unique keys may cause children to be " +
-                "duplicated and/or omitted — the behavior is unsupported and " +
-                "could change in a future version.",
-              key
-            );
-          });
-          break;
-        case REACT_LAZY_TYPE: {
-          let resolvedChild;
-          if (false) {
-            resolvedChild = callLazyInitInDEV((child: any));
-          } else {
-            const payload = child._payload;
-            const init = (child._init: any);
-            resolvedChild = init(payload);
-          }
-          warnOnInvalidKey(
-            returnFiber,
-            workInProgress,
-            resolvedChild,
-            knownKeys
-          );
-          break;
-        }
-        default:
-          break;
-      }
-    }
     return knownKeys;
   }
 
@@ -1165,15 +797,6 @@ function createChildReconciler(
         break;
       }
 
-      if (false) {
-        knownKeys = warnOnInvalidKey(
-          returnFiber,
-          newFiber,
-          newChildren[newIdx],
-          knownKeys
-        );
-      }
-
       if (shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
@@ -1214,14 +837,6 @@ function createChildReconciler(
         if (newFiber === null) {
           continue;
         }
-        if (false) {
-          knownKeys = warnOnInvalidKey(
-            returnFiber,
-            newFiber,
-            newChildren[newIdx],
-            knownKeys
-          );
-        }
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
         if (previousNewFiber === null) {
           // TODO: Move out of the loop. This only happens for the first run.
@@ -1251,14 +866,6 @@ function createChildReconciler(
         lanes
       );
       if (newFiber !== null) {
-        if (false) {
-          knownKeys = warnOnInvalidKey(
-            returnFiber,
-            newFiber,
-            newChildren[newIdx],
-            knownKeys
-          );
-        }
         if (shouldTrackSideEffects) {
           if (newFiber.alternate !== null) {
             // The new fiber is a work in progress, but if there exists a
@@ -1313,44 +920,6 @@ function createChildReconciler(
 
     const newChildren = iteratorFn.call(newChildrenIterable);
 
-    if (false) {
-      if (newChildren === newChildrenIterable) {
-        // We don't support rendering Generators as props because it's a mutation.
-        // See https://github.com/facebook/react/issues/12995
-        // We do support generators if they were created by a GeneratorFunction component
-        // as its direct child since we can recreate those by rerendering the component
-        // as needed.
-        const isGeneratorComponent =
-          returnFiber.tag === FunctionComponent &&
-          // $FlowFixMe[method-unbinding]
-          Object.prototype.toString.call(returnFiber.type) ===
-            "[object GeneratorFunction]" &&
-          // $FlowFixMe[method-unbinding]
-          Object.prototype.toString.call(newChildren) === "[object Generator]";
-        if (!isGeneratorComponent) {
-          if (!didWarnAboutGenerators) {
-            console.error(
-              "Using Iterators as children is unsupported and will likely yield " +
-                "unexpected results because enumerating a generator mutates it. " +
-                "You may convert it to an array with `Array.from()` or the " +
-                "`[...spread]` operator before rendering. You can also use an " +
-                "Iterable that can iterate multiple times over the same items."
-            );
-          }
-          didWarnAboutGenerators = true;
-        }
-      } else if ((newChildrenIterable: any).entries === iteratorFn) {
-        // Warn about using Maps as children
-        if (!didWarnAboutMaps) {
-          console.error(
-            "Using Maps as children is not supported. " +
-              "Use an array of keyed ReactElements instead."
-          );
-          didWarnAboutMaps = true;
-        }
-      }
-    }
-
     return reconcileChildrenIterator(
       returnFiber,
       currentFirstChild,
@@ -1366,34 +935,6 @@ function createChildReconciler(
     lanes: Lanes
   ): Fiber | null {
     const newChildren = newChildrenIterable[ASYNC_ITERATOR]();
-
-    if (false) {
-      if (newChildren === newChildrenIterable) {
-        // We don't support rendering AsyncGenerators as props because it's a mutation.
-        // We do support generators if they were created by a AsyncGeneratorFunction component
-        // as its direct child since we can recreate those by rerendering the component
-        // as needed.
-        const isGeneratorComponent =
-          returnFiber.tag === FunctionComponent &&
-          // $FlowFixMe[method-unbinding]
-          Object.prototype.toString.call(returnFiber.type) ===
-            "[object AsyncGeneratorFunction]" &&
-          // $FlowFixMe[method-unbinding]
-          Object.prototype.toString.call(newChildren) ===
-            "[object AsyncGenerator]";
-        if (!isGeneratorComponent) {
-          if (!didWarnAboutGenerators) {
-            console.error(
-              "Using AsyncIterators as children is unsupported and will likely yield " +
-                "unexpected results because enumerating a generator mutates it. " +
-                "You can use an AsyncIterable that can iterate multiple times over " +
-                "the same items."
-            );
-          }
-          didWarnAboutGenerators = true;
-        }
-      }
-    }
 
     if (newChildren == null) {
       throw new Error("An iterable object provided no iterator.");
@@ -1459,15 +1000,6 @@ function createChildReconciler(
         break;
       }
 
-      if (false) {
-        knownKeys = warnOnInvalidKey(
-          returnFiber,
-          newFiber,
-          step.value,
-          knownKeys
-        );
-      }
-
       if (shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
@@ -1508,14 +1040,7 @@ function createChildReconciler(
         if (newFiber === null) {
           continue;
         }
-        if (false) {
-          knownKeys = warnOnInvalidKey(
-            returnFiber,
-            newFiber,
-            step.value,
-            knownKeys
-          );
-        }
+
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
         if (previousNewFiber === null) {
           // TODO: Move out of the loop. This only happens for the first run.
@@ -1545,14 +1070,6 @@ function createChildReconciler(
         lanes
       );
       if (newFiber !== null) {
-        if (false) {
-          knownKeys = warnOnInvalidKey(
-            returnFiber,
-            newFiber,
-            step.value,
-            knownKeys
-          );
-        }
         if (shouldTrackSideEffects) {
           if (newFiber.alternate !== null) {
             // The new fiber is a work in progress, but if there exists a
@@ -1608,12 +1125,6 @@ function createChildReconciler(
     deleteRemainingChildren(returnFiber, currentFirstChild);
     const created = createFiberFromText(textContent, returnFiber.mode, lanes);
     created.return = returnFiber;
-    if (false) {
-      // We treat the parent as the owner for stack purposes.
-      created._debugOwner = returnFiber;
-      created._debugTask = returnFiber._debugTask;
-      created._debugInfo = currentDebugInfo;
-    }
     return created;
   }
 
@@ -1638,20 +1149,12 @@ function createChildReconciler(
               coerceRef(existing, element);
             }
             existing.return = returnFiber;
-            if (false) {
-              existing._debugOwner = element._owner;
-              existing._debugInfo = currentDebugInfo;
-            }
             validateFragmentProps(element, existing, returnFiber);
             return existing;
           }
         } else {
           if (
             child.elementType === elementType ||
-            // Keep this check inline so it only runs on the false path:
-            (false
-              ? isCompatibleFamilyForHotReloading(child, element)
-              : false) ||
             // Lazy types should reconcile their resolved type.
             // We need to do this after the Hot Reloading check above,
             // because hot reloading has different semantics than prod because
@@ -1665,10 +1168,6 @@ function createChildReconciler(
             const existing = useFiber(child, element.props);
             coerceRef(existing, element);
             existing.return = returnFiber;
-            if (false) {
-              existing._debugOwner = element._owner;
-              existing._debugInfo = currentDebugInfo;
-            }
             return existing;
           }
         }
@@ -1692,21 +1191,12 @@ function createChildReconciler(
         coerceRef(created, element);
       }
       created.return = returnFiber;
-      if (false) {
-        // We treat the parent as the owner for stack purposes.
-        created._debugOwner = returnFiber;
-        created._debugTask = returnFiber._debugTask;
-        created._debugInfo = currentDebugInfo;
-      }
       validateFragmentProps(element, created, returnFiber);
       return created;
     } else {
       const created = createFiberFromElement(element, returnFiber.mode, lanes);
       coerceRef(created, element);
       created.return = returnFiber;
-      if (false) {
-        created._debugInfo = currentDebugInfo;
-      }
       return created;
     }
   }
@@ -1784,7 +1274,7 @@ function createChildReconciler(
     if (typeof newChild === "object" && newChild !== null) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE: {
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           const firstChild = placeSingleChild(
             reconcileSingleElement(
               returnFiber,
@@ -1806,15 +1296,11 @@ function createChildReconciler(
             )
           );
         case REACT_LAZY_TYPE: {
-          const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+          const prevDebugInfo = null;
           let result;
-          if (false) {
-            result = callLazyInitInDEV(newChild);
-          } else {
-            const payload = newChild._payload;
-            const init = newChild._init;
-            result = init(payload);
-          }
+          const payload = newChild._payload;
+          const init = newChild._init;
+          result = init(payload);
           const firstChild = reconcileChildFibersImpl(
             returnFiber,
             currentFirstChild,
@@ -1827,7 +1313,7 @@ function createChildReconciler(
       }
 
       if (isArray(newChild)) {
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const firstChild = reconcileChildrenArray(
           returnFiber,
           currentFirstChild,
@@ -1839,7 +1325,7 @@ function createChildReconciler(
       }
 
       if (getIteratorFn(newChild)) {
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const firstChild = reconcileChildrenIteratable(
           returnFiber,
           currentFirstChild,
@@ -1854,7 +1340,7 @@ function createChildReconciler(
         enableAsyncIterableChildren &&
         typeof newChild[ASYNC_ITERATOR] === "function"
       ) {
-        const prevDebugInfo = pushDebugInfo(newChild._debugInfo);
+        const prevDebugInfo = null;
         const firstChild = reconcileChildrenAsyncIteratable(
           returnFiber,
           currentFirstChild,
@@ -1883,7 +1369,7 @@ function createChildReconciler(
       // consider as an future improvement.
       if (typeof newChild.then === "function") {
         const thenable: Thenable<any> = (newChild: any);
-        const prevDebugInfo = pushDebugInfo((thenable: any)._debugInfo);
+        const prevDebugInfo = null;
         const firstChild = reconcileChildFibersImpl(
           returnFiber,
           currentFirstChild,
@@ -1921,15 +1407,6 @@ function createChildReconciler(
           lanes
         )
       );
-    }
-
-    if (false) {
-      if (typeof newChild === "function") {
-        warnOnFunctionType(returnFiber, newChild);
-      }
-      if (typeof newChild === "symbol") {
-        warnOnSymbolType(returnFiber, newChild);
-      }
     }
 
     // Remaining cases are all treated as empty.
@@ -1981,26 +1458,6 @@ function createChildReconciler(
       // the error or suspending if needed.
       const throwFiber = createFiberFromThrow(x, returnFiber.mode, lanes);
       throwFiber.return = returnFiber;
-      if (false) {
-        const debugInfo = (throwFiber._debugInfo = currentDebugInfo);
-        // Conceptually the error's owner/task should ideally be captured when the
-        // Error constructor is called but neither console.createTask does this,
-        // nor do we override them to capture our `owner`. So instead, we use the
-        // nearest parent as the owner/task of the error. This is usually the same
-        // thing when it's thrown from the same async component but not if you await
-        // a promise started from a different component/task.
-        throwFiber._debugOwner = returnFiber._debugOwner;
-        throwFiber._debugTask = returnFiber._debugTask;
-        if (debugInfo != null) {
-          for (let i = debugInfo.length - 1; i >= 0; i--) {
-            if (typeof debugInfo[i].stack === "string") {
-              throwFiber._debugOwner = (debugInfo[i]: any);
-              throwFiber._debugTask = debugInfo[i].debugTask;
-              break;
-            }
-          }
-        }
-      }
       return throwFiber;
     } finally {
       currentDebugInfo = prevDebugInfo;
@@ -2057,104 +1514,8 @@ export function resetChildFibers(workInProgress: Fiber, lanes: Lanes): void {
   }
 }
 
-function validateSuspenseListNestedChild(childSlot: mixed, index: number) {
-  if (false) {
-    const isAnArray = isArray(childSlot);
-    const isIterable =
-      !isAnArray && typeof getIteratorFn(childSlot) === "function";
-    const isAsyncIterable =
-      enableAsyncIterableChildren &&
-      typeof childSlot === "object" &&
-      childSlot !== null &&
-      typeof (childSlot: any)[ASYNC_ITERATOR] === "function";
-    if (isAnArray || isIterable || isAsyncIterable) {
-      const type = isAnArray
-        ? "array"
-        : isAsyncIterable
-        ? "async iterable"
-        : "iterable";
-      console.error(
-        "A nested %s was passed to row #%s in <SuspenseList />. Wrap it in " +
-          "an additional SuspenseList to configure its revealOrder: " +
-          "<SuspenseList revealOrder=...> ... " +
-          "<SuspenseList revealOrder=...>{%s}</SuspenseList> ... " +
-          "</SuspenseList>",
-        type,
-        index,
-        type
-      );
-      return false;
-    }
-  }
-  return true;
-}
-
 export function validateSuspenseListChildren(
   children: mixed,
   revealOrder: SuspenseListRevealOrder
 ) {
-  if (false) {
-    if (
-      (revealOrder === "forwards" ||
-        revealOrder === "backwards" ||
-        revealOrder === "unstable_legacy-backwards") &&
-      children !== undefined &&
-      children !== null &&
-      children !== false
-    ) {
-      if (isArray(children)) {
-        for (let i = 0; i < children.length; i++) {
-          if (!validateSuspenseListNestedChild(children[i], i)) {
-            return;
-          }
-        }
-      } else {
-        const iteratorFn = getIteratorFn(children);
-        if (typeof iteratorFn === "function") {
-          const childrenIterator = iteratorFn.call(children);
-          if (childrenIterator) {
-            let step = childrenIterator.next();
-            let i = 0;
-            for (; !step.done; step = childrenIterator.next()) {
-              if (!validateSuspenseListNestedChild(step.value, i)) {
-                return;
-              }
-              i++;
-            }
-          }
-        } else if (
-          enableAsyncIterableChildren &&
-          typeof (children: any)[ASYNC_ITERATOR] === "function"
-        ) {
-          // TODO: Technically we should warn for nested arrays inside the
-          // async iterable but it would require unwrapping the array.
-          // However, this mistake is not as easy to make so it's ok not to warn.
-        } else if (
-          enableAsyncIterableChildren &&
-          children.$$typeof === REACT_ELEMENT_TYPE &&
-          typeof children.type === "function" &&
-          // $FlowFixMe
-          (Object.prototype.toString.call(children.type) ===
-            "[object GeneratorFunction]" ||
-            // $FlowFixMe
-            Object.prototype.toString.call(children.type) ===
-              "[object AsyncGeneratorFunction]")
-        ) {
-          console.error(
-            'A generator Component was passed to a <SuspenseList revealOrder="%s" />. ' +
-              "This is not supported as a way to generate lists. Instead, pass an " +
-              "iterable as the children.",
-            revealOrder
-          );
-        } else {
-          console.error(
-            'A single row was passed to a <SuspenseList revealOrder="%s" />. ' +
-              "This is not useful since it needs multiple rows. " +
-              "Did you mean to pass multiple children or an array?",
-            revealOrder
-          );
-        }
-      }
-    }
-  }
 }
