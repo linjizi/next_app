@@ -19,7 +19,6 @@ import type {Transition} from 'react/src/ReactStartTransition';
 import type {ScheduledGesture} from './ReactFiberGestureScheduler';
 
 import {
-  enableTransitionTracing,
   enableViewTransition,
   enableGestureTransition,
 } from 'shared/ReactFeatureFlags';
@@ -254,10 +253,6 @@ export function pushRootTransition(
   root: FiberRoot,
   renderLanes: Lanes,
 ) {
-  if (enableTransitionTracing) {
-    const rootTransitions = getWorkInProgressTransitions();
-    push(transitionStack, rootTransitions, workInProgress);
-  }
 }
 
 export function popRootTransition(
@@ -265,9 +260,6 @@ export function popRootTransition(
   root: FiberRoot,
   renderLanes: Lanes,
 ) {
-  if (enableTransitionTracing) {
-    pop(transitionStack, workInProgress);
-  }
 }
 
 export function pushTransition(
@@ -280,36 +272,15 @@ export function pushTransition(
   } else {
     push(resumedCache, prevCachePool.pool, offscreenWorkInProgress);
   }
-
-  if (enableTransitionTracing) {
-    if (transitionStack.current === null) {
-      push(transitionStack, newTransitions, offscreenWorkInProgress);
-    } else if (newTransitions === null) {
-      push(transitionStack, transitionStack.current, offscreenWorkInProgress);
-    } else {
-      push(
-        transitionStack,
-        transitionStack.current.concat(newTransitions),
-        offscreenWorkInProgress,
-      );
-    }
-  }
 }
 
 export function popTransition(workInProgress: Fiber, current: Fiber | null) {
   if (current !== null) {
-    if (enableTransitionTracing) {
-      pop(transitionStack, workInProgress);
-    }
-
     pop(resumedCache, workInProgress);
   }
 }
 
 export function getPendingTransitions(): Array<Transition> | null {
-  if (!enableTransitionTracing) {
-    return null;
-  }
 
   return transitionStack.current;
 }

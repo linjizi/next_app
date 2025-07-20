@@ -109,10 +109,8 @@ import {
   disableLegacyContext,
   disableLegacyContextForFunctionComponents,
   enableProfilerCommitHooks,
-  enableProfilerTimer,
   enableScopeAPI,
   enableSchedulingProfiler,
-  enableTransitionTracing,
   enableLegacyHidden,
   enableCPUSuspense,
   enablePostpone,
@@ -289,7 +287,6 @@ import {
 } from "./ReactFiberTreeContext";
 import {
   requestCacheFromPool,
-  pushRootTransition,
   getSuspendedCache,
   pushTransition,
   getOffscreenDeferredCache,
@@ -729,14 +726,6 @@ function updateOffscreenComponent(
       prevCachePool = prevState.cachePool;
 
       let transitions = null;
-      if (enableTransitionTracing) {
-        // We have now gone from hidden to visible, so any transitions should
-        // be added to the stack to get added to any Offscreen/suspense children
-        const instance: OffscreenInstance | null = workInProgress.stateNode;
-        if (instance !== null && instance._transitions != null) {
-          transitions = Array.from(instance._transitions);
-        }
-      }
 
       pushTransition(workInProgress, prevCachePool, transitions);
 
@@ -1177,51 +1166,6 @@ function updateCacheComponent(
   return workInProgress.child;
 }
 
-// This should only be called if the name changes
-function updateTracingMarkerComponent(
-  current: Fiber | null,
-  workInProgress: Fiber,
-  renderLanes: Lanes
-) {
-  if (!enableTransitionTracing) {
-    return null;
-  }
-
-  const nextProps: TracingMarkerProps = workInProgress.pendingProps;
-
-  // TODO: (luna) Only update the tracing marker if it's newly rendered or it's name changed.
-  // A tracing marker is only associated with the transitions that rendered
-  // or updated it, so we can create a new set of transitions each time
-  if (current === null) {
-    const currentTransitions = getPendingTransitions();
-    if (currentTransitions !== null) {
-      const markerInstance: TracingMarkerInstance = {
-        tag: TransitionTracingMarker,
-        transitions: new Set(currentTransitions),
-        pendingBoundaries: null,
-        name: nextProps.name,
-        aborts: null,
-      };
-      workInProgress.stateNode = markerInstance;
-
-      // We call the marker complete callback when all child suspense boundaries resolve.
-      // We do this in the commit phase on Offscreen. If the marker has no child suspense
-      // boundaries, we need to schedule a passive effect to make sure we call the marker
-      // complete callback.
-      workInProgress.flags |= Passive;
-    }
-  } else {
-  }
-
-  const instance: TracingMarkerInstance | null = workInProgress.stateNode;
-  if (instance !== null) {
-    pushMarkerInstance(workInProgress, instance);
-  }
-  const nextChildren = nextProps.children;
-  reconcileChildren(current, workInProgress, nextChildren, renderLanes);
-  return workInProgress.child;
-}
-
 function updateFragment(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1250,21 +1194,6 @@ function updateProfiler(
   workInProgress: Fiber,
   renderLanes: Lanes
 ) {
-  if (enableProfilerTimer) {
-    workInProgress.flags |= Update;
-
-    if (enableProfilerCommitHooks) {
-      // Schedule a passive effect for this Profiler to call onPostCommit hooks.
-      // This effect should be scheduled even if there is no onPostCommit callback for this Profiler,
-      // because the effect is also where times bubble to parent Profilers.
-      workInProgress.flags |= Passive;
-      // Reset effect durations for the next eventual effect phase.
-      // These are reset during render to allow the DevTools commit hook a chance to read them,
-      const stateNode = workInProgress.stateNode;
-      stateNode.effectDuration = -0;
-      stateNode.passiveEffectDuration = -0;
-    }
-  }
   const nextProps: ProfilerProps = workInProgress.pendingProps;
   const nextChildren = nextProps.children;
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
@@ -1495,9 +1424,6 @@ function finishClassComponent(
     // TODO: Warn in a future release.
     nextChildren = null;
 
-    if (enableProfilerTimer) {
-      stopProfilerTimerIfRunning(workInProgress);
-    }
   } else {
     if (enableSchedulingProfiler) {
       markComponentRenderStarted(workInProgress);
@@ -1571,11 +1497,6 @@ function updateHostRoot(
 
   const nextState: RootState = workInProgress.memoizedState;
   const root: FiberRoot = workInProgress.stateNode;
-  pushRootTransition(workInProgress, root, renderLanes);
-
-  if (enableTransitionTracing) {
-    pushRootMarkerInstance(workInProgress);
-  }
 
   const nextCache: Cache = nextState.cache;
   pushCacheProvider(workInProgress, nextCache);
@@ -2128,25 +2049,6 @@ function updateSuspenseComponent(
         renderLanes
       );
       workInProgress.memoizedState = SUSPENDED_MARKER;
-      if (enableTransitionTracing) {
-        const currentTransitions = getPendingTransitions();
-        if (currentTransitions !== null) {
-          const parentMarkerInstances = getMarkerInstances();
-          const offscreenQueue: OffscreenQueue | null =
-            (primaryChildFragment.updateQueue: any);
-          if (offscreenQueue === null) {
-            const newOffscreenQueue: OffscreenQueue = {
-              transitions: currentTransitions,
-              markerInstances: parentMarkerInstances,
-              retryQueue: null,
-            };
-            primaryChildFragment.updateQueue = newOffscreenQueue;
-          } else {
-            offscreenQueue.transitions = currentTransitions;
-            offscreenQueue.markerInstances = parentMarkerInstances;
-          }
-        }
-      }
 
       return fallbackFragment;
     } else if (
@@ -2233,39 +2135,7 @@ function updateSuspenseComponent(
         prevOffscreenState === null
           ? mountSuspenseOffscreenState(renderLanes)
           : updateSuspenseOffscreenState(prevOffscreenState, renderLanes);
-      if (enableTransitionTracing) {
-        const currentTransitions = getPendingTransitions();
-        if (currentTransitions !== null) {
-          const parentMarkerInstances = getMarkerInstances();
-          const offscreenQueue: OffscreenQueue | null =
-            (primaryChildFragment.updateQueue: any);
-          const currentOffscreenQueue: OffscreenQueue | null =
-            (current.updateQueue: any);
-          if (offscreenQueue === null) {
-            const newOffscreenQueue: OffscreenQueue = {
-              transitions: currentTransitions,
-              markerInstances: parentMarkerInstances,
-              retryQueue: null,
-            };
-            primaryChildFragment.updateQueue = newOffscreenQueue;
-          } else if (offscreenQueue === currentOffscreenQueue) {
-            // If the work-in-progress queue is the same object as current, we
-            // can't modify it without cloning it first.
-            const newOffscreenQueue: OffscreenQueue = {
-              transitions: currentTransitions,
-              markerInstances: parentMarkerInstances,
-              retryQueue:
-                currentOffscreenQueue !== null
-                  ? currentOffscreenQueue.retryQueue
-                  : null,
-            };
-            primaryChildFragment.updateQueue = newOffscreenQueue;
-          } else {
-            offscreenQueue.transitions = currentTransitions;
-            offscreenQueue.markerInstances = parentMarkerInstances;
-          }
-        }
-      }
+
       primaryChildFragment.childLanes = getRemainingWorkInPrimaryTree(
         current,
         didPrimaryChildrenDefer,
@@ -2335,17 +2205,6 @@ function mountSuspenseFallbackChildren(
     primaryChildFragment = progressedPrimaryFragment;
     primaryChildFragment.childLanes = NoLanes;
     primaryChildFragment.pendingProps = primaryChildProps;
-
-    if (enableProfilerTimer && workInProgress.mode & ProfileMode) {
-      // Reset the durations from the first pass so they aren't included in the
-      // final amounts. This seems counterintuitive, since we're intentionally
-      // not measuring part of the render phase, but this makes it match what we
-      // do in Concurrent Mode.
-      primaryChildFragment.actualDuration = -0;
-      primaryChildFragment.actualStartTime = -1.1;
-      primaryChildFragment.selfBaseDuration = -0;
-      primaryChildFragment.treeBaseDuration = -0;
-    }
 
     fallbackChildFragment = createFiberFromFragment(
       fallbackChildren,
@@ -2465,19 +2324,6 @@ function updateSuspenseFallbackChildren(
     primaryChildFragment = progressedPrimaryFragment;
     primaryChildFragment.childLanes = NoLanes;
     primaryChildFragment.pendingProps = primaryChildProps;
-
-    if (enableProfilerTimer && workInProgress.mode & ProfileMode) {
-      // Reset the durations from the first pass so they aren't included in the
-      // final amounts. This seems counterintuitive, since we're intentionally
-      // not measuring part of the render phase, but this makes it match what we
-      // do in Concurrent Mode.
-      primaryChildFragment.actualDuration = -0;
-      primaryChildFragment.actualStartTime = -1.1;
-      primaryChildFragment.selfBaseDuration =
-        currentPrimaryChildFragment.selfBaseDuration;
-      primaryChildFragment.treeBaseDuration =
-        currentPrimaryChildFragment.treeBaseDuration;
-    }
 
     // The fallback fiber was added as a deletion during the first pass.
     // However, since we're going to remain on the fallback, we no longer want
@@ -3226,11 +3072,6 @@ function bailoutOnAlreadyFinishedWork(
     workInProgress.dependencies = current.dependencies;
   }
 
-  if (enableProfilerTimer) {
-    // Don't update "base" render times for bailouts.
-    stopProfilerTimerIfRunning(workInProgress);
-  }
-
   markSkippedUpdateLanes(workInProgress.lanes);
 
   // Check if the children have any pending work.
@@ -3288,11 +3129,6 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
     case HostRoot: {
       pushHostRootContext(workInProgress);
       const root: FiberRoot = workInProgress.stateNode;
-      pushRootTransition(workInProgress, root, renderLanes);
-
-      if (enableTransitionTracing) {
-        pushRootMarkerInstance(workInProgress);
-      }
 
       const cache: Cache = current.memoizedState.cache;
       pushCacheProvider(workInProgress, cache);
@@ -3320,28 +3156,6 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
       break;
     }
     case Profiler:
-      if (enableProfilerTimer) {
-        // Profiler should only call onRender when one of its descendants actually rendered.
-        const hasChildWork = includesSomeLane(
-          renderLanes,
-          workInProgress.childLanes
-        );
-        if (hasChildWork) {
-          workInProgress.flags |= Update;
-        }
-
-        if (enableProfilerCommitHooks) {
-          // Schedule a passive effect for this Profiler to call onPostCommit hooks.
-          // This effect should be scheduled even if there is no onPostCommit callback for this Profiler,
-          // because the effect is also where times bubble to parent Profilers.
-          workInProgress.flags |= Passive;
-          // Reset effect durations for the next eventual effect phase.
-          // These are reset during render to allow the DevTools commit hook a chance to read them,
-          const stateNode = workInProgress.stateNode;
-          stateNode.effectDuration = -0;
-          stateNode.passiveEffectDuration = -0;
-        }
-      }
       break;
     case ActivityComponent: {
       const state: ActivityState | null = workInProgress.memoizedState;
@@ -3498,13 +3312,6 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
       break;
     }
     case TracingMarkerComponent: {
-      if (enableTransitionTracing) {
-        const instance: TracingMarkerInstance | null = workInProgress.stateNode;
-        if (instance !== null) {
-          pushMarkerInstance(workInProgress, instance);
-        }
-        break;
-      }
       // Fallthrough
     }
     case LegacyHiddenComponent: {
@@ -3756,13 +3563,6 @@ function beginWork(
       return updateCacheComponent(current, workInProgress, renderLanes);
     }
     case TracingMarkerComponent: {
-      if (enableTransitionTracing) {
-        return updateTracingMarkerComponent(
-          current,
-          workInProgress,
-          renderLanes
-        );
-      }
       break;
     }
     case ViewTransitionComponent: {
