@@ -230,7 +230,6 @@ import { stopProfilerTimerIfRunning } from "./ReactProfilerTimer";
 import {
   getMaskedContext,
   getUnmaskedContext,
-  hasContextChanged as hasLegacyContextChanged,
   pushContextProvider as pushLegacyContextProvider,
   isContextProvider as isLegacyContextProvider,
   pushTopLevelContextObject,
@@ -532,7 +531,10 @@ function updateSimpleMemoComponent(
   // We'll need to figure out if this is fine or can cause issues.
   if (current !== null) {
     const prevProps = current.memoizedProps;
-    if (shallowEqual(prevProps, nextProps) && current.ref === workInProgress.ref) {
+    if (
+      shallowEqual(prevProps, nextProps) &&
+      current.ref === workInProgress.ref
+    ) {
       didReceiveUpdate = false;
 
       // The props are shallowly equal. Reuse the previous props object, like we
@@ -1317,7 +1319,6 @@ function updateFunctionComponent(
   nextProps: any,
   renderLanes: Lanes
 ) {
-
   let context;
   if (!disableLegacyContext && !disableLegacyContextForFunctionComponents) {
     const unmaskedContext = getUnmaskedContext(workInProgress, Component, true);
@@ -1408,7 +1409,6 @@ function updateClassComponent(
   nextProps: any,
   renderLanes: Lanes
 ) {
-
   // Push context providers early to prevent context stack mismatches.
   // During mounting we don't know the child context yet as the instance doesn't exist.
   // We will invalidate the child context in finishClassComponent() right after rendering.
@@ -2640,8 +2640,7 @@ function updateDehydratedSuspenseComponent(
       let message;
       let stack = null;
       let componentStack = null;
-      ({ digest } =
-        getSuspenseInstanceFallbackErrorDetails(suspenseInstance));
+      ({ digest } = getSuspenseInstanceFallbackErrorDetails(suspenseInstance));
 
       // TODO: Figure out a better signal than encoding a magic digest value.
       if (!enablePostpone || digest !== "POSTPONE") {
@@ -3528,12 +3527,11 @@ function beginWork(
   workInProgress: Fiber,
   renderLanes: Lanes
 ): Fiber | null {
-
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
-    if (oldProps !== newProps || hasLegacyContextChanged()) {
+    if (oldProps !== newProps) {
       // If props or context changed, mark the fiber as having performed work.
       // This may be unset if the props are determined to be equal later (memo).
       didReceiveUpdate = true;
