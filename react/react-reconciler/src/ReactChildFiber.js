@@ -47,7 +47,6 @@ import {
 import isArray from "shared/isArray";
 import {
   enableAsyncIterableChildren,
-  disableLegacyMode,
   enableFragmentRefs,
 } from "shared/ReactFeatureFlags";
 
@@ -1436,15 +1435,7 @@ function createChildReconciler(
       // set at the beginning.
       return firstChildFiber;
     } catch (x) {
-      if (
-        x === SuspenseException ||
-        x === SuspenseActionException ||
-        (!disableLegacyMode &&
-          (returnFiber.mode & ConcurrentMode) === NoMode &&
-          typeof x === "object" &&
-          x !== null &&
-          typeof x.then === "function")
-      ) {
+      if (x === SuspenseException || x === SuspenseActionException) {
         // Suspense exceptions need to read the current suspended state before
         // yielding and replay it using the same sequence so this trick doesn't
         // work here.

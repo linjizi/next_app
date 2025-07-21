@@ -110,7 +110,6 @@ import {
   disableLegacyContextForFunctionComponents,
   enableProfilerCommitHooks,
   enableScopeAPI,
-  enableSchedulingProfiler,
   enableLegacyHidden,
   enableCPUSuspense,
   enablePostpone,
@@ -420,9 +419,6 @@ function updateForwardRef(
 
   // The rest is a fork of updateFunctionComponent
   prepareToReadContext(workInProgress, renderLanes);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
 
   const nextChildren = renderWithHooks(
     current,
@@ -433,10 +429,6 @@ function updateForwardRef(
     renderLanes
   );
   const hasId = checkDidRenderIdHook();
-
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
 
   if (current !== null && !didReceiveUpdate) {
     bailoutHooks(current, workInProgress, renderLanes);
@@ -1229,17 +1221,11 @@ function updateFunctionComponent(
   renderLanes: Lanes
 ) {
   let context;
-  if (!disableLegacyContext && !disableLegacyContextForFunctionComponents) {
-    const unmaskedContext = getUnmaskedContext(workInProgress, Component, true);
-    context = getMaskedContext(workInProgress, unmaskedContext);
-  }
 
   let nextChildren;
   let hasId;
   prepareToReadContext(workInProgress, renderLanes);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
+
   nextChildren = renderWithHooks(
     current,
     workInProgress,
@@ -1249,9 +1235,6 @@ function updateFunctionComponent(
     renderLanes
   );
   hasId = checkDidRenderIdHook();
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
 
   if (current !== null && !didReceiveUpdate) {
     bailoutHooks(current, workInProgress, renderLanes);
@@ -1281,9 +1264,7 @@ export function replayFunctionComponent(
   // updateFunctionComponent that reuses the hooks from the previous attempt.
 
   prepareToReadContext(workInProgress, renderLanes);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
+
   const nextChildren = replaySuspendedComponentWithHooks(
     current,
     workInProgress,
@@ -1292,9 +1273,6 @@ export function replayFunctionComponent(
     secondArg
   );
   const hasId = checkDidRenderIdHook();
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
 
   if (current !== null && !didReceiveUpdate) {
     bailoutHooks(current, workInProgress, renderLanes);
@@ -1398,13 +1376,7 @@ function finishClassComponent(
     nextChildren = null;
 
   } else {
-    if (enableSchedulingProfiler) {
-      markComponentRenderStarted(workInProgress);
-    }
     nextChildren = instance.render();
-    if (enableSchedulingProfiler) {
-      markComponentRenderStopped();
-    }
   }
 
   // React DevTools reads this flag.
@@ -2923,14 +2895,8 @@ function updateContextConsumer(
 
   prepareToReadContext(workInProgress, renderLanes);
   const newValue = readContext(context);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
   let newChildren;
   newChildren = render(newValue);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
 
   // React DevTools reads this flag.
   workInProgress.flags |= PerformedWork;
