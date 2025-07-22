@@ -264,7 +264,6 @@ let didScheduleRenderPhaseUpdate: boolean = false;
 // TODO: Maybe there's some way to consolidate this with
 // `didScheduleRenderPhaseUpdate`. Or with `numberOfReRenders`.
 let didScheduleRenderPhaseUpdateDuringThisPass: boolean = false;
-let shouldDoubleInvokeUserFnsInHooksDEV: boolean = false;
 // Counts the number of useId hooks in this component.
 let localIdCounter: number = 0;
 // Counts number of `use`-d thenables
@@ -386,11 +385,7 @@ export function renderWithHooks<Props, SecondArg>(
   //
   // There are plenty of tests to ensure this behavior is correct.
 
-  shouldDoubleInvokeUserFnsInHooksDEV = false;
-  let children = false
-    ? callComponentInDEV(Component, props, secondArg)
-    : Component(props, secondArg);
-  shouldDoubleInvokeUserFnsInHooksDEV = false;
+  let children = Component(props, secondArg)
 
   // Check if there was a render phase update
   if (didScheduleRenderPhaseUpdateDuringThisPass) {
@@ -926,14 +921,6 @@ function mountReducer<S, I, A>(
   let initialState;
   if (init !== undefined) {
     initialState = init(initialArg);
-    if (shouldDoubleInvokeUserFnsInHooksDEV) {
-      setIsStrictModeForDevtools(true);
-      try {
-        init(initialArg);
-      } finally {
-        setIsStrictModeForDevtools(false);
-      }
-    }
   } else {
     initialState = ((initialArg: any): S);
   }
@@ -1168,9 +1155,6 @@ function updateReducerImpl<S, A>(
 
         // Process this update.
         const action = update.action;
-        if (shouldDoubleInvokeUserFnsInHooksDEV) {
-          reducer(newState, action);
-        }
         if (update.hasEagerState) {
           // If this update is a state update (not a reducer) and was processed eagerly,
           // we can use the eagerly computed state
@@ -1519,15 +1503,6 @@ function mountStateImpl<S>(initialState: (() => S) | S): Hook {
     const initialStateInitializer = initialState;
     // $FlowFixMe[incompatible-use]: Flow doesn't like mixed types
     initialState = initialStateInitializer();
-    if (shouldDoubleInvokeUserFnsInHooksDEV) {
-      setIsStrictModeForDevtools(true);
-      try {
-        // $FlowFixMe[incompatible-use]: Flow doesn't like mixed types
-        initialStateInitializer();
-      } finally {
-        setIsStrictModeForDevtools(false);
-      }
-    }
   }
   hook.memoizedState = hook.baseState = initialState;
   const queue: UpdateQueue<S, BasicStateAction<S>> = {
@@ -2440,14 +2415,6 @@ function mountMemo<T>(
   const hook = mountWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
   const nextValue = nextCreate();
-  if (shouldDoubleInvokeUserFnsInHooksDEV) {
-    setIsStrictModeForDevtools(true);
-    try {
-      nextCreate();
-    } finally {
-      setIsStrictModeForDevtools(false);
-    }
-  }
   hook.memoizedState = [nextValue, nextDeps];
   return nextValue;
 }
@@ -2467,14 +2434,6 @@ function updateMemo<T>(
     }
   }
   const nextValue = nextCreate();
-  if (shouldDoubleInvokeUserFnsInHooksDEV) {
-    setIsStrictModeForDevtools(true);
-    try {
-      nextCreate();
-    } finally {
-      setIsStrictModeForDevtools(false);
-    }
-  }
   hook.memoizedState = [nextValue, nextDeps];
   return nextValue;
 }
