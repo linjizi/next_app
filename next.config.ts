@@ -3,6 +3,8 @@ import path from "path";
 import webpack from "webpack";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
+  devIndicators: false,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
