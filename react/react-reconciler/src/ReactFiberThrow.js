@@ -40,7 +40,6 @@ import {
 } from "./ReactFiberFlags";
 import { NoMode, ConcurrentMode } from "./ReactTypeOfMode";
 import {
-  enableUpdaterTracking,
   enablePostpone,
   disableLegacyMode,
 } from "shared/ReactFeatureFlags";
@@ -100,11 +99,7 @@ function createRootErrorUpdate(
   // being called "element".
   update.payload = { element: null };
   update.callback = () => {
-    if (false) {
-      runWithFiberInDEV(errorInfo.source, logUncaughtError, root, errorInfo);
-    } else {
-      logUncaughtError(root, errorInfo);
-    }
+    logUncaughtError(root, errorInfo);
   };
   return update;
 }
@@ -128,20 +123,7 @@ function initializeClassErrorUpdate(
       return getDerivedStateFromError(error);
     };
     update.callback = () => {
-      if (false) {
-        markFailedErrorBoundaryForHotReloading(fiber);
-      }
-      if (false) {
-        runWithFiberInDEV(
-          errorInfo.source,
-          logCaughtError,
-          root,
-          fiber,
-          errorInfo
-        );
-      } else {
-        logCaughtError(root, fiber, errorInfo);
-      }
+      logCaughtError(root, fiber, errorInfo);
     };
   }
 
@@ -149,20 +131,7 @@ function initializeClassErrorUpdate(
   if (inst !== null && typeof inst.componentDidCatch === "function") {
     // $FlowFixMe[missing-this-annot]
     update.callback = function callback() {
-      if (false) {
-        markFailedErrorBoundaryForHotReloading(fiber);
-      }
-      if (false) {
-        runWithFiberInDEV(
-          errorInfo.source,
-          logCaughtError,
-          root,
-          fiber,
-          errorInfo
-        );
-      } else {
-        logCaughtError(root, fiber, errorInfo);
-      }
+      logCaughtError(root, fiber, errorInfo);
       if (typeof getDerivedStateFromError !== "function") {
         // To preserve the preexisting retry behavior of error boundaries,
         // we keep track of which ones already failed during this batch.
@@ -171,29 +140,11 @@ function initializeClassErrorUpdate(
         // not defined.
         markLegacyErrorBoundaryAsFailed(this);
       }
-      if (false) {
-        callComponentDidCatchInDEV(this, errorInfo);
-      } else {
-        const error = errorInfo.value;
-        const stack = errorInfo.stack;
-        this.componentDidCatch(error, {
-          componentStack: stack !== null ? stack : "",
-        });
-      }
-      if (false) {
-        if (typeof getDerivedStateFromError !== "function") {
-          // If componentDidCatch is the only error boundary method defined,
-          // then it needs to call setState to recover from errors.
-          // If no state update is scheduled then the boundary will swallow the error.
-          if (!includesSomeLane(fiber.lanes, (SyncLane: Lane))) {
-            console.error(
-              "%s: Error boundaries should implement getDerivedStateFromError(). " +
-                "In that method, return a state update to display an error message or fallback UI.",
-              getComponentNameFromFiber(fiber) || "Unknown"
-            );
-          }
-        }
-      }
+      const error = errorInfo.value;
+      const stack = errorInfo.stack;
+      this.componentDidCatch(error, {
+        componentStack: stack !== null ? stack : "",
+      });
     };
   }
 }
@@ -369,13 +320,6 @@ function throwException(
   // The source fiber did not complete.
   sourceFiber.flags |= Incomplete;
 
-  if (enableUpdaterTracking) {
-    if (isDevToolsPresent) {
-      // If we have pending work still, restore the original updaters
-      restorePendingUpdaters(root, rootRenderLanes);
-    }
-  }
-
   if (value !== null && typeof value === "object") {
     if (enablePostpone && value.$$typeof === REACT_POSTPONE_TYPE) {
       // Act as if this is an infinitely suspending promise.
@@ -385,15 +329,6 @@ function throwException(
       // This is a wakeable. The component suspended.
       const wakeable: Wakeable = (value: any);
       resetSuspendedComponent(sourceFiber, rootRenderLanes);
-
-      if (false) {
-        if (
-          getIsHydrating() &&
-          (disableLegacyMode || sourceFiber.mode & ConcurrentMode)
-        ) {
-          markDidThrowWhileHydratingDEV();
-        }
-      }
 
       // Mark the nearest Suspense boundary to switch to rendering a fallback.
       const suspenseBoundary = getSuspenseHandler();
