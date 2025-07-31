@@ -13,12 +13,6 @@ import type {PriorityLevel} from 'scheduler/src/SchedulerPriorities';
 import type {Transition} from 'react/src/ReactStartTransition';
 
 import {
-  disableLegacyMode,
-  enableYieldingBeforePassive,
-  enableGestureTransition,
-  enableDefaultTransitionIndicator,
-} from 'shared/ReactFeatureFlags';
-import {
   NoLane,
   NoLanes,
   SyncLane,
@@ -40,13 +34,10 @@ import {
   getExecutionContext,
   getWorkInProgressRoot,
   getWorkInProgressRootRenderLanes,
-  getRootWithPendingPassiveEffects,
-  getPendingPassiveEffectsLanes,
   hasPendingCommitEffects,
   isWorkLoopSuspendedOnData,
   performWorkOnRoot,
 } from './ReactFiberWorkLoop';
-import {LegacyRoot} from './ReactRootTags';
 import {
   ImmediatePriority as ImmediateSchedulerPriority,
   UserBlockingPriority as UserBlockingSchedulerPriority,
@@ -67,15 +58,9 @@ import {
   supportsMicrotasks,
   scheduleMicrotask,
   shouldAttemptEagerTransition,
-  trackSchedulerEvent,
   noTimeout,
 } from './ReactFiberConfig';
 
-import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {
-  resetNestedUpdateFlag,
-  syncNestedUpdateFlag,
-} from './ReactProfilerTimer';
 import {peekEntangledActionLane} from './ReactFiberAsyncAction';
 
 import noop from 'shared/noop';
@@ -96,10 +81,6 @@ let lastScheduledRoot: FiberRoot | null = null;
 
 // Used to prevent redundant mircotasks from being scheduled.
 let didScheduleMicrotask: boolean = false;
-// `act` "microtasks" are scheduled on the `act` queue instead of an actual
-// microtask, so we have to dedupe those separately. This wouldn't be an issue
-// if we required all `act` calls to be awaited, which we might in the future.
-let didScheduleMicrotask_act: boolean = false;
 
 // Used to quickly bail out of flushSync if there's no sync work to do.
 let mightHavePendingSyncWork: boolean = false;
@@ -177,7 +158,7 @@ function flushSyncWorkAcrossRoots_impl(
     didPerformSomeWork = false;
     let root = firstScheduledRoot;
     while (root !== null) {
-      if (onlyLegacy && (disableLegacyMode || root.tag !== LegacyRoot)) {
+      if (onlyLegacy) {
         // Skip non-legacy roots.
       } else {
         if (syncTransitionLanes !== NoLanes) {
@@ -202,9 +183,7 @@ function flushSyncWorkAcrossRoots_impl(
             rootHasPendingCommit,
           );
           if (
-            (includesSyncLane(nextLanes) ||
-              (enableGestureTransition && isGestureRender(nextLanes))) &&
-            !checkIfRootIsPrerendering(root, nextLanes)
+            (includesSyncLane(nextLanes) || isGestureRender(nextLanes)) && !checkIfRootIsPrerendering(root, nextLanes)
           ) {
             // This root has pending sync work. Flush it now.
             didPerformSomeWork = true;
@@ -237,7 +216,7 @@ function processRootScheduleInMicrotask() {
       // render it synchronously anyway. We do this during a popstate event to
       // preserve the scroll position of the previous page.
       syncTransitionLanes = currentEventTransitionLane;
-    } else if (enableDefaultTransitionIndicator) {
+    } else {
       // If we have a Transition scheduled by this event it might be paired
       // with Default lane scheduled loading indicators. To unbatch it from
       // other events later on, flush it early to determine whether it
@@ -285,8 +264,7 @@ function processRootScheduleInMicrotask() {
         syncTransitionLanes !== NoLanes ||
         // Common case: we're not treating any extra lanes as synchronous, so we
         // can just check if the next lanes are sync.
-        includesSyncLane(nextLanes) ||
-        (enableGestureTransition && isGestureRender(nextLanes))
+        includesSyncLane(nextLanes) || isGestureRender(nextLanes)
       ) {
         mightHavePendingSyncWork = true;
       }
@@ -311,9 +289,6 @@ function processRootScheduleInMicrotask() {
 }
 
 function startDefaultTransitionIndicatorIfNeeded() {
-  if (!enableDefaultTransitionIndicator) {
-    return;
-  }
   // Check if we need to start an isomorphic indicator like if an async action
   // was started.
   startIsomorphicDefaultIndicatorIfNeeded();
@@ -360,24 +335,15 @@ function scheduleTaskForRootDuringMicrotask(
   markStarvedLanesAsExpired(root, currentTime);
 
   // Determine the next lanes to work on, and their priority.
-  const rootWithPendingPassiveEffects = getRootWithPendingPassiveEffects();
-  const pendingPassiveEffectsLanes = getPendingPassiveEffectsLanes();
   const workInProgressRoot = getWorkInProgressRoot();
   const workInProgressRootRenderLanes = getWorkInProgressRootRenderLanes();
   const rootHasPendingCommit =
     root.cancelPendingCommit !== null || root.timeoutHandle !== noTimeout;
-  const nextLanes =
-    enableYieldingBeforePassive && root === rootWithPendingPassiveEffects
-      ? // This will schedule the callback at the priority of the lane but we used to
-        // always schedule it at NormalPriority. Discrete will flush it sync anyway.
-        // So the only difference is Idle and it doesn't seem necessarily right for that
-        // to get upgraded beyond something important just because we're past commit.
-        pendingPassiveEffectsLanes
-      : getNextLanes(
-          root,
-          root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
-          rootHasPendingCommit,
-        );
+  const nextLanes = getNextLanes(
+    root,
+    root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
+    rootHasPendingCommit,
+  );
 
   const existingCallbackNode = root.callbackNode;
   if (
@@ -645,11 +611,9 @@ export function didCurrentEventScheduleTransition(): boolean {
 }
 
 export function markIndicatorHandled(root: FiberRoot): void {
-  if (enableDefaultTransitionIndicator) {
-    // The current transition event rendered a synchronous loading state.
-    // Clear it from the indicator lanes. We don't need to show a separate
-    // loading state for this lane.
-    root.indicatorLanes &= ~currentEventTransitionLane;
-    markIsomorphicIndicatorHandled();
-  }
+  // The current transition event rendered a synchronous loading state.
+  // Clear it from the indicator lanes. We don't need to show a separate
+  // loading state for this lane.
+  root.indicatorLanes &= ~currentEventTransitionLane;
+  markIsomorphicIndicatorHandled();
 }
