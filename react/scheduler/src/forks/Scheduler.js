@@ -42,6 +42,7 @@ export opaque type Task = {
   isQueued?: boolean,
 };
 
+// ? getCurrentTime计算原理
 let getCurrentTime: () => number | DOMHighResTimeStamp;
 const hasPerformanceNow =
   // $FlowFixMe[method-unbinding]

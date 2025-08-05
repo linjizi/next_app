@@ -19,16 +19,9 @@ export type Lane = number;
 export type LaneMap<T> = Array<T>;
 
 import {
-  enableRetryLaneExpiration,
-  enableSchedulingProfiler,
-  enableUpdaterTracking,
   syncLaneExpirationMs,
   transitionLaneExpirationMs,
-  retryLaneExpirationMs,
-  disableLegacyMode,
-  enableDefaultTransitionIndicator,
 } from 'shared/ReactFeatureFlags';
-import {isDevToolsPresent} from './ReactFiberDevToolsHook';
 import {clz32} from './clz32';
 import {LegacyRoot} from './ReactRootTags';
 
@@ -106,50 +99,6 @@ export const HydrationLanes =
 // This function is used for the experimental timeline (react-devtools-timeline)
 // It should be kept in sync with the Lanes values above.
 export function getLabelForLane(lane: Lane): string | void {
-  if (enableSchedulingProfiler) {
-    if (lane & SyncHydrationLane) {
-      return 'SyncHydrationLane';
-    }
-    if (lane & SyncLane) {
-      return 'Sync';
-    }
-    if (lane & InputContinuousHydrationLane) {
-      return 'InputContinuousHydration';
-    }
-    if (lane & InputContinuousLane) {
-      return 'InputContinuous';
-    }
-    if (lane & DefaultHydrationLane) {
-      return 'DefaultHydration';
-    }
-    if (lane & DefaultLane) {
-      return 'Default';
-    }
-    if (lane & TransitionHydrationLane) {
-      return 'TransitionHydration';
-    }
-    if (lane & TransitionLanes) {
-      return 'Transition';
-    }
-    if (lane & RetryLanes) {
-      return 'Retry';
-    }
-    if (lane & SelectiveHydrationLane) {
-      return 'SelectiveHydration';
-    }
-    if (lane & IdleHydrationLane) {
-      return 'IdleHydration';
-    }
-    if (lane & IdleLane) {
-      return 'Idle';
-    }
-    if (lane & OffscreenLane) {
-      return 'Offscreen';
-    }
-    if (lane & DeferredLane) {
-      return 'Deferred';
-    }
-  }
 }
 
 export const NoTimestamp = -1;
@@ -489,9 +438,7 @@ function computeExpirationTime(lane: Lane, currentTime: number) {
       // crashes. There must be some other underlying bug; not super urgent but
       // ideally should figure out why and fix it. Unfortunately we don't have
       // a repro for the crashes, only detected via production metrics.
-      return enableRetryLaneExpiration
-        ? currentTime + retryLaneExpirationMs
-        : NoTimestamp;
+      return NoTimestamp;
     case SelectiveHydrationLane:
     case IdleHydrationLane:
     case IdleLane:
@@ -525,9 +472,7 @@ export function markStarvedLanesAsExpired(
   // We exclude retry lanes because those must always be time sliced, in order
   // to unwrap uncached promises.
   // TODO: Write a test for this
-  let lanes = enableRetryLaneExpiration
-    ? pendingLanes
-    : pendingLanes & ~RetryLanes;
+  let lanes = pendingLanes & ~RetryLanes;
   while (lanes > 0) {
     const index = pickArbitraryLaneIndex(lanes);
     const lane = 1 << index;
@@ -760,10 +705,8 @@ export function createLaneMap<T>(initial: T): LaneMap<T> {
 
 export function markRootUpdated(root: FiberRoot, updateLane: Lane) {
   root.pendingLanes |= updateLane;
-  if (enableDefaultTransitionIndicator) {
-    // Mark that this lane might need a loading indicator to be shown.
-    root.indicatorLanes |= updateLane & TransitionLanes;
-  }
+  // Mark that this lane might need a loading indicator to be shown.
+  root.indicatorLanes |= updateLane & TransitionLanes;
 
   // If there are any suspended transitions, it's possible this new update
   // could unblock them. Clear the suspended lanes so that we can try rendering
@@ -845,9 +788,7 @@ export function markRootFinished(
   root.pingedLanes = NoLanes;
   root.warmLanes = NoLanes;
 
-  if (enableDefaultTransitionIndicator) {
-    root.indicatorLanes &= remainingLanes;
-  }
+  root.indicatorLanes &= remainingLanes;
 
   root.expiredLanes &= remainingLanes;
 
@@ -914,8 +855,7 @@ export function markRootFinished(
     // Note that we only do this if there were no updates since we started
     // rendering. This mirrors the logic in markRootUpdated — whenever we
     // receive an update, we reset all the suspended and pinged lanes.
-    updatedLanes === NoLanes &&
-    !(disableLegacyMode && root.tag === LegacyRoot)
+    updatedLanes === NoLanes && !(root.tag === LegacyRoot)
   ) {
     // We also need to avoid marking a retry lane as suspended if it was already
     // pending before this render. We can't say these are now suspended if they
@@ -1088,50 +1028,11 @@ export function addFiberToLanesMap(
   fiber: Fiber,
   lanes: Lanes | Lane,
 ) {
-  if (!enableUpdaterTracking) {
-    return;
-  }
-  if (!isDevToolsPresent) {
-    return;
-  }
-  const pendingUpdatersLaneMap = root.pendingUpdatersLaneMap;
-  while (lanes > 0) {
-    const index = laneToIndex(lanes);
-    const lane = 1 << index;
-
-    const updaters = pendingUpdatersLaneMap[index];
-    updaters.add(fiber);
-
-    lanes &= ~lane;
-  }
+  return;
 }
 
 export function movePendingFibersToMemoized(root: FiberRoot, lanes: Lanes) {
-  if (!enableUpdaterTracking) {
-    return;
-  }
-  if (!isDevToolsPresent) {
-    return;
-  }
-  const pendingUpdatersLaneMap = root.pendingUpdatersLaneMap;
-  const memoizedUpdaters = root.memoizedUpdaters;
-  while (lanes > 0) {
-    const index = laneToIndex(lanes);
-    const lane = 1 << index;
-
-    const updaters = pendingUpdatersLaneMap[index];
-    if (updaters.size > 0) {
-      updaters.forEach(fiber => {
-        const alternate = fiber.alternate;
-        if (alternate === null || !memoizedUpdaters.has(alternate)) {
-          memoizedUpdaters.add(fiber);
-        }
-      });
-      updaters.clear();
-    }
-
-    lanes &= ~lane;
-  }
+  return;
 }
 
 export function addTransitionToLanesMap(

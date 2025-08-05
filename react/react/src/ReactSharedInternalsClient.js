@@ -60,7 +60,7 @@ export type RendererTask = (boolean) => RendererTask | null;
 const ReactSharedInternals: SharedStateClient = ({
   H: null,
   A: null,
-  T: null, // ? 计算优先级中被使用
+  T: null, // 保存当前Transition，例如startTransition标记为Transition的更新
   S: null,
 }: any);
 if (enableGestureTransition) {
